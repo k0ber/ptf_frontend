@@ -15,7 +15,9 @@ import kotlinx.coroutines.cancel
 
 suspend fun SnackbarHostState.showError(message: String) = showSnackbar(message = message, duration = SnackbarDuration.Long)
 
-fun ComponentContext.componentScope() = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate).also { lifecycle.doOnDestroy { it.cancel() } }
+fun ComponentContext.componentScope() = CoroutineScope(
+    SupervisorJob() + Dispatchers.Main.immediate // todo: Default mb? avoid switching context to often
+).also { lifecycle.doOnDestroy { it.cancel() } }
 
 val iosParallaxScale by lazy {
     stackAnimator { factor, direction, content ->

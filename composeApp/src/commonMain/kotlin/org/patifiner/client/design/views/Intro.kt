@@ -27,20 +27,14 @@ fun PtfIntro(modifier: Modifier = Modifier) {
     ) {
         PtfShadowedText("PATIFINER")
         Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = "Let’s find something interesting..",
-            style = MaterialTheme.typography.titleMedium.copy(
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp,
-                color = MaterialTheme.colorScheme.secondary
-            )
-        )
+        PtfText("Let’s find something interesting..")
     }
 }
 
 @Composable
-fun PtfShadowedText(text: String, fontSize: Int = 34) {
+fun PtfShadowedText(text: String, fontSize: Int = 32, modifier: Modifier = Modifier) {
     Text(
+        modifier = modifier,
         text = text,
         style = MaterialTheme.typography.headlineLarge.copy(
             fontWeight = FontWeight.ExtraBold,
@@ -52,6 +46,19 @@ fun PtfShadowedText(text: String, fontSize: Int = 34) {
                 offset = Offset(0f, 0f),   // смещение (0,0) = ровное свечение
                 blurRadius = 24f           // радиус размытия
             )
+        )
+    )
+}
+
+@Composable
+fun PtfText(text: String, fontSize: Int = 16, modifier: Modifier = Modifier) {
+    Text(
+        modifier = modifier,
+        text = text,
+        style = MaterialTheme.typography.titleMedium.copy(
+            fontWeight = FontWeight.Bold,
+            fontSize = fontSize.sp,
+            color = MaterialTheme.colorScheme.secondary
         )
     )
 }

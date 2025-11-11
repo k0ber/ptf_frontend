@@ -23,12 +23,12 @@ import org.patifiner.client.login.LoginComponent
 import org.patifiner.client.login.ui.LoginScreen
 import org.patifiner.client.profile.ProfileComponent
 import org.patifiner.client.profile.ui.ProfileScreen
-import org.patifiner.client.topics.ui.viewing.UserTopicsScreen
+import org.patifiner.client.viewing.UserTopicsScreen
 import org.patifiner.client.signup.SignupComponent
 import org.patifiner.client.signup.ui.SignupScreen
-import org.patifiner.client.topics.ui.adding.AddUserTopicComponent
-import org.patifiner.client.topics.ui.viewing.UserTopicsComponent
-import org.patifiner.client.topics.ui.adding.AddUserTopicScreen
+import org.patifiner.client.topics.AddUserTopicComponent
+import org.patifiner.client.viewing.UserTopicsComponent
+import org.patifiner.client.topics.ui.AddUserTopicScreen
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalDecomposeApi::class)
 @Composable

@@ -1,8 +1,6 @@
-package org.patifiner.client.topics.ui.viewing
+package org.patifiner.client.viewing
 
 import androidx.compose.runtime.Immutable
-import org.patifiner.client.topics.TopicDto
-import org.patifiner.client.topics.TopicLevel
 import org.patifiner.client.topics.UserTopicDto
 
 sealed interface UserTopicsEvent {

@@ -1,4 +1,4 @@
-package org.patifiner.client.topics.ui.adding
+package org.patifiner.client.topics.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,13 +21,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.patifiner.client.design.AppTheme
-import org.patifiner.client.topics.TopicDto
 import org.patifiner.client.topics.TopicLevel
 
 @Composable
 fun TopicDraftCard(
     modifier: Modifier = Modifier.fillMaxWidth(),
-    draft: UserTopicDraft,
+    draft: UserTopicInfo,
     onLevelChange: (TopicLevel) -> Unit,
     onDescChange: (String) -> Unit,
     onDismiss: () -> Unit,
@@ -38,7 +37,9 @@ fun TopicDraftCard(
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(Modifier.padding(16.dp)) {
-            Text("Add: ${draft.topic.name}", style = MaterialTheme.typography.titleMedium)
+            // todo: add TopicViewModel and draw a new card here
+//            Text("Add: ${draft.topic.name}", style = MaterialTheme.typography.titleMedium)
+            Text("Add Topic", style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.height(8.dp))
 
             Text("Level", style = MaterialTheme.typography.labelLarge)
@@ -79,9 +80,9 @@ fun TopicDraftCard(
 @Composable
 fun TopicDraftCardPreview() {
     AppTheme(forceDarkMode = false) {
-        val fakeTopic = TopicDto(locale = "", id = 1, name = "Topic", slug = "slug", description = null, tags = null, icon = null, parentId = -1, children = emptyList())
+//        val fakeTopic = TopicDto(locale = "", id = 1, name = "Topic", slug = "slug", description = null, tags = null, icon = null, parentId = -1, children = emptyList())
         TopicDraftCard(
-            draft = UserTopicDraft(fakeTopic, level = TopicLevel.NEWBIE, description = ""),
+            draft = UserTopicInfo(level = TopicLevel.NEWBIE, description = ""),
             onLevelChange = {},
             onDescChange = {},
             onConfirm = {},

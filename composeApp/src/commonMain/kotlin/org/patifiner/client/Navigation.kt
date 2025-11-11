@@ -15,8 +15,8 @@ import org.patifiner.client.di.AppGraph
 import org.patifiner.client.login.LoginComponent
 import org.patifiner.client.profile.ProfileComponent
 import org.patifiner.client.signup.SignupComponent
-import org.patifiner.client.topics.ui.adding.AddUserTopicComponent
-import org.patifiner.client.topics.ui.viewing.UserTopicsComponent
+import org.patifiner.client.topics.AddUserTopicComponent
+import org.patifiner.client.viewing.UserTopicsComponent
 
 @Serializable
 enum class ScreenSource { LOAD, LOGIN, SIGNUP }
@@ -98,7 +98,9 @@ class RootComponent(
 
             is Screen.AddUserTopic -> AddUserTopicComponent(
                 componentContext = ctx,
-                repo = auth.topicsRepository,
+                loadUserTopicsTree = { auth.loadUserTopicsTreeUseCase() },
+                searchTopics = { q, tree -> auth.searchTopics(q, tree) },
+                addUserTopic = { topic, draft -> auth.addUserTopic(topic, draft) },
                 onDone = {} // TODO
             )
         }

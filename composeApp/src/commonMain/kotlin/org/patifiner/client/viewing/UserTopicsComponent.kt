@@ -1,4 +1,4 @@
-package org.patifiner.client.topics.ui.viewing
+package org.patifiner.client.viewing
 
 import com.arkivanov.decompose.ComponentContext
 import kotlinx.coroutines.FlowPreview

@@ -1,4 +1,4 @@
-package org.patifiner.client.topics.ui.adding
+package org.patifiner.client.topics.ui
 
 import org.patifiner.client.topics.TopicDto
 

@@ -3,13 +3,6 @@ package org.patifiner.client.topics
 import kotlinx.serialization.Serializable
 
 @Serializable
-enum class TopicLevel {
-    NEWBIE,
-    INTERMEDIATE,
-    ADVANCED,
-}
-
-@Serializable
 data class TopicDto(
     val locale: String,
     val id: Long,
@@ -32,3 +25,6 @@ data class UserTopicDto(
     val level: TopicLevel,
     val description: String?,
 )
+
+@Serializable
+enum class TopicLevel { NEWBIE, INTERMEDIATE, ADVANCED }

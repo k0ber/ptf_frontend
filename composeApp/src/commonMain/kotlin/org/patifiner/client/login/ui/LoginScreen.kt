@@ -5,16 +5,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -34,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import io.github.aakira.napier.Napier
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.patifiner.client.common.Constants
+import org.patifiner.client.common.centeredField
 import org.patifiner.client.common.scrollableScreen
 import org.patifiner.client.common.showError
 import org.patifiner.client.design.AppTheme
@@ -53,7 +47,7 @@ fun LoginScreen(component: LoginComponent, snackbarHostState: SnackbarHostState)
         component.events.collect { event ->
             when (event) {
                 is LoginScreenEvent.Error -> snackbarHostState.showError(event.message)
-                is LoginScreenEvent.FocusOnPassword ->  passwordFocusRequester.requestFocus()
+                is LoginScreenEvent.FocusOnPassword -> passwordFocusRequester.requestFocus()
             }
         }
     }
@@ -83,17 +77,16 @@ fun LoginContent(
     val pass = state.password
     val emailValid = remember(email) { Regex(Constants.EMAIL_REGEX).matches(email) }
     val passValid = pass.length >= Constants.MIN_PASS_LNG
-    val scrollState = rememberScrollState()
+    val screenScroll = rememberScrollState()
 
     Column(
-        modifier = Modifier.scrollableScreen(scrollState)
+        modifier = Modifier.scrollableScreen(screenScroll)
     ) {
-        val fieldsModifier = Modifier.fillMaxWidth().widthIn(max = 40.dp).padding(horizontal = 20.dp)
         Spacer(Modifier.weight(1f))
         PtfIntro(modifier = Modifier.fillMaxWidth().clickable(onClick = { Napier.d { "Click" } }))
         Spacer(Modifier.height(20.dp))
         EmailField(
-            modifier = fieldsModifier,
+            modifier = centeredField(),
             value = email,
             placeholder = "name@example.com",
             onValueChange = onEmailChange,
@@ -104,7 +97,7 @@ fun LoginContent(
         )
         Spacer(Modifier.height(4.dp))
         PasswordField(
-            modifier = fieldsModifier.focusRequester(passwordFocusRequester),
+            modifier = centeredField().focusRequester(passwordFocusRequester),
             value = pass,
             label = "Password",
             onValueChange = onPasswordChange,
@@ -165,6 +158,6 @@ fun LoginPreview() {
 fun LoginPreviewDark() {
     val focusRequester = remember { FocusRequester() }
     AppTheme(forceDarkMode = true) {
-        LoginContent(state = LoginScreenState(), passwordFocusRequester = focusRequester,  onEmailChange = {}, onPasswordChange = {})
+        LoginContent(state = LoginScreenState(), passwordFocusRequester = focusRequester, onEmailChange = {}, onPasswordChange = {})
     }
 }
