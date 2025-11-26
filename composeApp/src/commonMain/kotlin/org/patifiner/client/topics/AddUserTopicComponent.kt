@@ -1,106 +1,98 @@
 package org.patifiner.client.topics
 
+import TopicViewModel
 import com.arkivanov.decompose.ComponentContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.patifiner.client.common.componentScope
 import org.patifiner.client.common.toUserMessage
-import org.patifiner.client.topics.ui.AddTopicEvents
-import org.patifiner.client.topics.ui.AddUserTopicState
-import org.patifiner.client.topics.ui.TopicClickDelegate
-import org.patifiner.client.topics.ui.TopicViewModel
-import org.patifiner.client.topics.ui.UserTopicInfo
+import org.patifiner.client.topics.ui.logic.TopicClickDelegate
+import org.patifiner.client.topics.ui.logic.TreeAction
 
 class AddUserTopicComponent(
     componentContext: ComponentContext,
-    private val loadUserTopicsTree: suspend () -> Result<List<TopicViewModel>>,
+    private val loadWholeTopicsTree: suspend () -> Result<List<TopicViewModel>>,
     private val searchTopics: suspend (String, List<TopicViewModel>) -> Result<List<TopicViewModel>>,
     private val addUserTopic: suspend (TopicViewModel, UserTopicInfo) -> Result<List<UserTopicDto>>,
-    private val onDone: () -> Unit
 ) : ComponentContext by componentContext {
 
     private val scope = componentScope()
 
     private val _state = MutableStateFlow(AddUserTopicState())
-    val state: StateFlow<AddUserTopicState> = _state.asStateFlow()
+    val state = _state.asStateFlow()
 
     private val _events: MutableSharedFlow<AddTopicEvents> = MutableSharedFlow()
     val events = _events.asSharedFlow()
 
     init {
-        loadTree()
+        // todo: suspend functions launched in one scope - we need to subscribe on query after user date loading successfully completed
+        loadUserTopics()
         observeSearch()
+    }
+
+    private fun loadUserTopics() {
+        scope.launch(Dispatchers.Default) {
+            loadWholeTopicsTree()
+                .onSuccess { userTopics -> _state.update { it.copy(userTopicsTree = userTopics) } }
+                .onFailure { e -> _events.emit(AddTopicEvents.Error(e.toUserMessage("Can't load user topics"))) } // todo: how user can retry?
+        }
     }
 
     private fun observeSearch() {
         scope.launch(Dispatchers.Default) {
-            state
-                .map { it.query }
+            state.map { it.query }
                 .distinctUntilChanged()
-                .collectLatest { query ->
+                .combine(_state.map { it.userTopicsTree }) { query, allTopics -> Pair(query, allTopics) }
+                .collectLatest { (query, allTopics) ->
                     if (query.isBlank()) {
                         _state.update { it.copy(searchResult = emptyList()) }
-                        return@collectLatest
-                    }
-
-                    val userTree = _state.value.userTopicsTree
-                    searchTopics(query, userTree)
-                        .onSuccess { topics -> _state.update { it.copy(searchResult = topics) } }
-                        .onFailure { e -> _events.emit(AddTopicEvents.Error(e.toUserMessage())) }
+                    } else if (allTopics.isNotEmpty()) {
+                        searchTopics(query, allTopics)
+                            .onSuccess { found -> _state.update { it.copy(searchResult = found) } }
+                            .onFailure { e -> _events.emit(AddTopicEvents.Error(e.toUserMessage("Search failed"))) }
+                    } // else if (allTopics.isNotEmpty() мы ничего не делаем, пока loadUserTopics не завершится
                 }
         }
     }
 
-    private fun loadTree() {
-        scope.launch(Dispatchers.Default) {
-            loadUserTopicsTree()
-                .onSuccess { tree -> _state.update { it.copy(userTopicsTree = tree) } }
-                .onFailure { e -> _events.emit(AddTopicEvents.Error(e.toUserMessage())) }
+    fun onTopicClick(topic: TopicViewModel) {
+        val dlgAction = TopicClickDelegate.updateStateAfterClick(
+            topic = topic,
+            flatById = _state.value.flatById,
+            openedTopic = _state.value.openedTopic
+        )
+        when (dlgAction) {
+            is TreeAction.OpenDraft -> _state.update { it.copy(draft = UserTopicInfo()) }
+            is TreeAction.ChangeOpened -> _state.update { it.copy(openedTopic = dlgAction.openedTopic, draft = null) }
         }
     }
 
-    fun onQueryChange(value: String) = _state.update { it.copy(query = value) }
-
-    fun onTopicClick(topic: TopicViewModel) {
-        _events.tryEmit(AddTopicEvents.CloseKeyboard)
-        TopicClickDelegate.updateStateAfterClick(topic, _state)
+    fun onBreadcrumbLongClick(topic: TopicViewModel) {
+        _state.update { it.copy(draft = UserTopicInfo(level = TopicLevel.NEWBIE, description = "")) }
     }
 
     fun onDraftConfirm(draft: UserTopicInfo) {
         scope.launch {
             val topic = _state.value.openedTopic ?: return@launch
             addUserTopic(topic, draft)
-                .onSuccess { loadTree() }
+                .onSuccess { loadUserTopics() }
                 .onFailure { e -> _events.emit(AddTopicEvents.Error(e.toUserMessage())) }
 
-            _state.update { it.copy(isDraftOpened = false, draft = null) }
+            _state.update { it.copy(draft = null) }
         }
     }
 
-    fun onBreadcrumbLongClick(topic: TopicViewModel) {
-        _state.update {
-            it.copy(
-                draft = UserTopicInfo(level = TopicLevel.NEWBIE, description = ""),
-                isDraftOpened = true
-            )
-        }
-    }
-
-    fun onDraftDismiss() {
-        _state.update { it.copy(isDraftOpened = false, draft = null) }
-    }
-
-    fun onDraftChange(newDraft: UserTopicInfo) {
-        _state.update { it.copy(draft = newDraft) }
-    }
+    fun onQueryChange(value: String) = _state.update { it.copy(query = value) }
+    fun onDraftChange(newDraft: UserTopicInfo) = _state.update { it.copy(draft = newDraft) }
+    fun onDraftDismiss() = _state.update { it.copy(draft = null) }
 
 }

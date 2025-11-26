@@ -1,15 +1,14 @@
 package org.patifiner.client.topics.ui
 
+import TopicViewModel
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -25,14 +24,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.patifiner.client.common.centeredField
 import org.patifiner.client.common.screen
 import org.patifiner.client.common.showError
+import org.patifiner.client.design.AppTheme
 import org.patifiner.client.design.icons.PtfIcons
 import org.patifiner.client.design.icons.ptficons.IcEmail
 import org.patifiner.client.design.views.PtfShadowedText
 import org.patifiner.client.design.views.PtfText
+import org.patifiner.client.topics.AddTopicEvents
 import org.patifiner.client.topics.AddUserTopicComponent
+import org.patifiner.client.topics.AddUserTopicState
+import org.patifiner.client.topics.UserTopicInfo
+import org.patifiner.client.topics.ui.bottom.TopicDraftBottomSheet
+import org.patifiner.client.topics.ui.topics.TopicsTree
 
 @Composable
 fun AddUserTopicScreen(
@@ -73,19 +79,18 @@ fun AddUserTopicContent(
     onDraftChange: (UserTopicInfo) -> Unit,
     onDraftDismiss: () -> Unit,
     onDraftConfirm: (UserTopicInfo) -> Unit,
-    isPreview: Boolean = false,
 ) {
     Box(modifier = Modifier.screen()) {
         Column(modifier = Modifier.fillMaxSize()) {
             Spacer(Modifier.height(32.dp))
             PtfShadowedText(
-                text = "Add Your Interests !", fontSize = 24,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                text = "Add Your Interests !", fontSize = 24
             )
             Spacer(Modifier.height(64.dp))
             PtfText(
-                text = "What is your best topic ?",
-                modifier = Modifier.align(Alignment.CenterHorizontally)
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                text = "What is your best topic ?"
             )
             Spacer(Modifier.height(8.dp))
             OutlinedTextField(
@@ -94,29 +99,47 @@ fun AddUserTopicContent(
                 onValueChange = onQueryChange,
                 singleLine = true,
                 placeholder = { Text("Search topics...") },
-                shape = RoundedCornerShape(20.dp),
+                shape = RoundedCornerShape(20.dp), // todo: move TextFields colors to Design System
                 colors = OutlinedTextFieldDefaults.colors(unfocusedBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f), focusedBorderColor = MaterialTheme.colorScheme.primary),
                 leadingIcon = { Icon(imageVector = PtfIcons.IcEmail, contentDescription = null, tint = MaterialTheme.colorScheme.primary) })
-            Spacer(Modifier.height(12.dp))
-
-            val topicsScroll = rememberScrollState()
-            AddingTopicsTree(
-                state = state, onTopicClick = onTopicClick,
-                modifier = Modifier.weight(1f)
-                    .fillMaxWidth()
-                    .verticalScroll(topicsScroll)
-                    .padding(horizontal = 8.dp),
+            Spacer(Modifier.height(8.dp))
+            val showResults = state.query.isNotEmpty() && state.searchResult.isNotEmpty()
+            TopicsTree(
+                modifier = Modifier
+                    .wrapContentHeight()
+                    .padding(horizontal = 16.dp),
+                horizontalSpacing = 12.dp,
+                verticalSpacing = 8.dp,
+                tree = if (showResults) state.searchResult else state.userTopicsTree,
+                breadcrumbs = state.breadcrumbs,
+                openedTopic = state.openedTopic,
+                onTopicClick = onTopicClick,
             )
             Spacer(Modifier.height(16.dp))
         }
 
-        if (!isPreview) {
-            TopicDraftBottomSheet(
-                state = state,
-                onDraftChange = onDraftChange,
-                onDraftDismiss = onDraftDismiss,
-                onDraftConfirm = onDraftConfirm
-            )
-        }
+        TopicDraftBottomSheet( // doesn't show in preview by some serious reason
+            state = state,
+            onDraftChange = onDraftChange,
+            onDraftDismiss = onDraftDismiss,
+            onDraftConfirm = onDraftConfirm
+        )
+    }
+}
+
+@Preview
+@Composable
+fun TopicsScreenPreview() {
+    AppTheme {
+        val fakeTree = fakeTopicsTree()
+        val state = AddUserTopicState(userTopicsTree = fakeTree)
+        AddUserTopicContent(
+            state = state,
+            onQueryChange = {},
+            onTopicClick = {},
+            onDraftChange = {},
+            onDraftDismiss = {},
+            onDraftConfirm = {},
+        )
     }
 }

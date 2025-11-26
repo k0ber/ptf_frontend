@@ -4,7 +4,7 @@ import io.ktor.client.network.sockets.ConnectTimeoutException
 import io.ktor.http.HttpStatusCode
 
 
-fun Throwable.toUserMessage(default: String? = null): String = when (this) {
+fun Throwable.toUserMessage(default: String? = null): String = when (this) { // todo: add logging?
     is ConnectTimeoutException -> "Server is not responding. Check your connection"
     is ApiException -> message ?: default?: "Server error: $status"
     else -> default ?: "Something went wrong.. Try again later"

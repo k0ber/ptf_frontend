@@ -83,7 +83,11 @@ fun LoginContent(
         modifier = Modifier.scrollableScreen(screenScroll)
     ) {
         Spacer(Modifier.weight(1f))
-        PtfIntro(modifier = Modifier.fillMaxWidth().clickable(onClick = { Napier.d { "Click" } }))
+        PtfIntro(modifier = Modifier.fillMaxWidth().clickable(onClick = {
+            onEmailChange("qq@mm.mm")
+            onPasswordChange("11111111")
+            onPasswordConfirm()
+        }))
         Spacer(Modifier.height(20.dp))
         EmailField(
             modifier = centeredField(),

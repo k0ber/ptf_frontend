@@ -3,3 +3,4 @@ Generated from SVG by Android Studio Plugin: <right click on svgs folder> -> New
 
 Plugin generate errors in imports - need a screen to clean up
 
+Need to optimize usage with cache (preload?)

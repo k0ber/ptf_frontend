@@ -12,10 +12,8 @@ data class TopicDto(
     val tags: List<String>?,
     val icon: String?,
     val parentId: Long?,
-    val children: List<TopicDto> = emptyList()
-) {
-    fun hasChild(another: TopicDto?): Boolean = another != null && (this == another || children.any { it.hasChild(another) })
-}
+    val childrenIds: List<Long> = emptyList()
+)
 
 @Serializable
 data class UserTopicDto(

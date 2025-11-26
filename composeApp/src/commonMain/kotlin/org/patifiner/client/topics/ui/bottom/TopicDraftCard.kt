@@ -1,4 +1,4 @@
-package org.patifiner.client.topics.ui
+package org.patifiner.client.topics.ui.bottom
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.patifiner.client.design.AppTheme
 import org.patifiner.client.topics.TopicLevel
+import org.patifiner.client.topics.UserTopicInfo
 
 @Composable
 fun TopicDraftCard(

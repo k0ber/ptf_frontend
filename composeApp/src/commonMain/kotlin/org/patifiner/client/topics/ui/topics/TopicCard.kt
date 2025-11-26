@@ -1,17 +1,23 @@
-package org.patifiner.client.topics.ui
+package org.patifiner.client.topics.ui.topics
 
+import TopicViewModel
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredWidthIn
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
@@ -20,42 +26,51 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.patifiner.client.design.AppTheme
 import org.patifiner.client.topics.TopicLevel
+import org.patifiner.client.topics.UserTopicInfo
 
 
 @Composable
 fun TopicCard(
     topic: TopicViewModel,
+    isOpened: Boolean,
     isInBreadcrumb: Boolean,
-    isSelected: Boolean,
-    isExpanded: Boolean,
     onClick: (TopicViewModel) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val borderColor = (if (isOpened) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.secondary).copy(alpha = 0.5f)
+    val backgroundColor = MaterialTheme.colorScheme.surface
+
+    if (isInBreadcrumb || isOpened) MaterialTheme.colorScheme.primary.copy(alpha = 0.7f) else MaterialTheme.colorScheme.secondary
+    // todo: indications and colors
     Surface(
-        shape = RoundedCornerShape(40.dp),
-        tonalElevation = if (isExpanded) 6.dp else 1.dp,
-        shadowElevation = if (isExpanded) 4.dp else 0.dp,
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.4f)),
-        color = if (isExpanded) MaterialTheme.colorScheme.primary.copy(alpha = 0.1f) else MaterialTheme.colorScheme.surface,
         modifier = modifier
-            .wrapContentSize()
-            .clickable { onClick(topic) }
-            .padding(vertical = 4.dp)
+            .wrapContentHeight()
+            .clickable { onClick(topic) },
+        shape = RoundedCornerShape(40.dp),
+        border = BorderStroke(1.dp, borderColor),
+        color = backgroundColor,
     ) {
+        val textColor = when {
+            isInBreadcrumb -> MaterialTheme.colorScheme.primary
+            isInBreadcrumb -> MaterialTheme.colorScheme.secondary
+            else -> MaterialTheme.colorScheme.onSurface
+        }
         Text(
             text = topic.name,
-            modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
-            style = MaterialTheme.typography.bodyLarge.copy(
-                fontWeight = if (isExpanded) FontWeight.SemiBold else FontWeight.Normal,
-                color = if (isExpanded)
-                    MaterialTheme.colorScheme.primary
-                else
-                    MaterialTheme.colorScheme.onSurface
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+            style = MaterialTheme.typography.titleSmall.copy(
+                fontWeight = if (isInBreadcrumb) FontWeight.SemiBold else FontWeight.Normal,
+                color = textColor
             )
         )
     }
 }
 
+/**
+ * isOpened -> AppTheme.colors.primary.copy(alpha = 0.25f)
+ * isBreadcrumb -> AppTheme.colors.primary.copy(alpha = 0.12f)
+ * else -> AppTheme.colors.surfaceVariant
+ */
 @Composable
 fun TopicCardColored(
     topic: TopicViewModel,
@@ -145,6 +160,15 @@ fun TopicCardPreview() {
             children = emptyList(),
             userInfo = UserTopicInfo(level = TopicLevel.INTERMEDIATE, description = "I like it")
         )
-        TopicCard(topic = topic, isInBreadcrumb = true, isSelected = true, isExpanded = false, onClick = {})
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(text = "isInBreadcrumb = false, isOpened = false")
+            TopicCard(topic = topic, isInBreadcrumb = false, isOpened = false, onClick = {})
+            Text(text = "isInBreadcrumb = false, isOpened = true")
+            TopicCard(topic = topic, isInBreadcrumb = false, isOpened = true, onClick = {})
+            Text(text = "isInBreadcrumb = true, isOpened = false")
+            TopicCard(topic = topic, isInBreadcrumb = true, isOpened = false, onClick = {})
+            Text(text = "isInBreadcrumb = true, isOpened = true")
+            TopicCard(topic = topic, isInBreadcrumb = true, isOpened = true, onClick = {})
+        }
     }
 }

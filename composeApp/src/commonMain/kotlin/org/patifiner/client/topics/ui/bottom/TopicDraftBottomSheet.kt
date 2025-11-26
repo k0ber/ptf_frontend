@@ -1,4 +1,4 @@
-package org.patifiner.client.topics.ui
+package org.patifiner.client.topics.ui.bottom
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,6 +14,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import org.patifiner.client.topics.AddUserTopicState
+import org.patifiner.client.topics.UserTopicInfo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,3 +58,5 @@ fun TopicDraftBottomSheet(
         }
     }
 }
+
+// todo: add preview

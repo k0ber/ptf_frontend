@@ -18,6 +18,7 @@ import org.patifiner.client.signup.SignupComponent
 import org.patifiner.client.topics.AddUserTopicComponent
 import org.patifiner.client.viewing.UserTopicsComponent
 
+// todo: svalka
 @Serializable
 enum class ScreenSource { LOAD, LOGIN, SIGNUP }
 
@@ -98,10 +99,10 @@ class RootComponent(
 
             is Screen.AddUserTopic -> AddUserTopicComponent(
                 componentContext = ctx,
-                loadUserTopicsTree = { auth.loadUserTopicsTreeUseCase() },
+                loadWholeTopicsTree = { auth.loadUserTopicsTreeUseCase() },
                 searchTopics = { q, tree -> auth.searchTopics(q, tree) },
                 addUserTopic = { topic, draft -> auth.addUserTopic(topic, draft) },
-                onDone = {} // TODO
+//                onDone = {} // TODO
             )
         }
     }

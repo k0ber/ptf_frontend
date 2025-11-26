@@ -37,8 +37,7 @@ class LoginComponent(
         if (state.loading) return
         _state.update { it.copy(loading = true) }
 
-        val loginRequest = TokenRequest("john.doe@example.com", "Password123")
-//        val loginRequest = TokenRequest(state.email, state.password)
+        val loginRequest = TokenRequest(state.email, state.password)
         scope.launch {
             Napier.d { "LoginComponent -> login called" }
             login(loginRequest)
