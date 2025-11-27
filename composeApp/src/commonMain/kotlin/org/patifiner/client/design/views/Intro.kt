@@ -63,6 +63,19 @@ fun PtfText(text: String, fontSize: Int = 16, modifier: Modifier = Modifier) {
     )
 }
 
+@Composable
+fun PtfInputExampleText(text: String, fontSize: Int = 14, modifier: Modifier = Modifier) {
+    Text(
+        modifier = modifier,
+        text = text,
+        style = MaterialTheme.typography.bodyMedium.copy(
+            fontWeight = FontWeight.Medium,
+            fontSize = fontSize.sp,
+            color = MaterialTheme.colorScheme.outline
+        )
+    )
+}
+
 // ===============================================================================================
 @Preview
 @Composable

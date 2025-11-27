@@ -65,9 +65,11 @@ fun AddUserTopicScreen(
         state = state,
         onQueryChange = component::onQueryChange,
         onTopicClick = component::onTopicClick,
+
+
         onDraftChange = component::onDraftChange,
         onDraftDismiss = component::onDraftDismiss,
-        onDraftConfirm = component::onDraftConfirm
+        onDraftConfirm = component::onDraftConfirm,
     )
 }
 
@@ -118,12 +120,16 @@ fun AddUserTopicContent(
             Spacer(Modifier.height(16.dp))
         }
 
-        TopicDraftBottomSheet( // doesn't show in preview by some serious reason
-            state = state,
-            onDraftChange = onDraftChange,
-            onDraftDismiss = onDraftDismiss,
-            onDraftConfirm = onDraftConfirm
-        )
+        if (state.isDraftOpened && state.draft != null && state.openedTopic != null) {
+            val currentDraft = state.draft
+            TopicDraftBottomSheet(
+                topic = state.openedTopic,
+                draft = currentDraft,
+                onDraftChange = onDraftChange,
+                onDismiss = onDraftDismiss,
+                onConfirm = { onDraftConfirm(currentDraft) },
+            )
+        }
     }
 }
 

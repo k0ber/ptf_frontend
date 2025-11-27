@@ -65,8 +65,12 @@ fun mapTreeToViewModel(tree: List<TopicDto>, userTopics: List<UserTopicDto>): Li
             .mapNotNull { childId -> buildNodeRecursively(childId) }
 
         // 3. Создаем UserInfo и конечный узел с использованием функции-расширения
-        val userInfo = userTopicsById[dto.id]?.let {
-            UserTopicInfo(level = it.level, description = it.description ?: "")
+        val userInfo = userTopicsById[dto.id]?.let { userDto ->
+            UserTopicInfo(
+                topicId = userDto.topic.id,
+                level = userDto.level,
+                description = userDto.description ?: ""
+            )
         }
 
         val finalNode = dto.toViewModel(userInfo, childrenViewModels)

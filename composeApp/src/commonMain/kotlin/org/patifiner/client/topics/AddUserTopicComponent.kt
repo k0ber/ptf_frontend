@@ -71,14 +71,23 @@ class AddUserTopicComponent(
             openedTopic = _state.value.openedTopic
         )
         when (dlgAction) {
-            is TreeAction.OpenDraft -> _state.update { it.copy(draft = UserTopicInfo()) }
+            is TreeAction.OpenDraft -> {
+                val initialDraft = UserTopicInfo(
+                    topicId = topic.id,
+                    level = topic.userInfo?.level ?: TopicLevel.NONE,
+                    description = topic.userInfo?.description ?: ""
+                )
+                _state.update { it.copy(draft = initialDraft) }
+            }
+
             is TreeAction.ChangeOpened -> _state.update { it.copy(openedTopic = dlgAction.openedTopic, draft = null) }
         }
     }
 
-    fun onBreadcrumbLongClick(topic: TopicViewModel) {
-        _state.update { it.copy(draft = UserTopicInfo(level = TopicLevel.NEWBIE, description = "")) }
-    }
+    // todo: you can add breadcrumb by long click (?)
+//    fun onBreadcrumbLongClick(topic: TopicViewModel) {
+//        _state.update { it.copy(draft = UserTopicInfo(level = TopicLevel.NEWBIE, description = "")) }
+//    }
 
     fun onDraftConfirm(draft: UserTopicInfo) {
         scope.launch {

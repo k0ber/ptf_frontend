@@ -1,6 +1,9 @@
 package org.patifiner.client.topics
 
 import kotlinx.serialization.Serializable
+import org.patifiner.client.topics.TopicLevel.ADVANCED
+import org.patifiner.client.topics.TopicLevel.INTERMEDIATE
+import org.patifiner.client.topics.TopicLevel.NEWBIE
 
 @Serializable
 data class TopicDto(
@@ -25,4 +28,8 @@ data class UserTopicDto(
 )
 
 @Serializable
-enum class TopicLevel { NEWBIE, INTERMEDIATE, ADVANCED }
+enum class TopicLevel(val mark: String) {
+    NONE(""), NEWBIE("★"), INTERMEDIATE("★★"), ADVANCED("★★★");
+}
+
+fun presentableTopicLevels(): List<TopicLevel> = listOf(NEWBIE, INTERMEDIATE, ADVANCED)

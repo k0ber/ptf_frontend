@@ -30,6 +30,7 @@ data class AddUserTopicState(
 
 @Immutable
 data class UserTopicInfo(
-    val level: TopicLevel = TopicLevel.NEWBIE,
+    val topicId: Long,
+    val level: TopicLevel = TopicLevel.NONE,
     val description: String = ""
 )
