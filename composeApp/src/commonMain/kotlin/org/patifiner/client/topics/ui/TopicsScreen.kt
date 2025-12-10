@@ -25,8 +25,8 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import org.patifiner.client.common.centeredField
-import org.patifiner.client.common.screen
+import org.patifiner.client.design.centeredField
+import org.patifiner.client.design.screen
 import org.patifiner.client.common.showError
 import org.patifiner.client.design.AppTheme
 import org.patifiner.client.design.icons.PtfIcons

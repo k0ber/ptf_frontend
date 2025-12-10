@@ -24,11 +24,10 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import io.github.aakira.napier.Napier
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.patifiner.client.common.Constants
-import org.patifiner.client.common.centeredField
-import org.patifiner.client.common.scrollableScreen
+import org.patifiner.client.design.centeredField
+import org.patifiner.client.design.scrollableScreen
 import org.patifiner.client.common.showError
 import org.patifiner.client.design.AppTheme
 import org.patifiner.client.design.views.EmailField

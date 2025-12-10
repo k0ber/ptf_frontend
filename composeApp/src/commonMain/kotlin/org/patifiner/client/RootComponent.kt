@@ -18,31 +18,6 @@ import org.patifiner.client.signup.SignupComponent
 import org.patifiner.client.topics.AddUserTopicComponent
 import org.patifiner.client.viewing.UserTopicsComponent
 
-// todo: svalka
-@Serializable
-enum class ScreenSource { LOAD, LOGIN, SIGNUP }
-
-@Serializable
-enum class TopicAction { ADD }
-
-@Serializable
-sealed interface Screen {
-    @Serializable
-    data object Login : Screen
-
-    @Serializable
-    data object Signup : Screen
-
-    @Serializable
-    data class Profile(val source: ScreenSource) : Screen
-
-    @Serializable
-    data class UserTopics(val action: TopicAction) : Screen
-
-    @Serializable
-    data object AddUserTopic : Screen
-}
-
 class RootComponent(
     componentContext: ComponentContext,
     private val appGraph: AppGraph

@@ -12,13 +12,9 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.compose.stack.Children
-import com.arkivanov.decompose.extensions.compose.stack.animation.plus
-import com.arkivanov.decompose.extensions.compose.stack.animation.predictiveback.predictiveBackAnimation
-import com.arkivanov.decompose.extensions.compose.stack.animation.slide
-import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
 import dev.zacsweers.metro.createGraphFactory
-import org.patifiner.client.common.iosParallaxScale
 import org.patifiner.client.design.AppTheme
+import org.patifiner.client.design.childrenAnimation
 import org.patifiner.client.design.views.AppScaffold
 import org.patifiner.client.di.AppGraph
 import org.patifiner.client.di.binds.BindsCommon
@@ -34,6 +30,10 @@ import org.patifiner.client.topics.ui.AddUserTopicScreen
 import org.patifiner.client.viewing.UserTopicsComponent
 import org.patifiner.client.viewing.UserTopicsScreen
 
+// TODO ITERATION [2]
+// TODO: BOTTOM NAV BAR with navigation
+// TODO: ACTION BAR (for some screens might be needed
+// TODO: PROFILE WITH IMAGE UPLOAD
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalDecomposeApi::class, ExperimentalSharedTransitionApi::class)
 @Composable
@@ -60,11 +60,7 @@ fun App(componentContext: DefaultComponentContext) {
 
                     Children(
                         stack = root.stack,
-                        animation = predictiveBackAnimation(
-                            backHandler = root.backHandler,
-                            onBack = root::pop,
-                            fallbackAnimation = stackAnimation(slide() + iosParallaxScale) // iOS-ish
-                        ),                   // stackAnimation(slide() + scale()) // Material-ish
+                        animation = childrenAnimation(root),
                     ) { child ->
                         when (val instance = child.instance) {
                             is ProfileComponent -> ProfileScreen(instance, snackbarHost)
