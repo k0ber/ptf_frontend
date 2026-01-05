@@ -22,7 +22,6 @@ class SignupComponent(
     componentContext: ComponentContext,
     private val createUser: suspend (SignupRequest) -> Result<Unit>,
     private val navigateBackToLogin: () -> Unit,
-    private val navigateToProfile: () -> Unit
 ) : ComponentContext by componentContext {
 
     private val scope = componentScope()
@@ -53,10 +52,7 @@ class SignupComponent(
         scope.launch {
             Napier.d { "SignupComponent -> createUser called" }
             createUser(state.toRequest())
-                .onSuccess {
-                    Napier.d { "SignupComponent -> success" }
-                    navigateToProfile()
-                }
+                .onSuccess { Napier.d { "SignupComponent -> success" } }
                 .onFailure { e ->
                     Napier.e { "SignupComponent -> failed: $e" }
                     _events.emit(SignupEvent.Error(e.toUserMessage("Registration failed")))

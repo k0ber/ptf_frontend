@@ -13,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -72,6 +71,19 @@ fun PtfInputExampleText(text: String, fontSize: Int = 14, modifier: Modifier = M
             fontWeight = FontWeight.Medium,
             fontSize = fontSize.sp,
             color = MaterialTheme.colorScheme.outline
+        )
+    )
+}
+
+@Composable
+fun PtfWarningText(text: String, fontSize: Int = 14, modifier: Modifier = Modifier) {
+    Text(
+        modifier = modifier,
+        text = text,
+        style = MaterialTheme.typography.bodyMedium.copy(
+            fontWeight = FontWeight.Medium,
+            fontSize = fontSize.sp,
+            color = MaterialTheme.colorScheme.error
         )
     )
 }

@@ -1,88 +1,87 @@
 package org.patifiner.client
 
 import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.decompose.DelicateDecomposeApi
+import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.router.stack.pop
-import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.router.stack.replaceAll
-import io.github.aakira.napier.Napier
-import kotlinx.coroutines.launch
+import com.arkivanov.decompose.value.Value
+import dev.zacsweers.metro.Inject
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.serialization.Serializable
 import org.patifiner.client.common.componentScope
-import org.patifiner.client.di.AppGraph
+import org.patifiner.client.design.BackableComponent
 import org.patifiner.client.login.LoginComponent
-import org.patifiner.client.profile.ProfileComponent
+import org.patifiner.client.main.MainComponent
 import org.patifiner.client.signup.SignupComponent
-import org.patifiner.client.topics.AddUserTopicComponent
-import org.patifiner.client.viewing.UserTopicsComponent
 
-class RootComponent(
-    componentContext: ComponentContext,
-    private val appGraph: AppGraph
-) : ComponentContext by componentContext {
+@Serializable sealed interface RootConfig {
+    @Serializable data object Main : RootConfig
+    @Serializable data object Login : RootConfig
+    @Serializable data object Signup : RootConfig
+}
+
+sealed interface RootChild {
+    data class Login(val component: LoginComponent) : RootChild
+    data class Signup(val component: SignupComponent) : RootChild
+    data class Main(val component: MainComponent) : RootChild
+}
+
+@Inject
+class RootComponent(componentContext: ComponentContext, private val rootGraph: RootGraph) : ComponentContext by componentContext, BackableComponent {
+    private val authRepo = rootGraph.authRepo
+    private val mainGraphFactory = rootGraph.mainGraphFactory
+    private val navigation = StackNavigation<RootConfig>()
     private val scope = componentScope()
-    private val nav = StackNavigation<Screen>()
-    private val authRepo get() = appGraph.authRepo
-    private val auth get() = requireNotNull(authRepo.loggedInGraph) // todo danger
+
+    val isOnline: StateFlow<Boolean> = rootGraph.networkObserver.isOnline
+
+    val stack: Value<ChildStack<RootConfig, RootChild>> = childStack(
+        source = navigation,
+        serializer = RootConfig.serializer(),
+        initialConfiguration = if (authRepo.tokenFlow.value != null) RootConfig.Main else RootConfig.Login,
+        handleBackButton = true,
+        childFactory = ::createChild
+    )
 
     init {
-        Napier.d { "RootComponent Init" }
-        scope.launch {
-            appGraph.authRepo.isLoggedFlow.collect { loggedIn ->
-                nav.replaceAll(if (loggedIn) Screen.Profile(ScreenSource.LOGIN) else Screen.Login)
+        authRepo.tokenFlow.onEach { token ->
+            val showMain = token != null && stack.value.active.configuration !is RootConfig.Main
+            navigation.replaceAll(if (showMain) RootConfig.Main else RootConfig.Login)
+        }.launchIn(scope)
+    }
+
+    private fun createChild(config: RootConfig, componentContext: ComponentContext): RootChild {
+        return when (config) {
+            is RootConfig.Login -> RootChild.Login(
+                component = LoginComponent(
+                    componentContext = componentContext,
+                    login = { req -> rootGraph.loginUseCase(req) },
+                    navToSignup = { navigation.replaceAll(RootConfig.Signup) }
+                )
+            )
+
+            is RootConfig.Signup -> RootChild.Signup(
+                SignupComponent(
+                    componentContext = componentContext,
+                    createUser = { req -> rootGraph.signupUseCase(req) },
+                    navigateBackToLogin = { navigation.replaceAll(RootConfig.Login) }
+                )
+            )
+
+            is RootConfig.Main -> {
+                val mainGraph = mainGraphFactory.create(common = rootGraph.commonBinds)
+                val mainComponent = mainGraph.mainComponentFactory().create(
+                    componentContext = componentContext,
+                )
+                RootChild.Main(mainComponent)
             }
         }
     }
 
-    @OptIn(DelicateDecomposeApi::class)
-    val stack = childStack(
-        source = nav,
-        serializer = Screen.serializer(),
-        initialConfiguration = if (authRepo.isLogged) Screen.Profile(ScreenSource.LOAD) else Screen.Login,
-        handleBackButton = true
-    ) { screen, ctx ->
-        when (screen) {
-            Screen.Login -> LoginComponent(
-                componentContext = ctx,
-                login = { req -> appGraph.loginUseCase(req) },
-                navToSignup = { nav.push(Screen.Signup) },
-            )
+    override fun back() = navigation.pop()
 
-            Screen.Signup -> SignupComponent(
-                componentContext = ctx,
-                createUser = { req -> appGraph.signupUseCase(req) },
-                navigateBackToLogin = { nav.pop() },
-                navigateToProfile = { nav.replaceAll(Screen.Profile(ScreenSource.SIGNUP)) },
-            )
-
-            is Screen.Profile -> ProfileComponent(
-                componentContext = ctx,
-                source = screen.source,
-                loadProfile = { auth.loadProfile() },
-                logout = { appGraph.logoutUseCase() },
-                showMyTopics = { nav.push(Screen.UserTopics(TopicAction.ADD)) },
-                addNewTopic = { nav.push(Screen.AddUserTopic) },
-            )
-
-            is Screen.UserTopics -> UserTopicsComponent(
-                componentContext = ctx,
-                repo = auth.topicsRepository,
-                navigateToAdd = {} // TODO
-            )
-
-            is Screen.AddUserTopic -> AddUserTopicComponent(
-                componentContext = ctx,
-                loadWholeTopicsTree = { auth.loadUserTopicsTreeUseCase() },
-                searchTopics = { q, tree -> auth.searchTopics(q, tree) },
-                addUserTopic = { topic, draft -> auth.addUserTopic(topic, draft) },
-//                onDone = {} // TODO
-            )
-        }
-    }
-
-    fun pop() {
-        nav.pop()
-    }
 }

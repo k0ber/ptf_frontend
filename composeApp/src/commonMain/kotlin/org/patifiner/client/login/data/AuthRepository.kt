@@ -5,41 +5,38 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.withContext
-import org.patifiner.client.di.LoggedInGraph
-import org.patifiner.client.di.binds.BindsCommon
+import org.patifiner.client.NetworkObserver
 import org.patifiner.client.login.TokenRequest
 import org.patifiner.client.login.TokenResponse
 import org.patifiner.client.login.UserInfoDto
+import org.patifiner.client.main.MainGraph
 import org.patifiner.client.signup.SignupRequest
 
 
 class AuthRepository(
+    private val appScope: CoroutineScope,
     private val client: HttpClient,
     private val tokenStorage: TokenStorage,
-    private val loggedInGraphFactory: LoggedInGraph.Factory
+    private val loggedInGraphFactory: MainGraph.Factory
 ) {
-    var loggedInGraph: LoggedInGraph? = tokenStorage.token?.let { createAuthGraph() }
-        private set
 
-    val isLogged: Boolean = tokenStorage.token != null
-
-    val isLoggedFlow: Flow<Boolean> = tokenStorage.tokenFlow.map { it != null }
+    val tokenFlow: StateFlow<String?> = tokenStorage.tokenFlow
 
     suspend fun login(loginRequest: TokenRequest): Result<Unit> = runCatching {
         withContext(Dispatchers.Default) {
             val response: TokenResponse = client.post("/user/login") { setBody(loginRequest) }.body()
             tokenStorage.token = response.token
-            loggedInGraph = createAuthGraph()
         }
     }
 
     fun logout() {
         tokenStorage.clear()
-        loggedInGraph = null
     }
 
     suspend fun loadProfile(): Result<UserInfoDto> = runCatching {
@@ -50,6 +47,4 @@ class AuthRepository(
         val response = client.post("/user/create") { setBody(req) }.body<TokenResponse>()
         tokenStorage.token = response.token
     }
-
-    private fun createAuthGraph() = loggedInGraphFactory.createLoggedInGraph(common = object : BindsCommon {})
 }

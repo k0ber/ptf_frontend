@@ -9,50 +9,55 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.view.WindowCompat
-import com.arkivanov.decompose.DefaultComponentContext
+import com.arkivanov.decompose.defaultComponentContext
 import com.arkivanov.essenty.backhandler.BackDispatcher
-import com.arkivanov.essenty.lifecycle.LifecycleRegistry
+import dev.zacsweers.metro.createGraphFactory
 import org.patifiner.client.Platform.appContext
+import org.patifiner.client.binds.BindsCommon
+import org.patifiner.client.binds.BindsNetwork
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         appContext = this
         enableEdgeToEdge()
-        super.onCreate(savedInstanceState)
 
-        WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowCompat.setDecorFitsSystemWindows(window, false) // for keyboard ?
+        val componentContext = defaultComponentContext()
+        val rootComponent = createGraphFactory<RootGraph.Factory>().create(
+            common = object : BindsCommon {},
+            network = object : BindsNetwork {},
+            networkObserver = Platform.networkObserver(),
+            apiConfig = Platform.apiConfig(),
+            engine = Platform.engineFactory(),
+            settings = Platform.settings(),
+            appMainScope = Platform.appMainScope(),
+            componentContext = componentContext,
+        ).rootComponent()
 
         setContent {
-            val lifecycle = remember { LifecycleRegistry() }
-            val essentyBack = remember { BackDispatcher() }
-            val androidBack = LocalOnBackPressedDispatcherOwner.current!!.onBackPressedDispatcher
-
-            DisposableEffect(essentyBack, androidBack) {
-                val callback = object : OnBackPressedCallback(true) {
-                    override fun handleOnBackPressed() {
-                        if (!essentyBack.back()) {
-                            isEnabled = false
-                            androidBack.onBackPressed()
-                            isEnabled = true
-                        }
-                    }
-                }
-                androidBack.addCallback(callback)
-                onDispose { callback.remove() }
-            }
-            val componentContext = remember { DefaultComponentContext(lifecycle = lifecycle, backHandler = essentyBack) }
-            App(componentContext)
+            SetupBackHandle()
+            RootScreen(rootComponent)
         }
     }
-}
 
-@Preview
-@Composable
-fun AppAndroidPreview() {
-    val lifecycle = remember { LifecycleRegistry() }
-    val back = remember { BackDispatcher() }
-    val componentContext = remember { DefaultComponentContext( lifecycle = lifecycle, backHandler = back ) }
-    App(componentContext)
+    @Composable
+    private fun SetupBackHandle() { // возможно ненужно
+        val essentyBack = remember { BackDispatcher() }
+        val androidBack = LocalOnBackPressedDispatcherOwner.current!!.onBackPressedDispatcher
+        DisposableEffect(essentyBack, androidBack) {
+            val callback = object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    if (!essentyBack.back()) {
+                        isEnabled = false
+                        androidBack.onBackPressed()
+                        isEnabled = true
+                    }
+                }
+            }
+            androidBack.addCallback(callback)
+            onDispose { callback.remove() }
+        }
+    }
 }

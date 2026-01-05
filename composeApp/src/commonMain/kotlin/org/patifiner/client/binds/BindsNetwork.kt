@@ -1,4 +1,4 @@
-package org.patifiner.client.di.binds
+package org.patifiner.client.binds
 
 import dev.zacsweers.metro.ContributesTo
 import dev.zacsweers.metro.Provides
@@ -17,15 +17,15 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
-import io.ktor.http.URLProtocol
 import io.ktor.http.append
 import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import org.patifiner.client.ApiConfig
+import org.patifiner.client.AppScope
+import org.patifiner.client.LoggedInScope
 import org.patifiner.client.common.ApiException
 import org.patifiner.client.common.ErrorResponse
-import org.patifiner.client.di.AppScope
-import org.patifiner.client.di.LoggedInScope
 import org.patifiner.client.login.data.TokenStorage
 
 @ContributesTo(AppScope::class)
@@ -37,28 +37,29 @@ interface BindsNetwork {
     fun provideHttp(
         engine: HttpClientEngineFactory<*>,
         json: Json,
+        config: ApiConfig,
         tokenStorage: TokenStorage,
     ): HttpClient = HttpClient(engine) {
+
         expectSuccess = false
         install(ContentNegotiation) { json(json) }
+
         install(Logging) {
             logger = object : Logger {
-                override fun log(message: String) {
-                    Napier.d(message, tag = "Ktor")
-                }
+                override fun log(message: String) = Napier.d(message, tag = "Ktor")
             }
             level = LogLevel.ALL
         }
+
         install(DefaultRequest) {
-            url {
-                protocol = URLProtocol.HTTP
-                host = "10.0.2.2"
-                port = 8080
-            }
+            url(config.baseUrl)
+            url.port = config.port
+
             tokenStorage.token?.let { headers.append(HttpHeaders.Authorization, "Bearer $it") }
             headers.append(HttpHeaders.ContentType, ContentType.Application.Json)
             accept(ContentType.Application.Json)
         }
+
         HttpResponseValidator {
             validateResponse { resp ->
                 if (!resp.status.isSuccess()) {

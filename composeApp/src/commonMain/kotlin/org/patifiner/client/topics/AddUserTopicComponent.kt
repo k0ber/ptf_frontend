@@ -2,6 +2,9 @@ package org.patifiner.client.topics
 
 import TopicViewModel
 import com.arkivanov.decompose.ComponentContext
+import dev.zacsweers.metro.Assisted
+import dev.zacsweers.metro.AssistedFactory
+import dev.zacsweers.metro.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,12 +21,18 @@ import org.patifiner.client.common.toUserMessage
 import org.patifiner.client.topics.ui.logic.TopicClickDelegate
 import org.patifiner.client.topics.ui.logic.TreeAction
 
+@Inject
 class AddUserTopicComponent(
-    componentContext: ComponentContext,
-    private val loadWholeTopicsTree: suspend () -> Result<List<TopicViewModel>>,
-    private val searchTopics: suspend (String, List<TopicViewModel>) -> Result<List<TopicViewModel>>,
-    private val addUserTopic: suspend (TopicViewModel, UserTopicInfo) -> Result<List<UserTopicDto>>,
+    @Assisted componentContext: ComponentContext,
+    private val loadWholeTopicsTree: LoadUserTopicsTreeUseCase,
+    private val searchTopics: SearchTopicsUseCase,
+    private val addUserTopic: AddUserTopicUseCase,
 ) : ComponentContext by componentContext {
+
+    @AssistedFactory
+    fun interface Factory {
+        fun create(componentContext: ComponentContext): AddUserTopicComponent
+    }
 
     private val scope = componentScope()
 

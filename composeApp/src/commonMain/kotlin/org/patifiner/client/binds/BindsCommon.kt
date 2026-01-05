@@ -1,13 +1,13 @@
-package org.patifiner.client.di.binds
+package org.patifiner.client.binds
 
 import com.russhwolf.settings.Settings
 import dev.zacsweers.metro.ContributesTo
 import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 import io.ktor.client.HttpClient
-import org.patifiner.client.di.AppScope
-import org.patifiner.client.di.LoggedInGraph
-import org.patifiner.client.di.LoggedInScope
+import kotlinx.coroutines.CoroutineScope
+import org.patifiner.client.AppScope
+import org.patifiner.client.LoggedInScope
 import org.patifiner.client.login.LoadProfileUseCase
 import org.patifiner.client.login.LoginUseCase
 import org.patifiner.client.login.LogoutUseCase
@@ -15,7 +15,7 @@ import org.patifiner.client.login.SignupUseCase
 import org.patifiner.client.login.data.AuthRepository
 import org.patifiner.client.login.data.TokenStorage
 import org.patifiner.client.login.data.TokenStorageImpl
-import org.patifiner.client.topics.data.TopicsRepository
+import org.patifiner.client.main.MainGraph
 
 
 @ContributesTo(AppScope::class)
@@ -28,7 +28,8 @@ interface BindsCommon {
 
     @Provides
     @SingleIn(AppScope::class)
-    fun provideAuthRepo(http: HttpClient, ts: TokenStorage, fct: LoggedInGraph.Factory): AuthRepository = AuthRepository(http, ts, fct)
+    fun provideAuthRepo(appScope: CoroutineScope, http: HttpClient, ts: TokenStorage, fct: MainGraph.Factory): AuthRepository =
+        AuthRepository(appScope, http, ts, fct)
 
     @Provides
     @SingleIn(AppScope::class)

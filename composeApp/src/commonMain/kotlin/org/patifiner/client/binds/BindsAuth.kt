@@ -1,10 +1,10 @@
-package org.patifiner.client.di.binds
+package org.patifiner.client.binds
 
 import dev.zacsweers.metro.ContributesTo
 import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 import io.ktor.client.HttpClient
-import org.patifiner.client.di.LoggedInScope
+import org.patifiner.client.LoggedInScope
 import org.patifiner.client.topics.AddUserTopicUseCase
 import org.patifiner.client.topics.LoadUserTopicsTreeUseCase
 import org.patifiner.client.topics.SearchTopicsUseCase

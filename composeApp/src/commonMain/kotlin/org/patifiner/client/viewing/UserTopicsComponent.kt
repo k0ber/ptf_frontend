@@ -1,6 +1,9 @@
 package org.patifiner.client.viewing
 
 import com.arkivanov.decompose.ComponentContext
+import dev.zacsweers.metro.Assisted
+import dev.zacsweers.metro.AssistedFactory
+import dev.zacsweers.metro.Inject
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,12 +15,19 @@ import org.patifiner.client.common.componentScope
 import org.patifiner.client.topics.data.RemoveUserTopicsRequest
 import org.patifiner.client.topics.data.TopicsRepository
 
-@OptIn(FlowPreview::class)
+@Inject
 class UserTopicsComponent(
-    componentContext: ComponentContext,
+    @Assisted private val componentContext: ComponentContext,
+    @Assisted private val navigateToAdd: () -> Unit,
     private val repo: TopicsRepository,
-    private val navigateToAdd: () -> Unit,
 ) : ComponentContext by componentContext {
+
+    @AssistedFactory fun interface Factory {
+        fun create(
+            componentContext: ComponentContext,
+            naviAddTopic: () -> Unit
+        ): UserTopicsComponent
+    }
 
     private val scope = componentScope()
     private val _state = MutableStateFlow(UserTopicsState())
@@ -53,5 +63,7 @@ class UserTopicsComponent(
             }
     }
 
-    fun onAddClick() { navigateToAdd() }
+    fun onAddClick() {
+        navigateToAdd()
+    }
 }
