@@ -7,10 +7,9 @@ import com.arkivanov.decompose.router.stack.bringToFront
 import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.decompose.value.operator.map
-import dev.zacsweers.metro.Assisted
-import dev.zacsweers.metro.AssistedFactory
-import dev.zacsweers.metro.Inject
 import kotlinx.serialization.Serializable
+import org.koin.core.component.KoinComponent
+import org.koin.core.scope.Scope
 import org.patifiner.client.profile.ProfileComponent
 import org.patifiner.client.topics.AddUserTopicComponent
 import org.patifiner.client.viewing.UserTopicsComponent
@@ -27,17 +26,10 @@ sealed interface MainChild {
     data class AddUserTopic(val component: AddUserTopicComponent) : MainChild
 }
 
-@Inject
 class MainComponent(
-    @Assisted componentContext: ComponentContext,
-    private val profileComponentFactory: ProfileComponent.Factory,
-    private val userTopicsComponentFactory: UserTopicsComponent.Factory,
-    private val addUserTopicComponentFactory: AddUserTopicComponent.Factory
-) : ComponentContext by componentContext {
-
-    @AssistedFactory fun interface Factory {
-        fun create(componentContext: ComponentContext): MainComponent
-    }
+    componentContext: ComponentContext,
+    private val koinScope: Scope
+) : ComponentContext by componentContext, KoinComponent {
 
     private val tabsNavigation = StackNavigation<MainConfig>()
 
@@ -54,21 +46,21 @@ class MainComponent(
     private fun createChild(config: MainConfig, componentContext: ComponentContext): MainChild {
         return when (config) {
             is MainConfig.UserTopics -> MainChild.UserTopics(
-                component = userTopicsComponentFactory.create(
+                component = UserTopicsComponent(
                     componentContext = componentContext,
-                    naviAddTopic = { onTabClicked(Tab.ADD_TOPIC) }
+                    koinScope = koinScope,
+                    navigateToAdd = { onTabClicked(Tab.ADD_TOPIC) }
                 )
             )
 
-            is MainConfig.AddUserTopic -> MainChild.AddUserTopic(
-                component = addUserTopicComponentFactory.create(componentContext)
-            )
+            is MainConfig.AddUserTopic -> MainChild.AddUserTopic(component = AddUserTopicComponent(componentContext = componentContext, koinScope = koinScope))
 
             is MainConfig.Profile -> MainChild.Profile(
-                component = profileComponentFactory.create(
+                component = ProfileComponent(
                     componentContext = componentContext,
+                    koinScope = koinScope,
                     navMyTopics = { onTabClicked(Tab.TOPICS) },
-                    navAddTopic = { onTabClicked(Tab.ADD_TOPIC) },
+                    navAddTopic = { onTabClicked(Tab.ADD_TOPIC) }
                 )
             )
         }

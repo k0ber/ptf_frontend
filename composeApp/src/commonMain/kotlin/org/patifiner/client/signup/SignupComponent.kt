@@ -10,8 +10,11 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.patifiner.client.common.componentScope
 import org.patifiner.client.common.toUserMessage
+import org.patifiner.client.login.SignupUseCase
 import org.patifiner.client.signup.ui.SignupUiState
 
 sealed interface SignupEvent {
@@ -20,11 +23,12 @@ sealed interface SignupEvent {
 
 class SignupComponent(
     componentContext: ComponentContext,
-    private val createUser: suspend (SignupRequest) -> Result<Unit>,
     private val navigateBackToLogin: () -> Unit,
-) : ComponentContext by componentContext {
+) : ComponentContext by componentContext, KoinComponent {
 
+    private val signupUseCase: SignupUseCase by inject()
     private val scope = componentScope()
+
     private val _state = MutableStateFlow(SignupUiState())
     private val _events = MutableSharedFlow<SignupEvent>()
 
@@ -51,7 +55,7 @@ class SignupComponent(
 
         scope.launch {
             Napier.d { "SignupComponent -> createUser called" }
-            createUser(state.toRequest())
+            signupUseCase(state.toRequest())
                 .onSuccess { Napier.d { "SignupComponent -> success" } }
                 .onFailure { e ->
                     Napier.e { "SignupComponent -> failed: $e" }

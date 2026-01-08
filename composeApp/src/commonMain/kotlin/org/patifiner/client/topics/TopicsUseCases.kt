@@ -1,7 +1,6 @@
 package org.patifiner.client.topics
 
 import TopicViewModel
-import dev.zacsweers.metro.Inject
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import mapTreeToViewModel
@@ -10,7 +9,6 @@ import org.patifiner.client.topics.data.AddUserTopicsRequest
 import org.patifiner.client.topics.data.RemoveUserTopicsRequest
 import org.patifiner.client.topics.data.TopicsRepository
 
-@Inject
 class LoadUserTopicsTreeUseCase(private val repo: TopicsRepository) {
     suspend operator fun invoke(): Result<List<TopicViewModel>> = runCatching {
         coroutineScope {
@@ -25,7 +23,6 @@ class LoadUserTopicsTreeUseCase(private val repo: TopicsRepository) {
     }
 }
 
-@Inject
 class SearchTopicsUseCase(private val repo: TopicsRepository) {
     suspend operator fun invoke(query: String, userTopicsTree: List<TopicViewModel>): Result<List<TopicViewModel>> = runCatching {
         fun flatten(node: TopicViewModel): List<TopicViewModel> = listOf(node) + node.children.flatMap(::flatten)
@@ -35,7 +32,6 @@ class SearchTopicsUseCase(private val repo: TopicsRepository) {
     }
 }
 
-@Inject
 class AddUserTopicUseCase(private val repo: TopicsRepository) {
     suspend operator fun invoke(topic: TopicViewModel, draft: UserTopicInfo): Result<List<UserTopicDto>> = runCatching {
         val description = draft.description.takeIf { it.isNotBlank() }
@@ -52,7 +48,6 @@ class AddUserTopicUseCase(private val repo: TopicsRepository) {
     }
 }
 
-@Inject
 class RemoveUserTopicUseCase(private val repo: TopicsRepository) {
     suspend operator fun invoke(req: RemoveUserTopicsRequest): Result<Int> = repo.removeUserTopics(req)
 }

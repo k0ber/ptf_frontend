@@ -2,9 +2,6 @@ package org.patifiner.client.topics
 
 import TopicViewModel
 import com.arkivanov.decompose.ComponentContext
-import dev.zacsweers.metro.Assisted
-import dev.zacsweers.metro.AssistedFactory
-import dev.zacsweers.metro.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,23 +13,21 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.scope.Scope
 import org.patifiner.client.common.componentScope
 import org.patifiner.client.common.toUserMessage
 import org.patifiner.client.topics.ui.logic.TopicClickDelegate
 import org.patifiner.client.topics.ui.logic.TreeAction
 
-@Inject
 class AddUserTopicComponent(
-    @Assisted componentContext: ComponentContext,
-    private val loadWholeTopicsTree: LoadUserTopicsTreeUseCase,
-    private val searchTopics: SearchTopicsUseCase,
-    private val addUserTopic: AddUserTopicUseCase,
-) : ComponentContext by componentContext {
+    componentContext: ComponentContext,
+    private val koinScope: Scope
+) : ComponentContext by componentContext, KoinComponent {
 
-    @AssistedFactory
-    fun interface Factory {
-        fun create(componentContext: ComponentContext): AddUserTopicComponent
-    }
+    private val loadWholeTopicsTree: LoadUserTopicsTreeUseCase = koinScope.get()
+    private val searchTopics: SearchTopicsUseCase = koinScope.get()
+    private val addUserTopic: AddUserTopicUseCase = koinScope.get()
 
     private val scope = componentScope()
 

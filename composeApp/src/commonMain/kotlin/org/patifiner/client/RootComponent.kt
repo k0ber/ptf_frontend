@@ -7,14 +7,20 @@ import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.replaceAll
 import com.arkivanov.decompose.value.Value
-import dev.zacsweers.metro.Inject
+import com.arkivanov.essenty.lifecycle.doOnDestroy
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.serialization.Serializable
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import org.koin.core.qualifier.named
 import org.patifiner.client.common.componentScope
 import org.patifiner.client.design.BackableComponent
 import org.patifiner.client.login.LoginComponent
+import org.patifiner.client.login.LoginUseCase
+import org.patifiner.client.login.SignupUseCase
+import org.patifiner.client.login.data.AuthRepository
 import org.patifiner.client.main.MainComponent
 import org.patifiner.client.signup.SignupComponent
 
@@ -30,14 +36,16 @@ sealed interface RootChild {
     data class Main(val component: MainComponent) : RootChild
 }
 
-@Inject
-class RootComponent(componentContext: ComponentContext, private val rootGraph: RootGraph) : ComponentContext by componentContext, BackableComponent {
-    private val authRepo = rootGraph.authRepo
-    private val mainGraphFactory = rootGraph.mainGraphFactory
+class RootComponent(componentContext: ComponentContext) : ComponentContext by componentContext, BackableComponent, KoinComponent {
+    private val authRepo: AuthRepository by inject()
+    private val networkObserver: NetworkObserver by inject()
+    private val loginUseCase: LoginUseCase by inject()
+    private val signupUseCase: SignupUseCase by inject()
+
     private val navigation = StackNavigation<RootConfig>()
     private val scope = componentScope()
 
-    val isOnline: StateFlow<Boolean> = rootGraph.networkObserver.isOnline
+    val isOnline: StateFlow<Boolean> = networkObserver.isOnline
 
     val stack: Value<ChildStack<RootConfig, RootChild>> = childStack(
         source = navigation,
@@ -49,35 +57,32 @@ class RootComponent(componentContext: ComponentContext, private val rootGraph: R
 
     init {
         authRepo.tokenFlow.onEach { token ->
-            val showMain = token != null && stack.value.active.configuration !is RootConfig.Main
-            navigation.replaceAll(if (showMain) RootConfig.Main else RootConfig.Login)
+            val isMainActive = stack.value.active.configuration is RootConfig.Main
+            if (token != null && !isMainActive) navigation.replaceAll(RootConfig.Main)
+            else if (token == null && isMainActive) navigation.replaceAll(RootConfig.Login)
         }.launchIn(scope)
     }
 
     private fun createChild(config: RootConfig, componentContext: ComponentContext): RootChild {
         return when (config) {
-            is RootConfig.Login -> RootChild.Login(
-                component = LoginComponent(
+            RootConfig.Login -> RootChild.Login(
+                LoginComponent(
                     componentContext = componentContext,
-                    login = { req -> rootGraph.loginUseCase(req) },
                     navToSignup = { navigation.replaceAll(RootConfig.Signup) }
                 )
             )
 
-            is RootConfig.Signup -> RootChild.Signup(
+            RootConfig.Signup -> RootChild.Signup(
                 SignupComponent(
                     componentContext = componentContext,
-                    createUser = { req -> rootGraph.signupUseCase(req) },
                     navigateBackToLogin = { navigation.replaceAll(RootConfig.Login) }
                 )
             )
 
             is RootConfig.Main -> {
-                val mainGraph = mainGraphFactory.create(common = rootGraph.commonBinds)
-                val mainComponent = mainGraph.mainComponentFactory().create(
-                    componentContext = componentContext,
-                )
-                RootChild.Main(mainComponent)
+                val sessionScope = getKoin().getOrCreateScope("session_id", named("LoggedInScope"))
+                componentContext.lifecycle.doOnDestroy { sessionScope.close() }
+                RootChild.Main(MainComponent(componentContext = componentContext, koinScope = sessionScope))
             }
         }
     }

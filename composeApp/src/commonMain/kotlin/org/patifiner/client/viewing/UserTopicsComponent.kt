@@ -1,33 +1,25 @@
 package org.patifiner.client.viewing
 
 import com.arkivanov.decompose.ComponentContext
-import dev.zacsweers.metro.Assisted
-import dev.zacsweers.metro.AssistedFactory
-import dev.zacsweers.metro.Inject
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.scope.Scope
 import org.patifiner.client.common.componentScope
 import org.patifiner.client.topics.data.RemoveUserTopicsRequest
 import org.patifiner.client.topics.data.TopicsRepository
 
-@Inject
 class UserTopicsComponent(
-    @Assisted private val componentContext: ComponentContext,
-    @Assisted private val navigateToAdd: () -> Unit,
-    private val repo: TopicsRepository,
-) : ComponentContext by componentContext {
+    componentContext: ComponentContext,
+    private val navigateToAdd: () -> Unit,
+    private val koinScope: Scope
+) : ComponentContext by componentContext, KoinComponent {
 
-    @AssistedFactory fun interface Factory {
-        fun create(
-            componentContext: ComponentContext,
-            naviAddTopic: () -> Unit
-        ): UserTopicsComponent
-    }
+    private val repo: TopicsRepository = koinScope.get()
 
     private val scope = componentScope()
     private val _state = MutableStateFlow(UserTopicsState())

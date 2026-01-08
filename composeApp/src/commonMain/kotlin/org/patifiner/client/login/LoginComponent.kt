@@ -8,6 +8,8 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.patifiner.client.common.componentScope
 import org.patifiner.client.common.toUserMessage
 import org.patifiner.client.login.ui.LoginScreenEvent
@@ -15,9 +17,10 @@ import org.patifiner.client.login.ui.LoginScreenState
 
 class LoginComponent(
     componentContext: ComponentContext,
-    private val login: suspend (TokenRequest) -> Result<Unit>,
     private val navToSignup: () -> Unit,
-) : ComponentContext by componentContext {
+) : ComponentContext by componentContext, KoinComponent {
+
+    private val loginUseCase by inject<LoginUseCase>()
 
     private val scope = componentScope()
     private val _state = MutableStateFlow(LoginScreenState())
@@ -30,7 +33,7 @@ class LoginComponent(
     fun onPasswordChange(v: String) = _state.update { it.copy(password = v) }
     fun onSignup() = navToSignup()
 
-    fun onEmailConfirm() = scope.launch { _events.emit(LoginScreenEvent.FocusOnPassword)  }
+    fun onEmailConfirm() = scope.launch { _events.emit(LoginScreenEvent.FocusOnPassword) }
 
     fun onPasswordConfirm() {
         val state = _state.value
@@ -40,7 +43,7 @@ class LoginComponent(
         val loginRequest = TokenRequest(state.email, state.password)
         scope.launch {
             Napier.d { "LoginComponent -> login called" }
-            login(loginRequest)
+            loginUseCase(loginRequest)
                 .onSuccess { Napier.d { "LoginComponent -> login succeed" } }
                 .onFailure { e ->
                     Napier.e { "LoginComponent -> login failed: $e" }

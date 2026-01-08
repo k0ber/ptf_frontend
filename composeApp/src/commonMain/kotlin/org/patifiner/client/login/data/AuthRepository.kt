@@ -15,15 +15,12 @@ import org.patifiner.client.NetworkObserver
 import org.patifiner.client.login.TokenRequest
 import org.patifiner.client.login.TokenResponse
 import org.patifiner.client.login.UserInfoDto
-import org.patifiner.client.main.MainGraph
 import org.patifiner.client.signup.SignupRequest
 
 
 class AuthRepository(
-    private val appScope: CoroutineScope,
     private val client: HttpClient,
     private val tokenStorage: TokenStorage,
-    private val loggedInGraphFactory: MainGraph.Factory
 ) {
 
     val tokenFlow: StateFlow<String?> = tokenStorage.tokenFlow

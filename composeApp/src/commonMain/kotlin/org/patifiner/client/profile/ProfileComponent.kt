@@ -1,35 +1,25 @@
 package org.patifiner.client.profile
 
 import com.arkivanov.decompose.ComponentContext
-import dev.zacsweers.metro.Assisted
-import dev.zacsweers.metro.AssistedFactory
-import dev.zacsweers.metro.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.koin.core.scope.Scope
 import org.patifiner.client.common.componentScope
 import org.patifiner.client.login.LoadProfileUseCase
 import org.patifiner.client.login.LogoutUseCase
 import org.patifiner.client.profile.ui.ProfileUiState
 
-@Inject
 class ProfileComponent(
-    @Assisted componentContext: ComponentContext,
-    @Assisted("nav_my_topics") private val navMyTopics: () -> Unit,
-    @Assisted("nav_add_topic") private val navAddTopic: () -> Unit,
-    private val loadProfile: LoadProfileUseCase,
-    private val logout: LogoutUseCase,
+    componentContext: ComponentContext,
+    private val navMyTopics: () -> Unit,
+    private val navAddTopic: () -> Unit,
+    private val koinScope: Scope
 ) : ComponentContext by componentContext {
 
-    @AssistedFactory
-    fun interface Factory {
-        fun create(
-            @Assisted componentContext: ComponentContext,
-            @Assisted("nav_my_topics") navMyTopics: () -> Unit,
-            @Assisted("nav_add_topic") navAddTopic: () -> Unit
-        ): ProfileComponent
-    }
+    private val loadProfile: LoadProfileUseCase = koinScope.get()
+    private val logout: LogoutUseCase = koinScope.get()
 
     private val scope = componentScope()
     private val _state = MutableStateFlow(ProfileUiState())

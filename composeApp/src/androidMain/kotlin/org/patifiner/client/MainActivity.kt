@@ -12,29 +12,17 @@ import androidx.compose.runtime.remember
 import androidx.core.view.WindowCompat
 import com.arkivanov.decompose.defaultComponentContext
 import com.arkivanov.essenty.backhandler.BackDispatcher
-import dev.zacsweers.metro.createGraphFactory
-import org.patifiner.client.Platform.appContext
-import org.patifiner.client.binds.BindsCommon
-import org.patifiner.client.binds.BindsNetwork
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        appContext = this
+
         enableEdgeToEdge()
 
         WindowCompat.setDecorFitsSystemWindows(window, false) // for keyboard ?
+
         val componentContext = defaultComponentContext()
-        val rootComponent = createGraphFactory<RootGraph.Factory>().create(
-            common = object : BindsCommon {},
-            network = object : BindsNetwork {},
-            networkObserver = Platform.networkObserver(),
-            apiConfig = Platform.apiConfig(),
-            engine = Platform.engineFactory(),
-            settings = Platform.settings(),
-            appMainScope = Platform.appMainScope(),
-            componentContext = componentContext,
-        ).rootComponent()
+        val rootComponent = RootComponent(componentContext = componentContext)
 
         setContent {
             SetupBackHandle()
