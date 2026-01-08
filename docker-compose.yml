@@ -1,43 +1,11 @@
 services:
-  traefik:
-    image: traefik:v3.6
-    container_name: traefik_front
-    restart: unless-stopped
-    command:
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
-      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
-      - "--api.dashboard=true"
-      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
-      - "--certificatesresolvers.myresolver.acme.email=admin@patifiner.ru"
-      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "./letsencrypt:/letsencrypt"
-    labels:
-      - "traefik.enable=true"
-      # Dashboard router
-      - "traefik.http.routers.dash.rule=Host(`dashboard-web.patifiner.ru`)"
-      - "traefik.http.routers.dash.entrypoints=websecure"
-      - "traefik.http.routers.dash.service=api@internal"
-      - "traefik.http.routers.dash.tls.certresolver=myresolver"
-      - "traefik.http.routers.dash.middlewares=auth"
-      - "traefik.http.middlewares.auth.basicauth.users=root:${DASHBOARD_ROOT_PWD}"
-
   frontend:
     image: ghcr.io/${IMAGE_REPO}:${IMAGE_TAG:-latest}
     container_name: ptf_frontend
-    depends_on:
-      - traefik
     labels:
       - "traefik.enable=true"
-      # Front
+      - "traefik.docker.network=web"
+      # Domain
       - "traefik.http.routers.ptf-front.rule=Host(`patifiner.ru`)"
       - "traefik.http.routers.ptf-front.entrypoints=websecure"
       - "traefik.http.routers.ptf-front.tls.certresolver=myresolver"
@@ -45,9 +13,13 @@ services:
       - "traefik.http.routers.ptf-front.middlewares=wasm-headers"
       - "traefik.http.middlewares.wasm-headers.headers.customResponseHeaders.Cross-Origin-Embedder-Policy=require-corp"
       - "traefik.http.middlewares.wasm-headers.headers.customResponseHeaders.Cross-Origin-Opener-Policy=same-origin"
-      # Balancer
+      # Nginx port
       - "traefik.http.services.ptf-front.loadbalancer.server.port=80"
+
+    networks:
+      - web
     restart: unless-stopped
 
-volumes:
-  letsencrypt:
+networks:
+  web:
+    external: true
