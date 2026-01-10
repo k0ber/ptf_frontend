@@ -107,19 +107,28 @@ android {
     defaultConfig {
         applicationId = "org.patifiner.client"
         minSdk = libs.versions.android.minSdk.get().toInt()
-        //noinspection OldTargetApi
+        //noinspection OldTargetApi # targetSdk = 35 is fine
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = System.getenv("VERSION_CODE").toInt()
+        versionName = System.getenv("VERSION_NAME")
     }
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+    signingConfigs {
+        create("release") {
+            storeFile = file("../release.keystore").takeIf { it.exists() } ?: file("patifiner-release.jks")
+            storePassword = System.getenv("KEYSTORE_PASSWORD")
+            keyAlias = System.getenv("KEY_ALIAS")
+            keyPassword = System.getenv("KEY_PASSWORD")
         }
     }
     buildTypes {
         getByName("release") {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            signingConfig = signingConfigs.getByName("release")
+        }
+    }
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
     compileOptions {

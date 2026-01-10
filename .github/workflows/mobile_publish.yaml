@@ -1,0 +1,51 @@
+name: Deploy to RuStore
+# переменные все добавлены, надо проверить когда вручную пройдёт релиз в русторе
+# обязательно проверить версию и доки для экшена ru-store/rustore-upload-action@v1.1.0
+# на момент создания пайплайна этому экшену 4 дня
+
+on:
+  # 1. Позволяет запустить скрипт вручную из вкладки Actions
+  workflow_dispatch:
+
+  # 2. Срабатывает только когда ты создаешь тэг версии (например, v1.0, v2.1.3)
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # Декодируем файл подписи из секрета
+      - name: Decode Keystore
+        run: echo "${{ secrets.KEYSTORE_FILE }}" | base64 --decode > ../release.keystore
+
+      # Собираем релизный билд
+      - name: Build with Gradle
+        run: ./gradlew assembleRelease
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          VERSION_CODE: ${{ github.run_number }}
+          VERSION_NAME: ${{ github.ref_name || 'manual' }}
+
+      # Загрузка в RuStore
+      - name: Upload to RuStore
+        uses: ru-store/rustore-upload-action@v1.1.0
+        with:
+          key-id: ${{ secrets.RUSTORE_KEY_ID }}
+          private-key: ${{ secrets.RUSTORE_PRIVATE_KEY }}
+          app-id: org.patifiner.client
+          # Путь к APK может немного отличаться в зависимости от структуры проекта
+          bundle-path: composeApp/build/outputs/apk/release/composeApp-release.apk
+          publish-type: "MANUAL"
