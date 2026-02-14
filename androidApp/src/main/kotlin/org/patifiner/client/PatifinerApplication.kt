@@ -1,12 +1,12 @@
 package org.patifiner.client
 
 import android.app.Application
+import org.koin.android.ext.koin.androidContext
 
 class PatifinerApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        Platform.initNapier()
 
         initKoin(
             KoinAppConfig(
@@ -14,9 +14,7 @@ class PatifinerApplication : Application() {
                 apiConfig = Platform.apiConfig(),
                 appScope = Platform.appMainScope()
             )
-        ) {
-            Platform.setup(context = this@PatifinerApplication)
-        }
+        ) { androidContext(this@PatifinerApplication) }
     }
 
 }

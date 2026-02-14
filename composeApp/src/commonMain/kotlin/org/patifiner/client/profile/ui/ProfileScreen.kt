@@ -16,10 +16,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.patifiner.client.design.AppTheme
 import org.patifiner.client.profile.ProfileComponent
+
+// TODO: use Coil3 for show and Peekaboo for peeking images
 
 @Composable
 fun ProfileScreen(component: ProfileComponent, snackbarHost: SnackbarHostState) {

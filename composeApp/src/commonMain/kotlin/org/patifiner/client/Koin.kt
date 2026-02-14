@@ -1,6 +1,5 @@
 package org.patifiner.client
 
-import com.russhwolf.settings.Settings
 import io.github.aakira.napier.Napier
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngineFactory
@@ -46,26 +45,33 @@ data class KoinAppConfig(
     val appScope: CoroutineScope
 )
 
-fun initKoin(config: KoinAppConfig, extraConfiguration: KoinAppDeclaration = {}) = startKoin {
-    extraConfiguration()
-    modules(appModule, module {
-        single { config.engine }
-        single { config.apiConfig }
-        single { config.appScope }
-        single { Platform.settings() }
-        single { Platform.networkObserver() }
-    })
-}
+fun initKoin(config: KoinAppConfig, appDeclaration: KoinAppDeclaration = {}) =
+    startKoin {
+        appDeclaration()
+
+        Platform.initNapier()
+
+        modules(appModule, module {
+            single { config.engine }
+            single { config.apiConfig }
+            single { config.appScope }
+            single { Platform.settings() }
+            single { Platform.networkObserver() }
+        })
+    }
 
 private val appModule = module {
     single {
         Json {
+            prettyPrint = true
             ignoreUnknownKeys = true
             explicitNulls = false
             encodeDefaults = true
             isLenient = true
         }
     }
+
+    single<TokenStorage> { TokenStorageImpl(settings = get()) }
 
     single {
         val engine: HttpClientEngineFactory<*> = get()
@@ -108,8 +114,6 @@ private val appModule = module {
         }
     }
 
-    // App scope
-    single<TokenStorage> { TokenStorageImpl(settings = get()) }
     single { AuthRepository(client = get(), tokenStorage = get()) }
 
     factoryOf(::LoginUseCase)

@@ -3,12 +3,11 @@ package org.patifiner.client.signup.ui
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -21,12 +20,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.Dimension
-import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.patifiner.client.common.showError
 import org.patifiner.client.design.AppTheme
+import org.patifiner.client.design.scrollableScreen
 import org.patifiner.client.design.views.EmailField
 import org.patifiner.client.design.views.IndeterminateGradientProgress
 import org.patifiner.client.design.views.PasswordField
@@ -79,32 +77,15 @@ fun SignupContent(
     onSignup: () -> Unit = {},
     onBack: () -> Unit = {},
 ) {
-    ConstraintLayout(
-        modifier = Modifier
-            .fillMaxSize()
-            .imePadding()
-    ) {
-        val (intro, form, progress) = createRefs()
+    val screenScroll = rememberScrollState()
 
-        PtfIntro(
-            modifier = Modifier.constrainAs(intro) {
-                width = Dimension.fillToConstraints
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-                top.linkTo(parent.top, 24.dp)
-            }
-        )
+    Column(
+        modifier = Modifier.scrollableScreen(screenScroll)
+    ) {
+        PtfIntro()
 
         SignupForm(
-            modifier = Modifier
-                .constrainAs(form) {
-                    width = Dimension.fillToConstraints
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                    top.linkTo(intro.bottom, 24.dp)
-                    bottom.linkTo(parent.bottom)
-                }
-                .padding(horizontal = 20.dp),
+            modifier = Modifier.padding(horizontal = 20.dp),
             state = state,
             onName = onName,
             onSurname = onSurname,
@@ -119,14 +100,7 @@ fun SignupContent(
         )
 
         if (state.loading) {
-            IndeterminateGradientProgress(
-                modifier = Modifier.constrainAs(progress) {
-                    width = Dimension.fillToConstraints
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                    bottom.linkTo(parent.bottom)
-                }
-            )
+            IndeterminateGradientProgress()
         }
     }
 }

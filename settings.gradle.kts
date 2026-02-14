@@ -3,6 +3,7 @@ rootProject.name = "PatifinerClient"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
+    @Suppress("UnstableApiUsage")
     repositories {
         google {
             mavenContent {
@@ -30,3 +31,4 @@ plugins {
 }
 
 include(":composeApp")
+include(":androidApp")
