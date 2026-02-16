@@ -50,7 +50,7 @@ fun ProfileContent(
         verticalArrangement = Arrangement.Center
     ) {
         Spacer(Modifier.height(16.dp))
-        state.userInfoDto?.let {
+        state.userDto?.let {
             Text("ID: ${it.id}")
             Text("Name: ${it.name}")
             Text("Email: ${it.email}")

@@ -19,7 +19,7 @@ class LogoutUseCase(private val repo: AuthRepository) {
 }
 
 class LoadProfileUseCase(private val repo: AuthRepository) {
-    suspend operator fun invoke(): Result<UserInfoDto> {
+    suspend operator fun invoke(): Result<UserDto> {
         // get from database or load ??
         return repo.loadProfile()
     }

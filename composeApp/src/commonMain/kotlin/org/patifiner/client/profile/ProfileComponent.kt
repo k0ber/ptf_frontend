@@ -34,7 +34,7 @@ class ProfileComponent(
         componentScope.launch {
             _state.update { it.copy(loading = true, error = null) }
             loadProfile()
-                .onSuccess { info -> _state.update { it.copy(userInfoDto = info, error = null) } }
+                .onSuccess { info -> _state.update { it.copy(userDto = info, error = null) } }
                 .onFailure { e -> _state.update { it.copy(error = e.message ?: "Failed to load profile") } }
             _state.update { it.copy(loading = false) }
         }

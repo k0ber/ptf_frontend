@@ -5,16 +5,12 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.withContext
-import org.patifiner.client.NetworkObserver
 import org.patifiner.client.login.TokenRequest
 import org.patifiner.client.login.TokenResponse
-import org.patifiner.client.login.UserInfoDto
+import org.patifiner.client.login.UserDto
 import org.patifiner.client.signup.SignupRequest
 
 
@@ -28,7 +24,7 @@ class AuthRepository(
     suspend fun login(loginRequest: TokenRequest): Result<Unit> = runCatching {
         withContext(Dispatchers.Default) {
             val response: TokenResponse = client.post("/user/login") { setBody(loginRequest) }.body()
-            tokenStorage.token = response.token
+            tokenStorage.token = response.accessToken
         }
     }
 
@@ -36,12 +32,12 @@ class AuthRepository(
         tokenStorage.clear()
     }
 
-    suspend fun loadProfile(): Result<UserInfoDto> = runCatching {
+    suspend fun loadProfile(): Result<UserDto> = runCatching {
         client.get("/user/me").body()
     }
 
     suspend fun signup(req: SignupRequest): Result<Unit> = runCatching {
         val response = client.post("/user/create") { setBody(req) }.body<TokenResponse>()
-        tokenStorage.token = response.token
+        tokenStorage.token = response.accessToken
     }
 }
