@@ -6,21 +6,33 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface TokenStorage {
     val tokenFlow: StateFlow<String?>
-    var token: String?
+    var accessToken: String?
+    var refreshToken: String?
     fun clear()
 }
 
 class TokenStorageImpl(private val settings: Settings) : TokenStorage {
-    private val key = "auth_token"
-    private val _tokenFlow = MutableStateFlow(settings.getStringOrNull(key))
+    private val accessKey = "access_token"
+    private val refreshKey = "refresh_token"
+
+    private val _tokenFlow = MutableStateFlow(settings.getStringOrNull(accessKey))
     override val tokenFlow: StateFlow<String?> = _tokenFlow
 
-    override var token: String?
+    override var accessToken: String?
         get() = _tokenFlow.value
         set(value) {
             _tokenFlow.value = value
-            if (value == null) settings.remove(key) else settings.putString(key, value)
+            if (value == null) settings.remove(accessKey) else settings.putString(accessKey, value)
         }
 
-    override fun clear() { token = null }
+    override var refreshToken: String?
+        get() = settings.getStringOrNull(refreshKey)
+        set(value) {
+            if (value == null) settings.remove(refreshKey) else settings.putString(refreshKey, value)
+        }
+
+    override fun clear() {
+        accessToken = null
+        refreshToken = null
+    }
 }

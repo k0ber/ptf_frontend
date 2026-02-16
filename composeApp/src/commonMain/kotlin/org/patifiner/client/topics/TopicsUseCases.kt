@@ -1,8 +1,10 @@
 package org.patifiner.client.topics
 
 import TopicViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.withContext
 import mapTreeToViewModel
 import org.patifiner.client.topics.data.AddUserTopicRequest
 import org.patifiner.client.topics.data.AddUserTopicsRequest
@@ -11,14 +13,16 @@ import org.patifiner.client.topics.data.TopicsRepository
 
 class LoadUserTopicsTreeUseCase(private val repo: TopicsRepository) {
     suspend operator fun invoke(): Result<List<TopicViewModel>> = runCatching {
-        coroutineScope {
-            val topicsDeferred = async { repo.loadTopicsTree().getOrThrow() }
-            val userTopicsDeferred = async { repo.getUserTopics().getOrThrow() }
+        withContext(Dispatchers.Default) { // mapping could be heavy
+            coroutineScope {
+                val topicsDeferred = async { repo.loadTopicsTree().getOrThrow() }
+                val userTopicsDeferred = async { repo.getUserTopics().getOrThrow() }
 
-            val topics = topicsDeferred.await()
-            val userTopics = userTopicsDeferred.await()
+                val topics = topicsDeferred.await()
+                val userTopics = userTopicsDeferred.await()
 
-            mapTreeToViewModel(topics, userTopics)
+                mapTreeToViewModel(topics, userTopics)
+            }
         }
     }
 }
