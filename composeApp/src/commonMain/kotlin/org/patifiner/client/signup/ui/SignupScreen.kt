@@ -22,7 +22,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import org.patifiner.client.common.showError
+import org.patifiner.client.base.showError
 import org.patifiner.client.design.AppTheme
 import org.patifiner.client.design.scrollableScreen
 import org.patifiner.client.design.views.EmailField

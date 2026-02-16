@@ -1,6 +1,5 @@
-package org.patifiner.client.login.ui
+package org.patifiner.client.login
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -14,7 +13,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -25,28 +23,28 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import org.patifiner.client.common.Constants
+import com.arkivanov.decompose.extensions.compose.subscribeAsState
+import org.patifiner.client.base.Constants
+import org.patifiner.client.base.showError
+import org.patifiner.client.design.AppTheme
 import org.patifiner.client.design.centeredField
 import org.patifiner.client.design.scrollableScreen
-import org.patifiner.client.common.showError
-import org.patifiner.client.design.AppTheme
 import org.patifiner.client.design.views.EmailField
 import org.patifiner.client.design.views.IndeterminateGradientProgress
 import org.patifiner.client.design.views.PasswordField
 import org.patifiner.client.design.views.PrimaryButton
 import org.patifiner.client.design.views.PtfIntro
-import org.patifiner.client.login.LoginComponent
 
 @Composable
 fun LoginScreen(component: LoginComponent, snackbarHostState: SnackbarHostState) {
-    val state by component.state.collectAsState()
+    val state by component.state.subscribeAsState()
     val passwordFocusRequester = remember { FocusRequester() }
 
     LaunchedEffect(Unit) {
-        component.events.collect { event ->
-            when (event) {
-                is LoginScreenEvent.Error -> snackbarHostState.showError(event.message)
-                is LoginScreenEvent.FocusOnPassword -> passwordFocusRequester.requestFocus()
+        component.labels.collect { label ->
+            when (label) {
+                is LoginLabel.Error -> snackbarHostState.showError(label.message)
+                LoginLabel.FocusOnPassword -> passwordFocusRequester.requestFocus()
             }
         }
     }
@@ -54,23 +52,21 @@ fun LoginScreen(component: LoginComponent, snackbarHostState: SnackbarHostState)
     LoginContent(
         state = state,
         passwordFocusRequester = passwordFocusRequester,
-        onEmailChange = { component.onEmailChange(it) },
-        onPasswordChange = { component.onPasswordChange(it) },
-        onEmailConfirm = { component.onEmailConfirm() },
-        onPasswordConfirm = { component.onPasswordConfirm() },
-        onSignupClick = { component.onSignup() }
+        onEmailChange = component::onEmailChange,
+        onPasswordChange = component::onPasswordChange,
+        onLogin = component::onLogin,
+        onSignup = component::onSignup
     )
 }
 
 @Composable
 fun LoginContent(
-    state: LoginScreenState,
+    state: LoginState,
     passwordFocusRequester: FocusRequester,
     onEmailChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
-    onEmailConfirm: () -> Unit = {},
-    onPasswordConfirm: () -> Unit = {},
-    onSignupClick: () -> Unit = {},
+    onLogin: () -> Unit,
+    onSignup: () -> Unit
 ) {
     val email = state.email
     val pass = state.password
@@ -82,11 +78,7 @@ fun LoginContent(
         modifier = Modifier.scrollableScreen(screenScroll)
     ) {
         Spacer(Modifier.weight(1f))
-        PtfIntro(modifier = Modifier.fillMaxWidth().clickable(onClick = {
-            onEmailChange("qq@mm.mm")
-            onPasswordChange("11111111")
-            onPasswordConfirm()
-        }))
+        PtfIntro(modifier = Modifier.fillMaxWidth())
         Spacer(Modifier.height(20.dp))
         EmailField(
             modifier = centeredField(),
@@ -95,8 +87,7 @@ fun LoginContent(
             onValueChange = onEmailChange,
             isError = email.isNotEmpty() && !emailValid,
             supportingText = if (email.isNotEmpty() && !emailValid) "Введите корректный e-mail" else "",
-            imeAction = ImeAction.Next,
-            onImeAction = { onEmailConfirm() }
+            imeAction = ImeAction.Next
         )
         Spacer(Modifier.height(4.dp))
         PasswordField(
@@ -107,20 +98,20 @@ fun LoginContent(
             isError = pass.isNotEmpty() && !passValid,
             supportingText = if (pass.isNotEmpty() && !passValid) "Минимум 8 символов" else "",
             imeAction = ImeAction.Done,
-            onImeAction = { onPasswordConfirm() }
+            onImeAction = onLogin
         )
         PrimaryButton(
             modifier = Modifier.align(Alignment.CenterHorizontally),
-            text = if (state.loading) "Loading..." else "Login",
-            enabled = emailValid && passValid && !state.loading,
-            onClick = { onPasswordConfirm() },
+            text = if (state.isLoading) "Loading..." else "Login",
+            enabled = emailValid && passValid && !state.isLoading,
+            onClick = onLogin,
         )
         SignUpHint(
             modifier = Modifier.align(Alignment.CenterHorizontally),
-            onSignupClick = onSignupClick,
+            onSignupClick = onSignup,
         )
         Spacer(Modifier.weight(1f))
-        if (state.loading) {
+        if (state.isLoading) {
             IndeterminateGradientProgress(
                 modifier = Modifier.fillMaxWidth()
             )
@@ -129,9 +120,7 @@ fun LoginContent(
 }
 
 @Composable
-fun SignUpHint(
-    modifier: Modifier = Modifier, onSignupClick: () -> Unit
-) {
+fun SignUpHint(modifier: Modifier = Modifier, onSignupClick: () -> Unit) {
     Row(modifier = modifier) {
         Text(
             modifier = Modifier.align(Alignment.CenterVertically), text = "Don’t have an account?", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.outline
@@ -146,21 +135,17 @@ fun SignUpHint(
     }
 }
 
-// ================================================================================================================
 @Preview()
 @Composable
 fun LoginPreview() {
-    val focusRequester = remember { FocusRequester() }
     AppTheme {
-        LoginContent(state = LoginScreenState(loading = true), passwordFocusRequester = focusRequester, onEmailChange = {}, onPasswordChange = {})
-    }
-}
-
-@Preview()
-@Composable
-fun LoginPreviewDark() {
-    val focusRequester = remember { FocusRequester() }
-    AppTheme(forceDarkMode = true) {
-        LoginContent(state = LoginScreenState(), passwordFocusRequester = focusRequester, onEmailChange = {}, onPasswordChange = {})
+        LoginContent(
+            state = LoginState(isLoading = true, email = "preview@email.com", password = "password"),
+            passwordFocusRequester = remember { FocusRequester() },
+            onEmailChange = {},
+            onPasswordChange = {},
+            onLogin = {},
+            onSignup = {}
+        )
     }
 }

@@ -15,8 +15,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.scope.Scope
-import org.patifiner.client.common.componentScope
-import org.patifiner.client.common.toUserMessage
+import org.patifiner.client.base.componentScope
+import org.patifiner.client.base.toUserMessage
 import org.patifiner.client.topics.ui.logic.TopicClickDelegate
 import org.patifiner.client.topics.ui.logic.TreeAction
 
@@ -28,8 +28,6 @@ class AddUserTopicComponent(
     private val loadWholeTopicsTree: LoadUserTopicsTreeUseCase = koinScope.get()
     private val searchTopics: SearchTopicsUseCase = koinScope.get()
     private val addUserTopic: AddUserTopicUseCase = koinScope.get()
-
-    private val scope = componentScope()
 
     private val _state = MutableStateFlow(AddUserTopicState())
     val state = _state.asStateFlow()
@@ -44,7 +42,7 @@ class AddUserTopicComponent(
     }
 
     private fun loadUserTopics() {
-        scope.launch(Dispatchers.Default) {
+        componentScope.launch(Dispatchers.Default) {
             loadWholeTopicsTree()
                 .onSuccess { userTopics -> _state.update { it.copy(userTopicsTree = userTopics) } }
                 .onFailure { e -> _events.emit(AddTopicEvents.Error(e.toUserMessage("Can't load user topics"))) } // todo: how user can retry?
@@ -52,7 +50,7 @@ class AddUserTopicComponent(
     }
 
     private fun observeSearch() {
-        scope.launch(Dispatchers.Default) {
+        componentScope.launch(Dispatchers.Default) {
             state.map { it.query }
                 .distinctUntilChanged()
                 .combine(_state.map { it.userTopicsTree }) { query, allTopics -> Pair(query, allTopics) }
@@ -94,11 +92,11 @@ class AddUserTopicComponent(
 //    }
 
     fun onDraftConfirm(draft: UserTopicInfo) {
-        scope.launch {
+        componentScope.launch {
             val topic = _state.value.openedTopic ?: return@launch
             addUserTopic(topic, draft)
                 .onSuccess { loadUserTopics() }
-                .onFailure { e -> _events.emit(AddTopicEvents.Error(e.toUserMessage())) }
+                .onFailure { e -> _events.emit(AddTopicEvents.Error(e.toUserMessage("Can't create topic"))) }
 
             _state.update { it.copy(draft = null) }
         }

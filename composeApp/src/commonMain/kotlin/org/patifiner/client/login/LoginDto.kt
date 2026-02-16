@@ -3,6 +3,7 @@ package org.patifiner.client.login
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.Serializable
 
+// todo: update from backend
 @Serializable
 data class TokenRequest(val email: String, val password: String)
 

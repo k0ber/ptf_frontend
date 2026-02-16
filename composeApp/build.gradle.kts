@@ -92,7 +92,7 @@ kotlin {
             implementation(libs.napier.wasm)
         }
         androidMain.dependencies {
-            implementation(compose.preview)
+            implementation(libs.compose.ui.tooling)
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.okhttp)
             implementation(libs.decompose.extensions.android)

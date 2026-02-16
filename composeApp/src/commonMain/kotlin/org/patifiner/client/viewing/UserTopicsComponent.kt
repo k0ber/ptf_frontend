@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.scope.Scope
-import org.patifiner.client.common.componentScope
+import org.patifiner.client.base.componentScope
 import org.patifiner.client.topics.data.RemoveUserTopicsRequest
 import org.patifiner.client.topics.data.TopicsRepository
 
@@ -21,7 +21,6 @@ class UserTopicsComponent(
 
     private val repo: TopicsRepository = koinScope.get()
 
-    private val scope = componentScope()
     private val _state = MutableStateFlow(UserTopicsState())
     val state: StateFlow<UserTopicsState> = _state
 
@@ -32,7 +31,7 @@ class UserTopicsComponent(
         load()
     }
 
-    fun load() = scope.launch {
+    fun load() = componentScope.launch {
         _state.update { it.copy(loading = true) }
         repo.getUserTopics()
             .onSuccess { list ->
@@ -44,7 +43,7 @@ class UserTopicsComponent(
             }
     }
 
-    fun onRemoveTopic(id: Long) = scope.launch {
+    fun onRemoveTopic(id: Long) = componentScope.launch {
         repo.removeUserTopics(RemoveUserTopicsRequest(listOf(id)))
             .onSuccess { count ->
                 _state.update { it.copy(topics = it.topics.filterNot { t -> t.id == id }) }

@@ -6,11 +6,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.scope.Scope
-import org.patifiner.client.common.componentScope
+import org.patifiner.client.base.componentScope
 import org.patifiner.client.login.LoadProfileUseCase
 import org.patifiner.client.login.LogoutUseCase
 import org.patifiner.client.profile.ui.ProfileUiState
 
+// todo: rework with bootstraper
 class ProfileComponent(
     componentContext: ComponentContext,
     private val navMyTopics: () -> Unit,
@@ -21,7 +22,6 @@ class ProfileComponent(
     private val loadProfile: LoadProfileUseCase = koinScope.get()
     private val logout: LogoutUseCase = koinScope.get()
 
-    private val scope = componentScope()
     private val _state = MutableStateFlow(ProfileUiState())
     val state: StateFlow<ProfileUiState> = _state
 
@@ -31,7 +31,7 @@ class ProfileComponent(
 
     fun refresh() {
         if (_state.value.loading) return
-        scope.launch {
+        componentScope.launch {
             _state.update { it.copy(loading = true, error = null) }
             loadProfile()
                 .onSuccess { info -> _state.update { it.copy(userInfoDto = info, error = null) } }

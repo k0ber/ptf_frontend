@@ -1,5 +1,7 @@
 package org.patifiner.client
 
+import com.arkivanov.mvikotlin.core.store.StoreFactory
+import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import io.github.aakira.napier.Napier
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngineFactory
@@ -25,9 +27,11 @@ import org.koin.core.module.dsl.scopedOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
-import org.patifiner.client.common.ApiException
-import org.patifiner.client.common.ErrorResponse
+import org.patifiner.client.base.ApiException
+import org.patifiner.client.base.ErrorResponse
 import org.patifiner.client.login.LoadProfileUseCase
+import org.patifiner.client.login.LoginStore
+import org.patifiner.client.login.LoginStoreFactory
 import org.patifiner.client.login.LoginUseCase
 import org.patifiner.client.login.LogoutUseCase
 import org.patifiner.client.login.SignupUseCase
@@ -72,6 +76,7 @@ private val appModule = module {
     }
 
     single<TokenStorage> { TokenStorageImpl(settings = get()) }
+    single<StoreFactory> { DefaultStoreFactory() }
 
     single {
         val engine: HttpClientEngineFactory<*> = get()
@@ -119,6 +124,8 @@ private val appModule = module {
     factoryOf(::LoginUseCase)
     factoryOf(::SignupUseCase)
     factoryOf(::LogoutUseCase)
+
+    factory<LoginStore> { LoginStoreFactory(factory = get(), loginUseCase = get()).create() }
 
     // Session scope
     scope(named("LoggedInScope")) {

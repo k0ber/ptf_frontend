@@ -1,7 +1,7 @@
 package org.patifiner.client.signup.ui
 
 import kotlinx.datetime.LocalDate
-import org.patifiner.client.common.Constants
+import org.patifiner.client.base.Constants
 import org.patifiner.client.signup.SignupRequest
 
 data class SignupUiState(

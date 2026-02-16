@@ -27,7 +27,7 @@ import org.patifiner.client.design.AppTheme
 import org.patifiner.client.design.PtfAnim
 import org.patifiner.client.design.views.AppScaffold
 import org.patifiner.client.design.views.PtfWarningText
-import org.patifiner.client.login.ui.LoginScreen
+import org.patifiner.client.login.LoginScreen
 import org.patifiner.client.main.MainScreen
 import org.patifiner.client.signup.ui.SignupScreen
 

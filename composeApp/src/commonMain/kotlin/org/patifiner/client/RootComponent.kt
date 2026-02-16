@@ -15,11 +15,9 @@ import kotlinx.serialization.Serializable
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
-import org.patifiner.client.common.componentScope
+import org.patifiner.client.base.componentScope
 import org.patifiner.client.design.BackableComponent
 import org.patifiner.client.login.LoginComponent
-import org.patifiner.client.login.LoginUseCase
-import org.patifiner.client.login.SignupUseCase
 import org.patifiner.client.login.data.AuthRepository
 import org.patifiner.client.main.MainComponent
 import org.patifiner.client.signup.SignupComponent
@@ -39,11 +37,7 @@ sealed interface RootChild {
 class RootComponent(componentContext: ComponentContext) : ComponentContext by componentContext, BackableComponent, KoinComponent {
     private val authRepo: AuthRepository by inject()
     private val networkObserver: NetworkObserver by inject()
-    private val loginUseCase: LoginUseCase by inject()
-    private val signupUseCase: SignupUseCase by inject()
-
     private val navigation = StackNavigation<RootConfig>()
-    private val scope = componentScope()
 
     val isOnline: StateFlow<Boolean> = networkObserver.isOnline
 
@@ -52,7 +46,30 @@ class RootComponent(componentContext: ComponentContext) : ComponentContext by co
         serializer = RootConfig.serializer(),
         initialConfiguration = if (authRepo.tokenFlow.value != null) RootConfig.Main else RootConfig.Login,
         handleBackButton = true,
-        childFactory = ::createChild
+        childFactory = { config, componentContext ->
+            return@childStack when (config) {
+                RootConfig.Login -> RootChild.Login(
+                    LoginComponent(
+                        componentContext = componentContext,
+                        navToSignup = { navigation.replaceAll(RootConfig.Signup) }
+                    )
+                )
+
+                RootConfig.Signup -> RootChild.Signup(
+                    SignupComponent(
+                        componentContext = componentContext,
+                        navigateBackToLogin = { navigation.replaceAll(RootConfig.Login) }
+                    )
+                )
+
+                RootConfig.Main -> {
+                    val sessionScope = getKoin().getOrCreateScope("session_id", named("LoggedInScope"))
+                    componentContext.lifecycle.doOnDestroy { sessionScope.close() }
+                    RootChild.Main(MainComponent(componentContext = componentContext, koinScope = sessionScope))
+                }
+
+            }
+        }
     )
 
     init {
@@ -60,31 +77,7 @@ class RootComponent(componentContext: ComponentContext) : ComponentContext by co
             val isMainActive = stack.value.active.configuration is RootConfig.Main
             if (token != null && !isMainActive) navigation.replaceAll(RootConfig.Main)
             else if (token == null && isMainActive) navigation.replaceAll(RootConfig.Login)
-        }.launchIn(scope)
-    }
-
-    private fun createChild(config: RootConfig, componentContext: ComponentContext): RootChild {
-        return when (config) {
-            RootConfig.Login -> RootChild.Login(
-                LoginComponent(
-                    componentContext = componentContext,
-                    navToSignup = { navigation.replaceAll(RootConfig.Signup) }
-                )
-            )
-
-            RootConfig.Signup -> RootChild.Signup(
-                SignupComponent(
-                    componentContext = componentContext,
-                    navigateBackToLogin = { navigation.replaceAll(RootConfig.Login) }
-                )
-            )
-
-            is RootConfig.Main -> {
-                val sessionScope = getKoin().getOrCreateScope("session_id", named("LoggedInScope"))
-                componentContext.lifecycle.doOnDestroy { sessionScope.close() }
-                RootChild.Main(MainComponent(componentContext = componentContext, koinScope = sessionScope))
-            }
-        }
+        }.launchIn(componentScope)
     }
 
     override fun back() = navigation.pop()

@@ -1,57 +1,25 @@
 package org.patifiner.client.login
 
 import com.arkivanov.decompose.ComponentContext
-import io.github.aakira.napier.Napier
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
+import com.arkivanov.decompose.value.Value
+import com.arkivanov.mvikotlin.core.instancekeeper.getStore
+import com.arkivanov.mvikotlin.extensions.coroutines.labels
+import kotlinx.coroutines.flow.Flow
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import org.patifiner.client.common.componentScope
-import org.patifiner.client.common.toUserMessage
-import org.patifiner.client.login.ui.LoginScreenEvent
-import org.patifiner.client.login.ui.LoginScreenState
+import org.koin.core.component.get
+import org.patifiner.client.base.asValue
 
 class LoginComponent(
     componentContext: ComponentContext,
     private val navToSignup: () -> Unit,
 ) : ComponentContext by componentContext, KoinComponent {
+    private val store: LoginStore = instanceKeeper.getStore { get() }
 
-    private val loginUseCase by inject<LoginUseCase>()
+    val state: Value<LoginState> = store.asValue()
+    val labels: Flow<LoginLabel> = store.labels
 
-    private val scope = componentScope()
-    private val _state = MutableStateFlow(LoginScreenState())
-    private val _events = MutableSharedFlow<LoginScreenEvent>()
-
-    val state: StateFlow<LoginScreenState> = _state
-    val events: SharedFlow<LoginScreenEvent> = _events
-
-    fun onEmailChange(v: String) = _state.update { it.copy(email = v) }
-    fun onPasswordChange(v: String) = _state.update { it.copy(password = v) }
+    fun onEmailChange(v: String) = store.accept(LoginIntent.ChangeEmail(v))
+    fun onPasswordChange(v: String) = store.accept(LoginIntent.ChangePassword(v))
+    fun onLogin() = store.accept(LoginIntent.Login)
     fun onSignup() = navToSignup()
-
-    fun onEmailConfirm() = scope.launch { _events.emit(LoginScreenEvent.FocusOnPassword) }
-
-    fun onPasswordConfirm() {
-        val state = _state.value
-        if (state.loading) return
-        _state.update { it.copy(loading = true) }
-
-        val loginRequest = TokenRequest(state.email, state.password)
-        scope.launch {
-            Napier.d { "LoginComponent -> login called" }
-            loginUseCase(loginRequest)
-                .onSuccess { Napier.d { "LoginComponent -> login succeed" } }
-                .onFailure { e ->
-                    Napier.e { "LoginComponent -> login failed: $e" }
-                    _events.emit(LoginScreenEvent.Error(e.toUserMessage("Login failed")))
-                }
-
-            _state.update { it.copy(loading = false) }
-        }
-    }
-
 }

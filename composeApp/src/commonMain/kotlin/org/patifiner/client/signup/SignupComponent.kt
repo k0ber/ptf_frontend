@@ -12,8 +12,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import org.patifiner.client.common.componentScope
-import org.patifiner.client.common.toUserMessage
+import org.patifiner.client.base.componentScope
+import org.patifiner.client.base.toUserMessage
 import org.patifiner.client.login.SignupUseCase
 import org.patifiner.client.signup.ui.SignupUiState
 
@@ -27,7 +27,6 @@ class SignupComponent(
 ) : ComponentContext by componentContext, KoinComponent {
 
     private val signupUseCase: SignupUseCase by inject()
-    private val scope = componentScope()
 
     private val _state = MutableStateFlow(SignupUiState())
     private val _events = MutableSharedFlow<SignupEvent>()
@@ -53,7 +52,7 @@ class SignupComponent(
         _state.update { it.copy(loading = true) }
         val req = state.toRequest()
 
-        scope.launch {
+        componentScope.launch {
             Napier.d { "SignupComponent -> createUser called" }
             signupUseCase(state.toRequest())
                 .onSuccess { Napier.d { "SignupComponent -> success" } }

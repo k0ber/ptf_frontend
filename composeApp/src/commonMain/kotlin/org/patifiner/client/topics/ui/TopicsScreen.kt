@@ -27,7 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.patifiner.client.design.centeredField
 import org.patifiner.client.design.screen
-import org.patifiner.client.common.showError
+import org.patifiner.client.base.showError
 import org.patifiner.client.design.AppTheme
 import org.patifiner.client.design.icons.PtfIcons
 import org.patifiner.client.design.icons.ptficons.IcEmail

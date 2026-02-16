@@ -1,4 +1,4 @@
-package org.patifiner.client.common
+package org.patifiner.client.base
 
 
 object Constants {
