@@ -14,7 +14,7 @@ import org.w3c.dom.HTMLElement
 fun main() {
     val lifecycle = LifecycleRegistry()
 
-    try {
+    val rootComponent = try {
         initKoin(
             KoinAppConfig(
                 engine = Platform.engineFactory(),
@@ -22,27 +22,25 @@ fun main() {
                 appScope = Platform.appMainScope()
             )
         )
+        RootComponent(componentContext = DefaultComponentContext(lifecycle = lifecycle))
+    } catch (e: Throwable) {
+        Napier.e(tag = "WasmMain", throwable = e) { "Koin/RootComponent initialization failed" }
+        hideAppLoader()
+        null
+    }
 
-        val container = document.getElementById("ComposeTarget") as HTMLElement
+    val container = document.getElementById("ComposeTarget") as HTMLElement
 
-        ComposeViewport(container) {
-            LaunchedEffect(Unit) {
-                hideAppLoader()
-            }
+    ComposeViewport(container) {
+        LaunchedEffect(Unit) {
+            container.focus()
+            hideAppLoader()
+        }
 
-            val rootComponent = RootComponent(
-                componentContext = DefaultComponentContext(lifecycle = lifecycle)
-            )
-
+        if (rootComponent != null) {
             lifecycle.resume()
             RootScreen(rootComponent)
         }
-    } catch (e: Throwable) {
-        Napier.e(tag = "WasmMain", throwable = e) { "App startup failed" }
-        println("Critical Error: ${e.message}")
-        e.printStackTrace()
-
-        hideAppLoader()
     }
 }
 
