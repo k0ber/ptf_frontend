@@ -191,7 +191,7 @@ fun PasswordField(
         },
 
         keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Password,
+            keyboardType = KeyboardType.Text,
             imeAction = imeAction
         ),
         keyboardActions = KeyboardActions(

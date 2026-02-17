@@ -14,20 +14,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 
-fun Modifier.scrollableScreen(scrollState: ScrollState) = this
-    .fillMaxSize()
+fun Modifier.scrollableScreen(scrollState: ScrollState) = this.fillMaxSize()
+    .statusBarsPadding()
+    .navigationBarsPadding()
+    .imePadding()
     .verticalScroll(scrollState)
+
+fun Modifier.screen() = this.fillMaxSize()
     .imePadding()
     .statusBarsPadding()
     .navigationBarsPadding()
 
-fun Modifier.screen() = this
-    .fillMaxSize()
-    .imePadding()
-    .statusBarsPadding()
-    .navigationBarsPadding()
-
-fun ColumnScope.centeredField() = Modifier
-    .align(Alignment.CenterHorizontally)
+fun ColumnScope.centeredField() = Modifier.align(Alignment.CenterHorizontally)
     .requiredWidthIn(max = 400.dp)
     .wrapContentWidth(Alignment.CenterHorizontally)

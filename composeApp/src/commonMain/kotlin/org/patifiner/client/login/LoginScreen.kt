@@ -1,11 +1,13 @@
 package org.patifiner.client.login
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
@@ -26,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import org.patifiner.client.base.Constants
 import org.patifiner.client.base.showError
+import org.patifiner.client.base.takeIfOrEmpty
 import org.patifiner.client.design.AppTheme
 import org.patifiner.client.design.centeredField
 import org.patifiner.client.design.scrollableScreen
@@ -75,8 +78,13 @@ fun LoginContent(
     val screenScroll = rememberScrollState()
 
     Column(
-        modifier = Modifier.scrollableScreen(screenScroll)
+        modifier = Modifier.scrollableScreen(screenScroll),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.CenterVertically)
     ) {
+        if (state.isLoading) IndeterminateGradientProgress(modifier = Modifier.fillMaxWidth())
+        else Spacer(Modifier.height(4.dp)) // prevents height changes
+
         Spacer(Modifier.weight(1f))
         PtfIntro(modifier = Modifier.fillMaxWidth())
         Spacer(Modifier.height(20.dp))
@@ -86,7 +94,7 @@ fun LoginContent(
             placeholder = "name@example.com",
             onValueChange = onEmailChange,
             isError = email.isNotEmpty() && !emailValid,
-            supportingText = if (email.isNotEmpty() && !emailValid) "Введите корректный e-mail" else "",
+            supportingText = "Введите корректный e-mail".takeIfOrEmpty(email.isNotEmpty() && !emailValid),
             imeAction = ImeAction.Next
         )
         Spacer(Modifier.height(4.dp))
@@ -96,26 +104,17 @@ fun LoginContent(
             label = "Password",
             onValueChange = onPasswordChange,
             isError = pass.isNotEmpty() && !passValid,
-            supportingText = if (pass.isNotEmpty() && !passValid) "Минимум 8 символов" else "",
+            supportingText = "Минимум 8 символов".takeIfOrEmpty(pass.isNotEmpty() && !passValid),
             imeAction = ImeAction.Done,
             onImeAction = onLogin
         )
         PrimaryButton(
-            modifier = Modifier.align(Alignment.CenterHorizontally),
             text = if (state.isLoading) "Loading..." else "Login",
             enabled = emailValid && passValid && !state.isLoading,
             onClick = onLogin,
         )
-        SignUpHint(
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-            onSignupClick = onSignup,
-        )
+        SignUpHint(onSignupClick = onSignup)
         Spacer(Modifier.weight(1f))
-        if (state.isLoading) {
-            IndeterminateGradientProgress(
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
     }
 }
 
