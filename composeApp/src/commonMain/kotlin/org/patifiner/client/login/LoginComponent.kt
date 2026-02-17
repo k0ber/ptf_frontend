@@ -18,8 +18,6 @@ class LoginComponent(
     val state: Value<LoginState> = store.asValue()
     val labels: Flow<LoginLabel> = store.labels
 
-    fun onEmailChange(v: String) = store.accept(LoginIntent.ChangeEmail(v))
-    fun onPasswordChange(v: String) = store.accept(LoginIntent.ChangePassword(v))
-    fun onLogin() = store.accept(LoginIntent.Login)
+    fun onIntent(intent: LoginIntent) = store.accept(intent)
     fun onSignup() = navToSignup()
 }

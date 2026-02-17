@@ -52,9 +52,9 @@ fun LoginScreen(component: LoginComponent, snackbarHostState: SnackbarHostState)
     LoginContent(
         state = state,
         passwordFocusRequester = passwordFocusRequester,
-        onEmailChange = component::onEmailChange,
-        onPasswordChange = component::onPasswordChange,
-        onLogin = component::onLogin,
+        onEmailChange = { component.onIntent(LoginIntent.ChangeEmail(it)) },
+        onPasswordChange = { component.onIntent(LoginIntent.ChangePassword(it)) },
+        onLogin = { component.onIntent(LoginIntent.Login) },
         onSignup = component::onSignup
     )
 }
