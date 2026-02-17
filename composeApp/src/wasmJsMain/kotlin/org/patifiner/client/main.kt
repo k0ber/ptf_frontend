@@ -20,14 +20,13 @@ fun main() {
     )
 
     val lifecycle = LifecycleRegistry()
-    val componentContext = DefaultComponentContext(lifecycle = lifecycle)
+    val rootComponent = RootComponent(
+        componentContext = DefaultComponentContext(lifecycle = lifecycle)
+    )
+
     lifecycle.resume()
 
-    val canvas = document.getElementById("ComposeTarget") as HTMLCanvasElement
-
-    ComposeViewport(canvas) {
-        val rootComponent = RootComponent(componentContext = componentContext)
-
+    ComposeViewport(document.getElementById("ComposeTarget") as HTMLCanvasElement) {
         LaunchedEffect(Unit) {
             hideAppLoader()
         }
