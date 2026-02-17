@@ -18,7 +18,7 @@ fun HttpRequestBuilder.authRequired(required: Boolean) {
 suspend inline fun <reified T : Any, reified R : Any> HttpClient.post(
     urlString: String,
     body: T,
-    authRequired: Boolean = true // По умолчанию True
+    authRequired: Boolean = true
 ): R = post(urlString) {
     authRequired(authRequired)
     setBody(body)
