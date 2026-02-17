@@ -12,6 +12,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
+@Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 actual object Platform {
     actual fun engineFactory(): HttpClientEngineFactory<*> = Js
     actual fun initNapier() = Napier.base(DebugAntilog())
