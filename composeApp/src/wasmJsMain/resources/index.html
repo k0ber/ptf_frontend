@@ -14,23 +14,31 @@
     <div class="spinner"></div>
 </div>
 
-<div id="ComposeTarget" tabindex="0" contenteditable="true" spellcheck="false"></div>
+<div id="ComposeTarget"
+     tabindex="0"
+     contenteditable="true"
+     inputmode="text"
+     spellcheck="false"></div>
 
 <!--suppress HtmlUnknownTarget (it will be created after compilation)-->
 <script type="application/javascript" src="composeApp.js"></script>
 
 <script>
     window.hideAppLoader = function() {
-        console.log("Wasm initialized, hiding loader...");
         const loader = document.getElementById('app-loader');
         if (loader) {
+            loader.style.pointerEvents = 'none';
             loader.classList.add('fade-out');
             setTimeout(() => {
-                loader.style.display = 'none';
-                loader.remove();
+                if (loader.parentNode) loader.remove();
             }, 400);
         }
     };
+
+    const container = document.getElementById("ComposeTarget");
+    container.addEventListener("click", () => {
+        container.focus();
+    });
 </script>
 </body>
 </html>
