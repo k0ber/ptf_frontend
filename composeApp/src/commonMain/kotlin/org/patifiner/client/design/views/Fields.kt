@@ -1,14 +1,16 @@
 package org.patifiner.client.design.views
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -33,7 +35,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import org.patifiner.client.design.AppTheme
+import org.patifiner.client.design.PtfTheme
 import org.patifiner.client.design.icons.PtfIcons
 import org.patifiner.client.design.icons.ptficons.IcEmail
 import org.patifiner.client.design.icons.ptficons.IcPassword
@@ -41,54 +43,62 @@ import org.patifiner.client.design.icons.ptficons.IcVisibilityOff
 import org.patifiner.client.design.icons.ptficons.IcVisibilityOn
 
 @Composable
-fun FieldsPreview() {
-    var email by remember { mutableStateOf("") }
-    var pass by remember { mutableStateOf("") }
-    val emailValid = remember(email) {
-        Regex("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$").matches(email)
-    }
-    val passValid = pass.length >= 8
+fun PtfTextField(
+    modifier: Modifier = Modifier,
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String = "",
+    placeholder: String = "",
+    leadingIcon: @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
+    enabled: Boolean = true,
+    isError: Boolean = false,
+    supportingText: String = "",
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    singleLine: Boolean = true,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    autofocus: Boolean = false,
+    imeAction: ImeAction = ImeAction.Default,
+    onImeAction: () -> Unit = {}
+) {
+    val focusRequester = remember { FocusRequester() }
+    LaunchedEffect(autofocus) { if (autofocus) focusRequester.requestFocus() }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(20.dp)
-    ) {
-        EmailField(
-            modifier = Modifier.fillMaxWidth(),
-            value = email,
-            placeholder = "name@example.com",
-            onValueChange = { email = it },
-            autofocus = true,
-            isError = email.isNotEmpty() && !emailValid,
-            supportingText = if (email.isNotEmpty() && !emailValid) "Введите корректный e-mail" else "",
-            imeAction = ImeAction.Next
-        )
-        Spacer(Modifier.height(12.dp))
-        PasswordField(
-            modifier = Modifier.fillMaxWidth(),
-            value = pass,
-            label = "Password",
-            onValueChange = { pass = it },
-            isError = pass.isNotEmpty() && !passValid,
-            supportingText = if (pass.isNotEmpty() && !passValid) "Минимум 8 символов" else "",
-            imeAction = ImeAction.Done,
-        )
-        Spacer(Modifier.height(16.dp))
-        PrimaryButton(
-            text = "login",
-            onClick = { },
-            enabled = emailValid && passValid,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        )
-    }
+    OutlinedTextField(
+        modifier = modifier.focusRequester(focusRequester),
+        value = value,
+        onValueChange = onValueChange,
+        enabled = enabled,
+        singleLine = singleLine,
+        isError = isError,
+        shape = RoundedCornerShape(14.dp),
+        colors = OutlinedTextFieldDefaults.colors(
+            unfocusedBorderColor = MaterialTheme.colorScheme.primary,
+            errorBorderColor = MaterialTheme.colorScheme.error,
+        ),
+        textStyle = MaterialTheme.typography.bodyLarge,
+        label = if (label.isNotEmpty()) { { FieldLabel(label) } } else null,
+        placeholder = if (placeholder.isNotEmpty()) { { FieldPlaceholder(placeholder) } } else null,
+        supportingText = if (supportingText.isNotEmpty()) { { FieldSupportingText(supportingText) } } else null,
+        leadingIcon = leadingIcon,
+        trailingIcon = trailingIcon,
+        keyboardOptions = keyboardOptions.copy(imeAction = imeAction),
+        keyboardActions = KeyboardActions(
+            onDone = { onImeAction() },
+            onNext = { onImeAction() },
+            onSearch = { onImeAction() },
+            onSend = { onImeAction() },
+            onGo = { onImeAction() }
+        ),
+        visualTransformation = visualTransformation
+    )
 }
 
 @Composable
 fun EmailField(
     modifier: Modifier = Modifier,
     value: String,
-    placeholder: String,
+    placeholder: String = "name@example.com",
     onValueChange: (String) -> Unit,
     enabled: Boolean = true,
     label: String = "E-mail",
@@ -98,42 +108,26 @@ fun EmailField(
     imeAction: ImeAction = ImeAction.Done,
     onImeAction: () -> Unit = {}
 ) {
-    val focusRequester = remember { FocusRequester() }
-    LaunchedEffect(autofocus) { if (autofocus) focusRequester.requestFocus() }
-
-    OutlinedTextField(
-        modifier = modifier.focusRequester(focusRequester),
-        shape = RoundedCornerShape(14.dp),
-        colors = OutlinedTextFieldDefaults.colors(unfocusedBorderColor = MaterialTheme.colorScheme.primary),
-
+    PtfTextField(
+        modifier = modifier,
         value = value,
         onValueChange = onValueChange,
         enabled = enabled,
-        singleLine = true,
-
-        textStyle = MaterialTheme.typography.bodyLarge,
-
-        label = { FieldLabel(label) },
-        placeholder = { FieldPlaceholder(placeholder) },
-        supportingText = { FieldSupportingText(supportingText) },
-
+        label = label,
+        placeholder = placeholder,
+        autofocus = autofocus,
+        isError = isError,
+        supportingText = supportingText,
+        imeAction = imeAction,
+        onImeAction = onImeAction,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
         leadingIcon = {
             Icon(
                 painter = rememberVectorPainter(PtfIcons.IcEmail),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary
             )
-        },
-        isError = isError,
-
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Email,
-            imeAction = imeAction
-        ),
-        keyboardActions = KeyboardActions(
-            onDone = { onImeAction() },
-            onNext = { onImeAction() }
-        ),
+        }
     )
 }
 
@@ -152,27 +146,20 @@ fun PasswordField(
     onImeAction: () -> Unit = {}
 ) {
     var visible by remember { mutableStateOf(false) }
-    val focusRequester = remember { FocusRequester() }
-    LaunchedEffect(autofocus) { if (autofocus) focusRequester.requestFocus() }
 
-    OutlinedTextField(
-        modifier = modifier
-            .focusRequester(focusRequester),
-        shape = RoundedCornerShape(14.dp),
-        colors = OutlinedTextFieldDefaults.colors(unfocusedBorderColor = MaterialTheme.colorScheme.primary),
-
+    PtfTextField(
+        modifier = modifier,
         value = value,
         onValueChange = onValueChange,
         enabled = enabled,
-        singleLine = true,
+        label = label,
+        placeholder = placeholder,
+        autofocus = autofocus,
         isError = isError,
-
-        textStyle = MaterialTheme.typography.bodyLarge,
-
-        label = { FieldLabel(label) },
-        placeholder = { FieldPlaceholder(placeholder) },
-        supportingText = { FieldSupportingText(supportingText) },
-
+        supportingText = supportingText,
+        imeAction = imeAction,
+        onImeAction = onImeAction,
+        visualTransformation = if (visible) VisualTransformation.None else PasswordVisualTransformation(),
         leadingIcon = {
             Icon(
                 painter = rememberVectorPainter(PtfIcons.IcPassword),
@@ -188,20 +175,9 @@ fun PasswordField(
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
-        },
-
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Text,
-            imeAction = imeAction
-        ),
-        keyboardActions = KeyboardActions(
-            onDone = { onImeAction() },
-            onNext = { onImeAction() }
-        ),
-        visualTransformation = if (visible) VisualTransformation.None else PasswordVisualTransformation(),
+        }
     )
 }
-
 
 @Composable
 fun FieldLabel(text: String) {
@@ -238,14 +214,74 @@ fun FieldSupportingText(text: String) {
 }
 
 //================================================================================================================
+
+@Composable
+fun FieldsPreview() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text("Normal state", style = MaterialTheme.typography.titleMedium)
+        PtfTextField(
+            value = "",
+            onValueChange = {},
+            label = "Username",
+            placeholder = "Enter your username"
+        )
+
+        Text("Filled state", style = MaterialTheme.typography.titleMedium)
+        PtfTextField(
+            value = "John Doe",
+            onValueChange = {},
+            label = "Full Name"
+        )
+
+        Text("Error state", style = MaterialTheme.typography.titleMedium)
+        PtfTextField(
+            value = "invalid_input",
+            onValueChange = {},
+            label = "Username",
+            isError = true,
+            supportingText = "Username is already taken"
+        )
+
+        Text("Disabled state", style = MaterialTheme.typography.titleMedium)
+        PtfTextField(
+            value = "Cannot edit this",
+            onValueChange = {},
+            label = "ID",
+            enabled = false
+        )
+
+        Text("Email Field", style = MaterialTheme.typography.titleMedium)
+        EmailField(
+            value = "test@example.com",
+            onValueChange = {}
+        )
+
+        Text("Password Field", style = MaterialTheme.typography.titleMedium)
+        PasswordField(
+            value = "password123",
+            onValueChange = {},
+            label = "Password"
+        )
+        
+        Spacer(Modifier.height(32.dp))
+    }
+}
+
 @Preview
 @Composable
 fun FieldsPreviewLight() {
-    AppTheme { FieldsPreview() }
+    PtfTheme { FieldsPreview() }
 }
 
 @Preview
 @Composable
 fun FieldsPreviewDark() {
-    AppTheme(forceDarkMode = true) { FieldsPreview() }
+    PtfTheme(forceDarkMode = true) { FieldsPreview() }
 }

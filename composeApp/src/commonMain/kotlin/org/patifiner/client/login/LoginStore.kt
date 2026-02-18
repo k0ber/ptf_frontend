@@ -5,8 +5,10 @@ import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.coroutineExecutorFactory
 import org.patifiner.client.base.BaseState
+import org.patifiner.client.base.TokenRequest
 import org.patifiner.client.base.createDefault
 import org.patifiner.client.base.execute
+import org.patifiner.client.login.data.AuthRepository
 
 interface LoginStore : Store<LoginIntent, LoginState, LoginLabel>
 
@@ -56,4 +58,8 @@ internal class LoginStoreFactory(
                 }
             }
         ) {}
+}
+
+class LoginUseCase(private val repo: AuthRepository) {
+    suspend operator fun invoke(tokenRequest: TokenRequest): Result<Unit> = repo.requestToken(tokenRequest)
 }

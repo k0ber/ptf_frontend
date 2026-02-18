@@ -125,11 +125,11 @@ private fun ColorSwatch(name: String, color: Color) {
 @Preview
 @Composable
 fun DesignDemoLightPreview() {
-    AppTheme(forceDarkMode = false) { DesignDemo() }
+    PtfTheme(forceDarkMode = false) { DesignDemo() }
 }
 
 @Preview
 @Composable
 fun DesignDemoDarkPreview() {
-    AppTheme(forceDarkMode = true) { DesignDemo() }
+    PtfTheme(forceDarkMode = true) { DesignDemo() }
 }

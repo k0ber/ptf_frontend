@@ -1,55 +1,70 @@
 package org.patifiner.client.design
 
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.FiniteAnimationSpec
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import com.arkivanov.decompose.ExperimentalDecomposeApi
-import com.arkivanov.decompose.extensions.compose.stack.animation.Direction
 import com.arkivanov.decompose.extensions.compose.stack.animation.StackAnimation
 import com.arkivanov.decompose.extensions.compose.stack.animation.fade
 import com.arkivanov.decompose.extensions.compose.stack.animation.plus
+import com.arkivanov.decompose.extensions.compose.stack.animation.predictiveback.androidPredictiveBackAnimatableV1
 import com.arkivanov.decompose.extensions.compose.stack.animation.predictiveback.predictiveBackAnimation
+import com.arkivanov.decompose.extensions.compose.stack.animation.scale
 import com.arkivanov.decompose.extensions.compose.stack.animation.slide
 import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
-import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimator
 import com.arkivanov.essenty.backhandler.BackHandlerOwner
+import org.patifiner.client.Os
+import org.patifiner.client.Platform
 
 interface BackableComponent : BackHandlerOwner {
-    fun back(): Unit
+    fun back()
 }
 
 object PtfAnim {
-
-    @OptIn(ExperimentalDecomposeApi::class)
-    fun predictiveBack(root: BackableComponent) = predictiveBackAnimation(
-        backHandler = root.backHandler,
-        onBack = root::back, // stackAnimation(slide() + scale()) // Material-ish
-        fallbackAnimation = stackAnimation(slide() + iosParallaxScale) // iOS-ish
+    private val springSpec: FiniteAnimationSpec<Float> = spring(
+        stiffness = Spring.StiffnessMedium,
+        dampingRatio = Spring.DampingRatioNoBouncy
     )
 
-    fun <C : Any, T : Any> changingTabs(): StackAnimation<C, T> = stackAnimation(fade())
+    private val mediumTween: FiniteAnimationSpec<Float> = tween(
+        durationMillis = 450,
+        easing = FastOutSlowInEasing
+    )
 
-    private val iosParallaxScale by lazy {
-        stackAnimator { factor, direction, content ->
-            // factor:
-            //   ENTER_FRONT: 1 -> 0
-            //   EXIT_FRONT:  0 -> 1
-            //   ENTER_BACK: -1 -> 0
-            //   EXIT_BACK:   0 -> -1
-            val p = kotlin.math.abs(factor)
+    private val fastTween: FiniteAnimationSpec<Float> = tween(
+        durationMillis = 300,
+        easing = FastOutSlowInEasing
+    )
 
-            // Чуть-чуть «сжимаем» задний/уходящий экран
-            val scale = when (direction) {
-                Direction.EXIT_FRONT, Direction.ENTER_BACK -> 1f - 0.05f * p
-                else -> 1f
-            }
-
-            content(
-                Modifier.graphicsLayer {
-                    scaleX = scale
-                    scaleY = scale
-                }
+    @OptIn(ExperimentalDecomposeApi::class)
+    fun provideStackAnimation(root: BackableComponent): StackAnimation<Any, Any> =
+        when (Platform.os) {
+            Os.ANDROID -> predictiveBackAnimation(
+                backHandler = root.backHandler,
+                onBack = root::back,
+                selector = { initialBackEvent, _, _ ->
+                    androidPredictiveBackAnimatableV1(initialBackEvent)
+                },
+                fallbackAnimation = fallbackMatchingV1()
             )
-        }
-    }
 
+            Os.WEB -> stackAnimation(fade(mediumTween))
+            Os.IOS, Os.DESC -> stackAnimation(slide(springSpec) + fade(springSpec))
+        }
+
+    private fun fallbackMatchingV1(): StackAnimation<Any, Any> =
+        stackAnimation(
+            fade(springSpec) +
+                    scale(
+                        springSpec,
+                        frontFactor = 1.0f,
+                        backFactor = 0.9f
+                    ) +
+                    slide(springSpec)
+        )
+
+    fun <C : Any, T : Any> changingTabs(): StackAnimation<C, T> =
+        stackAnimation(fade(fastTween))
 }

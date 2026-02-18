@@ -28,7 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import org.patifiner.client.design.AppTheme
+import org.patifiner.client.design.PtfTheme
 import org.patifiner.client.design.views.PtfInputExampleText
 import org.patifiner.client.design.views.PtfShadowedText
 import org.patifiner.client.topics.TopicLevel
@@ -121,7 +121,7 @@ fun BottomSheetContent(
 @Preview
 @Composable
 fun TopicDraftCardPreview() {
-    AppTheme(forceDarkMode = false) {
+    PtfTheme(forceDarkMode = false) {
         val fakeTopic = fakeTopicsRow().first()
         val draftInfo = UserTopicInfo(
             topicId = fakeTopic.id,

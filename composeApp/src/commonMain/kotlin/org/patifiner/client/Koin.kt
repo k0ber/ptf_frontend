@@ -17,10 +17,12 @@ import org.patifiner.client.login.LoginStore
 import org.patifiner.client.login.LoginStoreFactory
 import org.patifiner.client.login.LoginUseCase
 import org.patifiner.client.login.LogoutUseCase
-import org.patifiner.client.login.SignupUseCase
 import org.patifiner.client.login.data.AuthRepository
 import org.patifiner.client.login.data.TokenStorage
 import org.patifiner.client.login.data.TokenStorageImpl
+import org.patifiner.client.signup.SignupStore
+import org.patifiner.client.signup.SignupStoreFactory
+import org.patifiner.client.signup.SignupUseCase
 import org.patifiner.client.topics.AddUserTopicUseCase
 import org.patifiner.client.topics.LoadUserTopicsTreeUseCase
 import org.patifiner.client.topics.SearchTopicsUseCase
@@ -74,10 +76,13 @@ private val appModule = module {
     single { AuthRepository(client = get(), tokenStorage = get()) }
 
     factoryOf(::LoginUseCase)
+    factory<LoginStore> { LoginStoreFactory(factory = get(), loginUseCase = get()).create() }
+
+    factory<SignupStore> { SignupStoreFactory(factory = get(), signupUseCase = get()).create() }
     factoryOf(::SignupUseCase)
+
     factoryOf(::LogoutUseCase)
 
-    factory<LoginStore> { LoginStoreFactory(factory = get(), loginUseCase = get()).create() }
 
     // Session scope
     scope(named("LoggedInScope")) {

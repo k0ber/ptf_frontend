@@ -13,10 +13,14 @@ import java.util.prefs.Preferences
 
 @Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 actual object Platform {
-    actual fun engineFactory(): HttpClientEngineFactory<*> = OkHttp
-    actual fun initNapier() = Napier.base(DebugAntilog())
-    actual fun settings(): Settings = PreferencesSettings(Preferences.userRoot().node("patifiner_settings"))
-    actual fun networkObserver(): NetworkObserver = JvmNetworkObserver()
+    actual val os: Os = Os.DESC
+
     actual fun apiConfig(): ApiConfig = ApiConfig(baseUrl = "https://api.patifiner.ru", port = 443)
+    actual fun engineFactory(): HttpClientEngineFactory<*> = OkHttp
+    actual fun networkObserver(): NetworkObserver = JvmNetworkObserver()
+
+    actual fun settings(): Settings = PreferencesSettings(Preferences.userRoot().node("patifiner_settings"))
+    actual fun initNapier() = Napier.base(DebugAntilog())
+
     actual fun appMainScope(): CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 }

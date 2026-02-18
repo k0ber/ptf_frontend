@@ -22,7 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import org.patifiner.client.design.AppTheme
+import org.patifiner.client.design.PtfTheme
 import org.patifiner.client.design.views.PtfShadowedText
 import org.patifiner.client.topics.TopicLevel
 import org.patifiner.client.topics.UserTopicInfo
@@ -116,7 +116,7 @@ fun TopicCardColored(
 @Composable
 fun TopicCardPreview() {
     val fakeTopic = fakeTopicsRow().first()
-    AppTheme {
+    PtfTheme {
         val topic = TopicViewModel(
             id = 1,
             name = "Kotlin",

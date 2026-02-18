@@ -15,8 +15,14 @@ import org.koin.core.component.get
 
 @Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 actual object Platform : KoinComponent {
+    actual val os: Os = Os.ANDROID
 
+    actual fun apiConfig(): ApiConfig = ApiConfig(baseUrl = "https://api.patifiner.ru/", port = 443)
     actual fun engineFactory(): HttpClientEngineFactory<*> = OkHttp
+    actual fun networkObserver(): NetworkObserver {
+        val context: Context = get()
+        return AndroidNetworkObserver(context)
+    }
 
     actual fun initNapier() = Napier.base(DebugAntilog())
 
@@ -24,16 +30,6 @@ actual object Platform : KoinComponent {
         val context: Context = get()
         return SharedPreferencesSettings(context.getSharedPreferences("ptf_settings", Context.MODE_PRIVATE))
     }
-
-    actual fun networkObserver(): NetworkObserver {
-        val context: Context = get()
-        return AndroidNetworkObserver(context)
-    }
-
-    actual fun apiConfig(): ApiConfig = ApiConfig(
-        baseUrl = "https://api.patifiner.ru/",
-        port = 443
-    )
 
     actual fun appMainScope(): CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 }

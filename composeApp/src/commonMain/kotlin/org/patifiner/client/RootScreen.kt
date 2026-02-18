@@ -23,9 +23,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.compose.stack.Children
-import org.patifiner.client.design.AppTheme
+import org.patifiner.client.design.PtfTheme
 import org.patifiner.client.design.PtfAnim
-import org.patifiner.client.design.views.AppScaffold
+import org.patifiner.client.design.views.PtfScaffold
 import org.patifiner.client.design.views.PtfWarningText
 import org.patifiner.client.login.LoginScreen
 import org.patifiner.client.main.MainScreen
@@ -37,10 +37,10 @@ fun RootScreen(rootComponent: RootComponent) {
     val isOnline by rootComponent.isOnline.collectAsState()
     val snackbarHost = remember { SnackbarHostState() }
 
-    AppTheme {
+    PtfTheme {
         SharedTransitionLayout {
             CompositionLocalProvider(LocalSharedTransitionScope provides this) {
-                AppScaffold(snackbarHostState = snackbarHost) {
+                PtfScaffold(snackbarHostState = snackbarHost) {
                     Column {
                         AnimatedVisibility(visible = !isOnline) {
                             Box(
@@ -54,7 +54,7 @@ fun RootScreen(rootComponent: RootComponent) {
                         }
                         Children(
                             stack = rootComponent.stack,
-                            animation = PtfAnim.predictiveBack(rootComponent)
+                            animation = PtfAnim.provideStackAnimation(rootComponent)
                         ) { child ->
                             when (val instance = child.instance) {
                                 is RootChild.Main -> MainScreen(instance.component, snackbarHost)

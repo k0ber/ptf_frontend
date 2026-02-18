@@ -1,12 +1,15 @@
 package org.patifiner.client
 
 import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.decompose.DelicateDecomposeApi
 import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.router.stack.pop
+import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.router.stack.replaceAll
 import com.arkivanov.decompose.value.Value
+import com.arkivanov.essenty.backhandler.BackHandler
 import com.arkivanov.essenty.lifecycle.doOnDestroy
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
@@ -41,6 +44,7 @@ class RootComponent(componentContext: ComponentContext) : ComponentContext by co
 
     val isOnline: StateFlow<Boolean> = networkObserver.isOnline
 
+    @OptIn(DelicateDecomposeApi::class)
     val stack: Value<ChildStack<RootConfig, RootChild>> = childStack(
         source = navigation,
         serializer = RootConfig.serializer(),
@@ -51,14 +55,14 @@ class RootComponent(componentContext: ComponentContext) : ComponentContext by co
                 RootConfig.Login -> RootChild.Login(
                     LoginComponent(
                         componentContext = componentContext,
-                        navToSignup = { navigation.replaceAll(RootConfig.Signup) }
+                        navToSignup = { navigation.push(RootConfig.Signup) }
                     )
                 )
 
                 RootConfig.Signup -> RootChild.Signup(
                     SignupComponent(
                         componentContext = componentContext,
-                        navigateBackToLogin = { navigation.replaceAll(RootConfig.Login) }
+                        navigateBackToLogin = { navigation.pop() }
                     )
                 )
 

@@ -14,19 +14,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
 
 @Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 actual object Platform {
-    actual fun engineFactory(): HttpClientEngineFactory<*> = Darwin
-
-    actual fun initNapier() = Napier.base(DebugAntilog())
-
-    @OptIn(ExperimentalSettingsImplementation::class)
-    actual fun settings(): Settings = KeychainSettings("patifiner.app")
-
-    actual fun appMainScope(): CoroutineScope =
-        CoroutineScope(SupervisorJob() + Dispatchers.Main)
+    actual val os: Os = Os.IOS
 
     actual fun apiConfig(): ApiConfig = ApiConfig("https://api.patifiner.ru/", 443)
-
+    actual fun engineFactory(): HttpClientEngineFactory<*> = Darwin
     actual fun networkObserver(): NetworkObserver = object : NetworkObserver {
         override val isOnline = MutableStateFlow(true)
     }
+
+    @OptIn(ExperimentalSettingsImplementation::class)
+    actual fun settings(): Settings = KeychainSettings("patifiner.app")
+    actual fun initNapier() = Napier.base(DebugAntilog())
+    actual fun appMainScope(): CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 }

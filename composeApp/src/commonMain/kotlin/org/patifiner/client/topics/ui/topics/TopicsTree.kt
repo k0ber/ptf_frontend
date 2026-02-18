@@ -16,7 +16,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.patifiner.client.design.AppShapes
-import org.patifiner.client.design.AppTheme
+import org.patifiner.client.design.PtfTheme
 import org.patifiner.client.topics.ui.logic.LayoutItem
 import org.patifiner.client.topics.ui.logic.MeasuredTopic
 import org.patifiner.client.topics.ui.logic.buildTopicTreeRows
@@ -221,7 +221,7 @@ private fun Placeable.PlacementScope.placeActiveRow(
 @Composable
 fun Preview_TopicsTreeSimple() {
     val fakeTree = fakeTopicsTree()
-    AppTheme(forceDarkMode = true) {
+    PtfTheme(forceDarkMode = true) {
         TopicsTree(
             tree = fakeTree,
             openedTopic = fakeTree.first(),

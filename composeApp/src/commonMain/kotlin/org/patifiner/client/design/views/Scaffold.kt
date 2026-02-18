@@ -17,10 +17,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import org.patifiner.client.design.AppTheme
+import org.patifiner.client.design.PtfTheme
 
 @Composable
-fun AppScaffold(
+fun PtfScaffold(
     snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
     content: @Composable (PaddingValues) -> Unit
@@ -28,13 +28,13 @@ fun AppScaffold(
     Scaffold(
         modifier = modifier,
         containerColor = Color.Transparent,
-        snackbarHost = { AppSnackbarHost(snackbarHostState) },
+        snackbarHost = { PtfSnackbarHost(snackbarHostState) },
         content = content
     )
 }
 
 @Composable
-fun AppSnackbarHost(
+fun PtfSnackbarHost(
     hostState: SnackbarHostState,
     modifier: Modifier = Modifier,
 ) {
@@ -56,8 +56,8 @@ fun AppSnackbarHost(
 // =====================================================================================================
 @Preview
 @Composable
-fun AppScaffoldPreview() {
-    AppTheme {
+fun PtfScaffoldPreview() {
+    PtfTheme {
         val hostState = remember { SnackbarHostState() }
         LaunchedEffect(Unit) {
             hostState.showSnackbar(
@@ -65,7 +65,7 @@ fun AppScaffoldPreview() {
                 duration = SnackbarDuration.Indefinite
             )
         }
-        AppScaffold(modifier = Modifier.fillMaxSize(), snackbarHostState = hostState) {
+        PtfScaffold(modifier = Modifier.fillMaxSize(), snackbarHostState = hostState) {
             PtfIntro()
         }
     }

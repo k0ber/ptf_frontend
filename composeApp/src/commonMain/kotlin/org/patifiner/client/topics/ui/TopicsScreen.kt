@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.dp
 import org.patifiner.client.design.centeredField
 import org.patifiner.client.design.screen
 import org.patifiner.client.base.showError
-import org.patifiner.client.design.AppTheme
+import org.patifiner.client.design.PtfTheme
 import org.patifiner.client.design.icons.PtfIcons
 import org.patifiner.client.design.icons.ptficons.IcEmail
 import org.patifiner.client.design.views.PtfShadowedText
@@ -136,7 +136,7 @@ fun AddUserTopicContent(
 @Preview
 @Composable
 fun TopicsScreenPreview() {
-    AppTheme {
+    PtfTheme {
         val fakeTree = fakeTopicsTree()
         val state = AddUserTopicState(userTopicsTree = fakeTree)
         AddUserTopicContent(

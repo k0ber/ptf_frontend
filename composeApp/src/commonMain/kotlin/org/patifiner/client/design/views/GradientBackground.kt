@@ -9,56 +9,69 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.tooling.preview.Preview
-import org.patifiner.client.design.AppTheme
+import org.patifiner.client.design.PtfTheme
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
+/**
+ *     colors: List<Color> = listOf(
+ *         MaterialTheme.colorScheme.primary.copy(alpha = 0.10f),
+ *         MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.27f),
+ *         MaterialTheme.colorScheme.tertiary.copy(alpha = 0.10f)
+ *     )
+ */
 @Composable
 fun GradientBackground(
     modifier: Modifier = Modifier,
-    angleDeg: Float = 32f,
+    angleDeg: Float = 38f,
     colors: List<Color> = listOf(
-        MaterialTheme.colorScheme.primary.copy(alpha = 0.10f),
-        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.27f),
-        MaterialTheme.colorScheme.tertiary.copy(alpha = 0.10f)
+        MaterialTheme.colorScheme.primary.copy(alpha = 0.065f),
+        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.16f),
+        MaterialTheme.colorScheme.tertiary.copy(alpha = 0.055f)
     ),
-    stops: List<Float>? = listOf(0f, 0.55f, 1f),
     content: @Composable BoxScope.() -> Unit
 ) {
     Box(
         modifier = modifier
-            .background(MaterialTheme.colorScheme.background)
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
             .drawWithCache {
-                onDrawBehind {
-                    val rad = angleDeg * PI.toFloat() / 180f
-                    val vx = cos(rad);
-                    val vy = sin(rad)
-                    val hw = size.width * 0.5f
-                    val hh = size.height * 0.5f
-                    val start = Offset(hw - vx * hw * 1.2f, hh - vy * hh * 1.2f)
-                    val end = Offset(hw + vx * hw * 1.2f, hh + vy * hh * 1.2f)
-
-                    val brush =
-                        if (stops != null)
-                            Brush.linearGradient(
-                                colorStops = stops.zip(colors).toTypedArray(),
-                                start = start, end = end
-                            )
-                        else
-                            Brush.linearGradient(
-                                colors = colors,
-                                start = start, end = end
-                            )
-
-                    drawRect(brush = brush)
-                }
+                val brush = Brush.linearGradient(
+                    colors = colors,
+                    start = calculateStart(size, angleDeg),
+                    end = calculateEnd(size, angleDeg)
+                )
+                onDrawBehind { drawRect(brush = brush) }
             },
         content = content
+    )
+}
+
+private fun calculateStart(size: Size, angle: Float): Offset {
+    val rad = angle * PI.toFloat() / 180f
+    val vx = cos(rad)
+    val vy = sin(rad)
+    return Offset(
+        size.width * 0.5f - vx * size.width * 0.65f,
+        size.height * 0.5f - vy * size.height * 0.65f
+    )
+}
+
+private fun calculateEnd(size: Size, angle: Float): Offset {
+    val rad = angle * PI.toFloat() / 180f
+    val vx = cos(rad)
+    val vy = sin(rad)
+    return Offset(
+        size.width * 0.5f + vx * size.width * 0.65f,
+        size.height * 0.5f + vy * size.height * 0.65f
     )
 }
 
@@ -66,11 +79,11 @@ fun GradientBackground(
 @Preview
 @Composable
 fun GradientBackgroundLightPreview() {
-    AppTheme(forceDarkMode = false) { }
+    PtfTheme(forceDarkMode = false) { }
 }
 
 @Preview
 @Composable
 fun GradientBackgroundDarkPreview() {
-    AppTheme(forceDarkMode = true) { }
+    PtfTheme(forceDarkMode = true) { }
 }

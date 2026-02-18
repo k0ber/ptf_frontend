@@ -14,12 +14,12 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
+        val root = retainedComponent { componentContext ->
+            RootComponent(componentContext = componentContext)
+        }
+
         setContent {
-            RootScreen(
-                retainedComponent { componentContext ->
-                    RootComponent(componentContext = componentContext)
-                }
-            )
+            RootScreen(root)
         }
     }
 }

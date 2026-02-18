@@ -31,7 +31,7 @@ import org.patifiner.client.design.views.GradientBackground
 import org.patifiner.client.design.views.ptfTypography
 
 @Composable
-fun AppTheme(forceDarkMode: Boolean? = null, content: @Composable () -> Unit) {
+fun PtfTheme(forceDarkMode: Boolean? = null, content: @Composable () -> Unit) {
     val isDark = forceDarkMode ?: isSystemInDarkTheme()
     MaterialTheme(
         colorScheme = if (isDark) darkScheme() else lightScheme(),
@@ -39,14 +39,14 @@ fun AppTheme(forceDarkMode: Boolean? = null, content: @Composable () -> Unit) {
         shapes = AppShapes,
         content = {
             CompositionLocalProvider(LocalSpacing provides Spacing()) {
-                GradientBackground {
+                // app background to prevent janks on screen changes
+                GradientBackground(modifier = Modifier.fillMaxSize()) {
                     content()
                 }
             }
         }
     )
 }
-
 
 private fun lightScheme(): ColorScheme = lightColorScheme(
     // Брендовые
@@ -181,12 +181,12 @@ fun ThemeColorsGrid(modifier: Modifier = Modifier) {
 fun ThemeColorsPreview() {
     Row(Modifier.fillMaxWidth()) {
         Column(Modifier.weight(1f)) {
-            AppTheme(forceDarkMode = false) {
+            PtfTheme(forceDarkMode = false) {
                 ThemeColorsGrid()
             }
         }
         Column(Modifier.weight(1f)) {
-            AppTheme(forceDarkMode = true) {
+            PtfTheme(forceDarkMode = true) {
                 ThemeColorsGrid()
             }
         }

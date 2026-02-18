@@ -1,7 +1,7 @@
 package org.patifiner.client.profile.ui
 
 import androidx.compose.runtime.Immutable
-import org.patifiner.client.login.UserDto
+import org.patifiner.client.base.UserDto
 
 @Immutable
 data class ProfileUiState(

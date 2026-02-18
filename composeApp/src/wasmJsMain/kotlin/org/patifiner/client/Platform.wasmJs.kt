@@ -14,15 +14,16 @@ import kotlinx.coroutines.flow.StateFlow
 
 @Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 actual object Platform {
-    actual fun engineFactory(): HttpClientEngineFactory<*> = Js
-    actual fun initNapier() = Napier.base(DebugAntilog())
-    actual fun settings(): Settings = StorageSettings()
-    actual fun appMainScope(): CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+    actual val os: Os = Os.WEB
 
     actual fun apiConfig(): ApiConfig = ApiConfig(baseUrl = "https://api.patifiner.ru", port = 443)
-
+    actual fun engineFactory(): HttpClientEngineFactory<*> = Js
     actual fun networkObserver(): NetworkObserver = object : NetworkObserver {
         override val isOnline: StateFlow<Boolean>
             get() = MutableStateFlow(true)
     }
+
+    actual fun settings(): Settings = StorageSettings()
+    actual fun initNapier() = Napier.base(DebugAntilog())
+    actual fun appMainScope(): CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 }

@@ -19,5 +19,5 @@ class LoginComponent(
     val labels: Flow<LoginLabel> = store.labels
 
     fun onIntent(intent: LoginIntent) = store.accept(intent)
-    fun onSignup() = navToSignup()
+    fun onNavToSignup() = navToSignup()
 }
