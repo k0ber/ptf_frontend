@@ -10,8 +10,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
+import org.jetbrains.compose.resources.stringResource
 import org.patifiner.client.base.showError
+import org.patifiner.client.base.takeIfOrEmpty
 import org.patifiner.client.design.PtfScreen
+import org.patifiner.client.design.centeredField
 import org.patifiner.client.design.views.EmailField
 import org.patifiner.client.design.views.PasswordField
 import org.patifiner.client.design.views.PrimaryButton
@@ -19,9 +22,23 @@ import org.patifiner.client.design.views.PtfIntro
 import org.patifiner.client.design.views.PtfLinearProgress
 import org.patifiner.client.design.views.PtfLinkHint
 import org.patifiner.client.design.views.PtfTextField
+import org.patifiner.client.signup.SignupIntent.ChangeConfirm
 import org.patifiner.client.signup.SignupIntent.ChangeEmail
 import org.patifiner.client.signup.SignupIntent.ChangeName
+import org.patifiner.client.signup.SignupIntent.ChangePassword
 import org.patifiner.client.signup.SignupIntent.Signup
+import patifinerclient.composeapp.generated.resources.Res
+import patifinerclient.composeapp.generated.resources.already_have_account
+import patifinerclient.composeapp.generated.resources.confirm_password_label
+import patifinerclient.composeapp.generated.resources.create_account_button
+import patifinerclient.composeapp.generated.resources.creating_button
+import patifinerclient.composeapp.generated.resources.email_incorrect
+import patifinerclient.composeapp.generated.resources.email_placeholder
+import patifinerclient.composeapp.generated.resources.login_link
+import patifinerclient.composeapp.generated.resources.name_label
+import patifinerclient.composeapp.generated.resources.password_label
+import patifinerclient.composeapp.generated.resources.passwords_dont_match
+import patifinerclient.composeapp.generated.resources.pwd_to_short
 
 @Composable
 fun SignupScreen(
@@ -34,8 +51,7 @@ fun SignupScreen(
         component.labels.collect { label ->
             when (label) {
                 is SignupLabel.Error -> snackbarHostState.showError(label.message)
-                SignupLabel.Success -> { /* Navigate or show success */
-                }
+                SignupLabel.Success -> { /* Navigate or show success */ }
             }
         }
     }
@@ -44,8 +60,8 @@ fun SignupScreen(
         state = state,
         onNameChange = { component.onIntent(ChangeName(it)) },
         onEmailChange = { component.onIntent(ChangeEmail(it)) },
-        onPasswordChange = { component.onIntent(SignupIntent.ChangeConfirm(it)) },
-        onConfirmPasswordChange = { component.onIntent(ChangeName(it)) },
+        onPasswordChange = { component.onIntent(ChangePassword(it)) },
+        onConfirmPasswordChange = { component.onIntent(ChangeConfirm(it)) },
         onSignup = { component.onIntent(Signup) },
         onBackToLogin = { component.onBack() }
     )
@@ -64,49 +80,58 @@ fun SignupContent(
     PtfScreen {
         PtfLinearProgress(isLoading = state.isLoading)
         PtfIntro()
+        Spacer(Modifier.height(16.dp))
         PtfTextField(
+            modifier = centeredField(),
             value = state.name,
             onValueChange = onNameChange,
-            label = "Name",
+            label = stringResource(Res.string.name_label),
             isError = state.name.isNotEmpty() && !state.nameValid,
-            supportingText = if (state.name.isNotEmpty() && !state.nameValid) "At least 2 characters" else "",
+            supportingText = stringResource(Res.string.email_incorrect).takeIfOrEmpty(state.name.isNotEmpty() && !state.nameValid),
             imeAction = ImeAction.Next,
         )
         Spacer(Modifier.height(8.dp))
         EmailField(
+            modifier = centeredField(),
             value = state.email,
             onValueChange = onEmailChange,
-            placeholder = "name@example.com",
+            placeholder = stringResource(Res.string.email_placeholder),
             isError = state.email.isNotEmpty() && !state.emailValid,
-            supportingText = if (state.email.isNotEmpty() && !state.emailValid) "Enter valid email" else "",
+            supportingText = stringResource(Res.string.email_incorrect).takeIfOrEmpty(state.email.isNotEmpty() && !state.emailValid),
             imeAction = ImeAction.Next
         )
         Spacer(Modifier.height(8.dp))
         PasswordField(
+            modifier = centeredField(),
             value = state.password,
-            label = "Password",
+            label = stringResource(Res.string.password_label),
             onValueChange = onPasswordChange,
             isError = state.password.isNotEmpty() && !state.passwordValid,
-            supportingText = if (state.password.isNotEmpty() && !state.passwordValid) "At least 8 characters" else "",
+            supportingText = stringResource(Res.string.pwd_to_short).takeIfOrEmpty(state.password.isNotEmpty() && !state.passwordValid),
             imeAction = ImeAction.Next
         )
         Spacer(Modifier.height(8.dp))
         PasswordField(
+            modifier = centeredField(),
             value = state.confirm,
-            label = "Confirm password",
+            label = stringResource(Res.string.confirm_password_label),
             onValueChange = onConfirmPasswordChange,
             isError = state.confirm.isNotEmpty() && !state.confirmValid,
-            supportingText = if (state.confirm.isNotEmpty() && !state.confirmValid) "Passwords do not match" else "",
+            supportingText = stringResource(Res.string.passwords_dont_match).takeIfOrEmpty(state.confirm.isNotEmpty() && !state.confirmValid),
             imeAction = ImeAction.Done,
             onImeAction = onSignup
         )
         Spacer(Modifier.height(16.dp))
         PrimaryButton(
-            text = if (state.isLoading) "Creating..." else "Create account",
+            text = if (state.isLoading) stringResource(Res.string.creating_button) else stringResource(Res.string.create_account_button),
             enabled = state.canSubmit,
             onClick = onSignup
         )
         Spacer(Modifier.height(4.dp))
-        PtfLinkHint(text = "Already have an account?", linkText = "Log in", onClick = onBackToLogin)
+        PtfLinkHint(
+            text = stringResource(Res.string.already_have_account),
+            linkText = stringResource(Res.string.login_link), 
+            onClick = onBackToLogin
+        )
     }
 }

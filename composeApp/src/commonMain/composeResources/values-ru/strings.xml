@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">Patifiner</string>
+
+    <!--#region REG    -->
+    <string name="email_incorrect">Введите корректный e-mail</string>
+    <string name="pwd_to_short">Минимум 8 символов</string>
+    <string name="name_label">Имя</string>
+    <string name="email_placeholder">name@example.com</string>
+    <string name="password_label">Пароль</string>
+    <string name="confirm_password_label">Подтвердите пароль</string>
+    <string name="passwords_dont_match">Пароли не совпадают</string>
+    <string name="creating_button">Создание…</string>
+    <string name="create_account_button">Создать аккаунт</string>
+    <string name="already_have_account">Уже есть аккаунт?</string>
+    <string name="login_link">Войти</string>
+    <string name="loading_button">Загрузка…</string>
+    <string name="login_button">Войти</string>
+    <string name="dont_have_account">Нет аккаунта?</string>
+    <string name="signup_link">Зарегистрироваться</string>
+    <!--#endregion-->
+
+</resources>

@@ -117,3 +117,9 @@ compose.desktop {
         }
     }
 }
+
+compose.resources {
+    publicResClass = true
+    generateResClass = always
+    packageOfResClass = "patifinerclient.composeapp.generated.resources"
+}
