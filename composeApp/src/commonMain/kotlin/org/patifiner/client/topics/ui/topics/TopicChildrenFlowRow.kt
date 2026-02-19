@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -21,7 +21,7 @@ fun ChildrenFlowRow(
     onTopicClick: (TopicViewModel) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val bg = MaterialTheme.colorScheme.primary.copy(alpha = 0.06f)
+    val bg = colorScheme.primary.copy(alpha = 0.06f)
     Surface(
         modifier = modifier
             .fillMaxWidth()

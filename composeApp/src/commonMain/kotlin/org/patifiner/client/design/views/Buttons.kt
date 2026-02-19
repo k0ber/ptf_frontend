@@ -8,29 +8,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilledTonalButton
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.patifiner.client.design.PtfTheme
-
-
-@Composable
-fun ButtonsPreview() {
-    Column (
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        PrimaryButton(text = "Login with E-mail", enabled = true, modifier = Modifier, onClick = {})
-        Spacer(modifier = Modifier.height(8.dp))
-        PrimaryButton(text = "Login with E-mail", enabled = false, modifier = Modifier, onClick = {})
-    }
-}
 
 @Composable
 fun PrimaryButton(
@@ -45,76 +33,49 @@ fun PrimaryButton(
         modifier = modifier,
         shape = RoundedCornerShape(40.dp),
         elevation = ButtonDefaults.buttonElevation(
-            defaultElevation = 12.dp,
-            pressedElevation = 14.dp,
-            disabledElevation = 8.dp
+            defaultElevation = 6.dp,
+            pressedElevation = 10.dp,
+            disabledElevation = 2.dp
         ),
         colors = ButtonDefaults.filledTonalButtonColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-            contentColor = MaterialTheme.colorScheme.primary,
-            disabledContainerColor = MaterialTheme.colorScheme.surface,//).copy(alpha = 0.8f),
-            disabledContentColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.9f),
+            containerColor = colorScheme.primaryContainer,
+            contentColor = colorScheme.onPrimaryContainer,
+
+            disabledContainerColor = colorScheme.surfaceVariant.copy(alpha = 0.75f),
+            disabledContentColor = colorScheme.onSurfaceVariant.copy(alpha = 0.65f),
         ),
-//        contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp)
     ) {
         Text(
             text = text,
-            style = MaterialTheme.typography.labelLarge,
-            fontSize = 14.sp
+            style = typography.labelLarge.copy(fontWeight = FontWeight.SemiBold),
+            fontSize = 15.sp
         )
     }
 }
 
-//
-////@Composable
-////fun GhostButton(
-////    onClick: () -> Unit,
-////    modifier: Modifier = Modifier,
-////    content: @Composable () -> Unit
-////) {
-////    val sp = LocalSpacing.current
-////    OutlinedButton(
-////        onClick = onClick,
-////        modifier = modifier,
-////        shape = MaterialTheme.shapes.medium,
-////        contentPadding = PaddingValues(start = sp.lg.dp, end = sp.lg.dp, top = sp.sm.dp, bottom = sp.sm.dp)
-////    ) { content() }
-////}
-//
-//@Preview
-//@Composable
-//fun ButtonsLightPreview() {
-//    AppTheme(forceDarkMode = false) {
-//        Row(Modifier.padding(20.dp)) {
-//            PrimaryButton(onClick = {}) {}
-////            GhostButton({}) {}
-//        }
-//    }
-//}
-//
-//@Preview
-//@Composable
-//fun ButtonsDarkPreview() {
-//    AppTheme(forceDarkMode = true) {
-//        Row(Modifier.padding(20.dp)) {
-//            PrimaryButton(onClick = {}) {}
-////            GhostButton({}) {}
-//        }
-//    }
-//}
+// region Preview
+@Composable
+fun ButtonsPreview() {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        PrimaryButton(text = "Login with E-mail", enabled = true, modifier = Modifier, onClick = {})
+        Spacer(modifier = Modifier.height(8.dp))
+        PrimaryButton(text = "Login with E-mail", enabled = false, modifier = Modifier, onClick = {})
+    }
+}
 
 @Preview
 @Composable
 fun ButtonsPreviewLight() {
-    Column {
-        PtfTheme(forceDarkMode = false) { ButtonsPreview() }
-    }
+    PtfTheme(forceDarkMode = false) { ButtonsPreview() }
 }
 
 @Preview
 @Composable
 fun ButtonsPreviewDark() {
-    Column {
-        PtfTheme(forceDarkMode = true) { ButtonsPreview() }
-    }
+    PtfTheme(forceDarkMode = true) { ButtonsPreview() }
 }
+// endregion

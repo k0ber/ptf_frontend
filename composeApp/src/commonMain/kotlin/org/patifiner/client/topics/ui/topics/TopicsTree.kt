@@ -4,7 +4,8 @@ import TopicViewModel
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -15,7 +16,7 @@ import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import org.patifiner.client.design.AppShapes
+import org.patifiner.client.design.PtfShapes
 import org.patifiner.client.design.PtfTheme
 import org.patifiner.client.topics.ui.logic.LayoutItem
 import org.patifiner.client.topics.ui.logic.MeasuredTopic
@@ -62,7 +63,9 @@ fun TopicsTree(
                         breadcrumbs.forEachIndexed { index, crumb ->
                             if (index >= 0) {
                                 Text( // todo icon
-                                    text = "›", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                                    text = "›",
+                                    style = typography.titleMedium,
+                                    color = colorScheme.onSurface.copy(alpha = 0.5f)
                                 )
                             }
                             TopicCard(
@@ -104,8 +107,8 @@ fun TopicsTree(
             backgroundPlaceable = subcompose("ACTIVE_BACKGROUND") {
                 Surface(
                     tonalElevation = 4.dp,
-                    color = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.14f),
-                    shape = AppShapes.medium,
+                    color = colorScheme.tertiary.copy(alpha = 0.14f),
+                    shape = PtfShapes.medium,
                 ) {
                 }
             }.first().measure(
@@ -165,17 +168,6 @@ fun TopicsTree(
         // endregion
     }
 }
-
-// todo use somewhere as background
-/**
- * GradientBackground(
- *                     modifier = Modifier.fillMaxWidth(),
- *                     colors = listOf(
- *                         MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.70f),
- *                         MaterialTheme.colorScheme.tertiary.copy(alpha = 0.85f),
- *                     ),
- *                 ) {}
- */
 
 private fun Placeable.PlacementScope.placeActiveRow(
     row: LayoutItem.TopicsRow, y: Int, // Текущая вертикальная позиция (начало строки)

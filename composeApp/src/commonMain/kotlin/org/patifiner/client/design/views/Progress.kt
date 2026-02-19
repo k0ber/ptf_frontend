@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -35,9 +36,9 @@ fun PtfLinearProgress(
     height: Dp = 4.dp,
     trackColor: Color = Color.Transparent,
     headColors: List<Color> = listOf(
-        MaterialTheme.colorScheme.primary,
-        MaterialTheme.colorScheme.secondary,
-        MaterialTheme.colorScheme.tertiary
+        colorScheme.primary,
+        colorScheme.secondary,
+        colorScheme.tertiary
     ),
     barFraction: Float = 0.33f,     // доля ширины градиента
     durationMillis: Int = 900

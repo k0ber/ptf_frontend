@@ -1,5 +1,6 @@
 package org.patifiner.client.design
 
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -16,9 +17,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
@@ -36,10 +39,15 @@ fun PtfTheme(forceDarkMode: Boolean? = null, content: @Composable () -> Unit) {
     MaterialTheme(
         colorScheme = if (isDark) darkScheme() else lightScheme(),
         typography = ptfTypography(),
-        shapes = AppShapes,
+        shapes = PtfShapes,
         content = {
-            CompositionLocalProvider(LocalSpacing provides Spacing()) {
-                // app background to prevent janks on screen changes
+            CompositionLocalProvider(
+                LocalSpacing provides PtfSpacing(),
+                LocalIndication provides ripple(
+                    color = colorScheme.primary.copy(alpha = if (isDark) 0.22f else 0.18f),
+                )
+            ) {
+                // app background to make screen transitions look better
                 GradientBackground(modifier = Modifier.fillMaxSize()) {
                     content()
                 }
@@ -52,7 +60,7 @@ private fun lightScheme(): ColorScheme = lightColorScheme(
     // Брендовые
     primary = Color(0xFF6C4CF5),
     onPrimary = Color.White,
-    primaryContainer = Color(0xFFB9A6FF), // светл
+    primaryContainer = Color(0xFFB9A6FF),
     onPrimaryContainer = Color(0xFF1C0062),
 
     secondary = Color(0xFF5840C7),
@@ -66,7 +74,7 @@ private fun lightScheme(): ColorScheme = lightColorScheme(
     onTertiaryContainer = Color(0xFF370017),
 
     // Поверхности
-    background = Color(0xFFFDF7FD), // нежный светлый розовато-белый
+    background = Color(0xFFFDF7FD),
     onBackground = Color(0xFF111113),
     surface = Color(0xFFF9F9FC),
     onSurface = Color(0xFF111113),
@@ -101,7 +109,7 @@ private fun darkScheme(): ColorScheme = darkColorScheme(
     onTertiaryContainer = Color.White,
 
     // Поверхности
-    background = Color(0xFF1B1B23), // лёгкий, не абсолютно чёрный
+    background = Color(0xFF1B1B23),
     onBackground = Color(0xFFEDEDF0),
     surface = Color(0xFF21212A),
     onSurface = Color(0xFFEDEDF0),
@@ -118,13 +126,12 @@ private fun darkScheme(): ColorScheme = darkColorScheme(
     scrim = Color(0xFF000000)
 )
 
-// ==================================================================================================================
-// ==================================================================================================================
+// region Preview
 private data class Swatch(val name: String, val bg: Color, val fg: Color)
 
 @Composable
 fun ThemeColorsGrid(modifier: Modifier = Modifier) {
-    val scheme = MaterialTheme.colorScheme
+    val scheme = colorScheme
     val swatches =
         listOf(
             Swatch("primary", scheme.primary, scheme.onPrimary),
@@ -143,9 +150,9 @@ fun ThemeColorsGrid(modifier: Modifier = Modifier) {
             Swatch("error", scheme.error, scheme.onError),
 
             // Добавим несколько служебных/редко-используемых токенов с авто-подбором текста:
-            Swatch("outline", MaterialTheme.colorScheme.outline, scheme.outline),
-            Swatch("inverseSurface", MaterialTheme.colorScheme.inverseSurface, scheme.inverseSurface),
-            Swatch("inversePrimary", MaterialTheme.colorScheme.inversePrimary, scheme.inversePrimary),
+            Swatch("outline", colorScheme.outline, scheme.outline),
+            Swatch("inverseSurface", colorScheme.inverseSurface, scheme.inverseSurface),
+            Swatch("inversePrimary", colorScheme.inversePrimary, scheme.inversePrimary),
         )
 
     LazyColumn(
@@ -175,7 +182,6 @@ fun ThemeColorsGrid(modifier: Modifier = Modifier) {
     }
 }
 
-// =============================================================================================
 @Preview
 @Composable
 fun ThemeColorsPreview() {
@@ -192,3 +198,4 @@ fun ThemeColorsPreview() {
         }
     }
 }
+// endregion

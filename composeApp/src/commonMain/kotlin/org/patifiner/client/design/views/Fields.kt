@@ -14,6 +14,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -73,10 +75,10 @@ fun PtfTextField(
         isError = isError,
         shape = RoundedCornerShape(14.dp),
         colors = OutlinedTextFieldDefaults.colors(
-            unfocusedBorderColor = MaterialTheme.colorScheme.primary,
-            errorBorderColor = MaterialTheme.colorScheme.error,
+            unfocusedBorderColor = colorScheme.primary,
+            errorBorderColor = colorScheme.error,
         ),
-        textStyle = MaterialTheme.typography.bodyLarge,
+        textStyle = typography.bodyLarge,
         label = if (label.isNotEmpty()) { { FieldLabel(label) } } else null,
         placeholder = if (placeholder.isNotEmpty()) { { FieldPlaceholder(placeholder) } } else null,
         supportingText = if (supportingText.isNotEmpty()) { { FieldSupportingText(supportingText) } } else null,
@@ -125,7 +127,7 @@ fun EmailField(
             Icon(
                 painter = rememberVectorPainter(PtfIcons.IcEmail),
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary
+                tint = colorScheme.primary
             )
         }
     )
@@ -164,7 +166,7 @@ fun PasswordField(
             Icon(
                 painter = rememberVectorPainter(PtfIcons.IcPassword),
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary
+                tint = colorScheme.primary
             )
         },
         trailingIcon = {
@@ -172,7 +174,7 @@ fun PasswordField(
                 Icon(
                     imageVector = if (visible) PtfIcons.IcVisibilityOn else PtfIcons.IcVisibilityOff,
                     contentDescription = if (visible) "Скрыть пароль" else "Показать пароль",
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = colorScheme.primary
                 )
             }
         }
@@ -183,8 +185,8 @@ fun PasswordField(
 fun FieldLabel(text: String) {
     Text(
         text = text,
-        color = MaterialTheme.colorScheme.secondary,
-        style = MaterialTheme.typography.labelLarge,
+        color = colorScheme.secondary,
+        style = typography.labelLarge,
         fontSize = 16.sp
     )
 }
@@ -193,8 +195,8 @@ fun FieldLabel(text: String) {
 fun FieldPlaceholder(text: String) {
     Text(
         text = text,
-        color = MaterialTheme.colorScheme.outline,
-        style = MaterialTheme.typography.bodyMedium,
+        color = colorScheme.outline,
+        style = typography.bodyMedium,
         fontSize = 14.sp,
         maxLines = 1,
         softWrap = false
@@ -205,8 +207,8 @@ fun FieldPlaceholder(text: String) {
 fun FieldSupportingText(text: String) {
     Text(
         text = text,
-        color = MaterialTheme.colorScheme.outline,
-        style = MaterialTheme.typography.bodyMedium,
+        color = colorScheme.outline,
+        style = typography.bodyMedium,
         fontSize = 14.sp,
         maxLines = 1,
         softWrap = false
@@ -225,22 +227,20 @@ fun FieldsPreview() {
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Normal state", style = MaterialTheme.typography.titleMedium)
+        PtfText("Normal state")
         PtfTextField(
             value = "",
             onValueChange = {},
             label = "Username",
             placeholder = "Enter your username"
         )
-
-        Text("Filled state", style = MaterialTheme.typography.titleMedium)
+        PtfText("Filled state")
         PtfTextField(
             value = "John Doe",
             onValueChange = {},
             label = "Full Name"
         )
-
-        Text("Error state", style = MaterialTheme.typography.titleMedium)
+        PtfText("Error state")
         PtfTextField(
             value = "invalid_input",
             onValueChange = {},
@@ -248,28 +248,24 @@ fun FieldsPreview() {
             isError = true,
             supportingText = "Username is already taken"
         )
-
-        Text("Disabled state", style = MaterialTheme.typography.titleMedium)
+        PtfText("Disabled state")
         PtfTextField(
             value = "Cannot edit this",
             onValueChange = {},
             label = "ID",
             enabled = false
         )
-
-        Text("Email Field", style = MaterialTheme.typography.titleMedium)
+        PtfText("Email Field")
         EmailField(
             value = "test@example.com",
             onValueChange = {}
         )
-
-        Text("Password Field", style = MaterialTheme.typography.titleMedium)
+        PtfText("Password Field")
         PasswordField(
             value = "password123",
             onValueChange = {},
             label = "Password"
         )
-        
         Spacer(Modifier.height(32.dp))
     }
 }
