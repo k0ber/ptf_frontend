@@ -7,7 +7,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -40,15 +41,15 @@ fun PtfShadowedText(text: String, fontSize: Int = 32, modifier: Modifier = Modif
     Text(
         modifier = modifier,
         text = text,
-        style = MaterialTheme.typography.headlineLarge.copy(
+        style = typography.headlineLarge.copy(
             fontWeight = FontWeight.ExtraBold,
             fontSize = fontSize.sp,
             letterSpacing = 2.sp,
-            color = MaterialTheme.colorScheme.primary,
+            color = colorScheme.primary,
             shadow = Shadow(
-                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f),
-                offset = Offset(0f, 0f),   // смещение (0,0) = ровное свечение
-                blurRadius = 24f           // радиус размытия
+                color = colorScheme.primary.copy(alpha = 0.6f),
+                offset = Offset(0f, 0f), // смещение (0,0) = ровное свечение
+                blurRadius = 24f                // радиус размытия
             )
         )
     )
@@ -59,10 +60,10 @@ fun PtfText(text: String, fontSize: Int = 16, modifier: Modifier = Modifier) {
     Text(
         modifier = modifier,
         text = text,
-        style = MaterialTheme.typography.titleMedium.copy(
+        style = typography.titleMedium.copy(
             fontWeight = FontWeight.Bold,
             fontSize = fontSize.sp,
-            color = MaterialTheme.colorScheme.secondary
+            color = colorScheme.secondary
         )
     )
 }
@@ -75,15 +76,12 @@ fun PtfLinkHint(
     modifier: Modifier = Modifier
 ) {
     val annotatedString = buildAnnotatedString {
-        withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.secondary)) {
+        withStyle(style = SpanStyle(color = colorScheme.secondary)) {
             append(text)
             append(" ")
         }
         withStyle(
-            style = SpanStyle(
-                color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Bold
-            )
+            style = SpanStyle(color = colorScheme.primary, fontWeight = FontWeight.Bold)
         ) {
             append(linkText)
         }
@@ -91,7 +89,7 @@ fun PtfLinkHint(
 
     Text(
         text = annotatedString,
-        style = MaterialTheme.typography.bodyMedium,
+        style = typography.bodyMedium,
         modifier = modifier
             .clickable(onClick = onClick)
             .padding(8.dp)
@@ -103,10 +101,10 @@ fun PtfInputExampleText(text: String, fontSize: Int = 14, modifier: Modifier = M
     Text(
         modifier = modifier,
         text = text,
-        style = MaterialTheme.typography.bodyMedium.copy(
+        style = typography.bodyMedium.copy(
             fontWeight = FontWeight.Medium,
             fontSize = fontSize.sp,
-            color = MaterialTheme.colorScheme.outline
+            color = colorScheme.outline
         )
     )
 }
@@ -116,10 +114,10 @@ fun PtfWarningText(text: String, fontSize: Int = 14, modifier: Modifier = Modifi
     Text(
         modifier = modifier,
         text = text,
-        style = MaterialTheme.typography.bodyMedium.copy(
+        style = typography.bodyMedium.copy(
             fontWeight = FontWeight.Medium,
             fontSize = fontSize.sp,
-            color = MaterialTheme.colorScheme.error
+            color = colorScheme.error
         )
     )
 }

@@ -100,6 +100,7 @@ fun LoginContent(
             enabled = emailValid && passValid && !state.isLoading,
             onClick = onLogin,
         )
+        Spacer(Modifier.height(4.dp))
         PtfLinkHint(text = "Don’t have an account?", linkText = "Sign Up", onClick = onSignup)
         Spacer(Modifier.weight(1f))
     }

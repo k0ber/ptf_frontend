@@ -5,7 +5,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,11 +32,11 @@ fun Chip(
             onClick = onClick,
             label = { Text(text) },
             modifier = modifier,
-            shape = MaterialTheme.shapes.medium,
-            border = if (!selected) BorderStroke(1.dp, MaterialTheme.colorScheme.outline) else null,
+            shape = shapes.medium,
+            border = if (!selected) BorderStroke(1.dp, colorScheme.outline) else null,
             colors = FilterChipDefaults.filterChipColors(
-                selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
-                selectedLabelColor = MaterialTheme.colorScheme.primary
+                selectedContainerColor = colorScheme.primary.copy(alpha = 0.12f),
+                selectedLabelColor = colorScheme.primary
             ),
         )
     }

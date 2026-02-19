@@ -11,7 +11,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.shapes
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,10 +39,10 @@ fun TopicCard(
     isInBreadcrumb: Boolean,
     onClick: (TopicViewModel) -> Unit,
 ) {
-    val borderColor = (if (isOpened) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.secondary).copy(alpha = 0.5f)
-    val backgroundColor = MaterialTheme.colorScheme.surface
+    val borderColor = (if (isOpened) colorScheme.tertiary else colorScheme.secondary).copy(alpha = 0.5f)
+    val backgroundColor = colorScheme.surface
 
-    if (isInBreadcrumb || isOpened) MaterialTheme.colorScheme.primary.copy(alpha = 0.7f) else MaterialTheme.colorScheme.secondary
+    if (isInBreadcrumb || isOpened) colorScheme.primary.copy(alpha = 0.7f) else colorScheme.secondary
     // todo: indications and colors
     Surface(
         modifier = modifier.wrapContentHeight().clickable { onClick(topic) },
@@ -49,13 +51,16 @@ fun TopicCard(
         color = backgroundColor,
     ) {
         val textColor = when {
-            isInBreadcrumb -> MaterialTheme.colorScheme.primary
-            isInBreadcrumb -> MaterialTheme.colorScheme.secondary
-            else -> MaterialTheme.colorScheme.onSurface
+            isInBreadcrumb -> colorScheme.primary
+            isInBreadcrumb -> colorScheme.secondary
+            else -> colorScheme.onSurface
         }
         Text(
-            text = topic.name, modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp), style = MaterialTheme.typography.titleSmall.copy(
-                fontWeight = if (isInBreadcrumb) FontWeight.SemiBold else FontWeight.Normal, color = textColor
+            text = topic.name,
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+            style = typography.titleSmall.copy(
+                fontWeight = if (isInBreadcrumb) FontWeight.SemiBold
+                else FontWeight.Normal, color = textColor
             )
         )
     }
@@ -76,32 +81,32 @@ fun TopicCardColored(
 
     // Цветовая логика
     val backgroundColor = when {
-        isSelected -> MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
-        isInBreadcrumb -> MaterialTheme.colorScheme.secondary.copy(alpha = 0.12f)
-        else -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.08f)
+        isSelected -> colorScheme.primary.copy(alpha = 0.15f)
+        isInBreadcrumb -> colorScheme.secondary.copy(alpha = 0.12f)
+        else -> colorScheme.surfaceVariant.copy(alpha = 0.08f)
     }
 
     val borderColor = when {
-        level != null -> MaterialTheme.colorScheme.primary
-        hasChildren -> MaterialTheme.colorScheme.outline.copy(alpha = 0.7f)
-        else -> MaterialTheme.colorScheme.outline
+        level != null -> colorScheme.primary
+        hasChildren -> colorScheme.outline.copy(alpha = 0.7f)
+        else -> colorScheme.outline
     }
 
     Surface(
-        modifier = modifier.clip(MaterialTheme.shapes.medium).clickable { onClick(topic) }.background(backgroundColor).padding(horizontal = 10.dp, vertical = 6.dp),
+        modifier = modifier.clip(shapes.medium).clickable { onClick(topic) }.background(backgroundColor).padding(horizontal = 10.dp, vertical = 6.dp),
         border = BorderStroke(1.dp, borderColor),
         tonalElevation = if (isSelected) 3.dp else 0.dp,
-        shape = MaterialTheme.shapes.medium
+        shape = shapes.medium
     ) {
         Row(
             modifier = Modifier.wrapContentSize(), horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
-            Text(text = topic.name, style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+            Text(text = topic.name, style = typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
             if (hasComment) {
                 Text(text = "💬", modifier = Modifier.padding(start = 6.dp))
             }
             if (hasChildren) {
-                Text(text = "..", color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(start = 6.dp))
+                Text(text = "..", color = colorScheme.onSurfaceVariant, modifier = Modifier.padding(start = 6.dp))
             }
             if (level != null) {
                 PtfShadowedText(

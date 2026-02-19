@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -23,8 +23,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.compose.stack.Children
-import org.patifiner.client.design.PtfTheme
 import org.patifiner.client.design.PtfAnim
+import org.patifiner.client.design.PtfTheme
 import org.patifiner.client.design.views.PtfScaffold
 import org.patifiner.client.design.views.PtfWarningText
 import org.patifiner.client.login.LoginScreen
@@ -47,7 +47,7 @@ fun RootScreen(rootComponent: RootComponent) {
                                 contentAlignment = Alignment.Center,
                                 modifier = Modifier.fillMaxWidth()
                                     .height(32.dp)
-                                    .background(MaterialTheme.colorScheme.errorContainer)
+                                    .background(colorScheme.errorContainer)
                             ) {
                                 PtfWarningText("No Internet Connection")
                             }

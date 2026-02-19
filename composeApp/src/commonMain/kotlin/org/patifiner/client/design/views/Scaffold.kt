@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
@@ -44,10 +44,10 @@ fun PtfSnackbarHost(
     ) { data ->
         Snackbar(
             shape = RoundedCornerShape(12.dp),
-            containerColor = MaterialTheme.colorScheme.surface,
-            contentColor = MaterialTheme.colorScheme.onSurface,
-            actionColor = MaterialTheme.colorScheme.primary,
-            dismissActionContentColor = MaterialTheme.colorScheme.primary,
+            containerColor = colorScheme.surface,
+            contentColor = colorScheme.onSurface,
+            actionColor = colorScheme.primary,
+            dismissActionContentColor = colorScheme.primary,
             snackbarData = data
         )
     }
@@ -61,12 +61,11 @@ fun PtfScaffoldPreview() {
         val hostState = remember { SnackbarHostState() }
         LaunchedEffect(Unit) {
             hostState.showSnackbar(
-                message ="Preview snackbar message",
+                message = "Preview snackbar message",
                 duration = SnackbarDuration.Indefinite
             )
         }
         PtfScaffold(modifier = Modifier.fillMaxSize(), snackbarHostState = hostState) {
-            PtfIntro()
         }
     }
 }

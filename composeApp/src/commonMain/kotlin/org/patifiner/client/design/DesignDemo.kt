@@ -14,7 +14,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.shapes
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -29,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.patifiner.client.design.views.Chip
 
+// todo: update or delete
 @Composable
 fun DesignDemo() {
     val sp = LocalSpacing.current
@@ -46,11 +49,11 @@ fun DesignDemo() {
     ) {
         // Типографика
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text("Display Large", style = MaterialTheme.typography.displayLarge)
-            Text("Headline", style = MaterialTheme.typography.headlineMedium)
-            Text("Title", style = MaterialTheme.typography.titleMedium)
-            Text("Body", style = MaterialTheme.typography.bodyLarge)
-            Text("Label", style = MaterialTheme.typography.labelLarge)
+            Text("Display Large", style = typography.displayLarge)
+            Text("Headline", style = typography.headlineMedium)
+            Text("Title", style = typography.titleMedium)
+            Text("Body", style = typography.bodyLarge)
+            Text("Label", style = typography.labelLarge)
         }
 
         // Кнопки
@@ -63,7 +66,7 @@ fun DesignDemo() {
         }
 
         // Чипы интересов
-        Text("Интересы", style = MaterialTheme.typography.titleMedium)
+        Text("Интересы", style = typography.titleMedium)
         FlowRowWrap {
             val interests = listOf("Kotlin", "Compose", "Running", "Art", "Gaming", "Coffee", "Travel")
             val selected = remember { mutableStateListOf<String>() }
@@ -84,9 +87,9 @@ fun DesignDemo() {
             horizontalArrangement = Arrangement.spacedBy(sp.sm.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            ColorSwatch("Primary", MaterialTheme.colorScheme.primary)
-            ColorSwatch("Surface", MaterialTheme.colorScheme.surface)
-            ColorSwatch("Error", MaterialTheme.colorScheme.error)
+            ColorSwatch("Primary", colorScheme.primary)
+            ColorSwatch("Surface", colorScheme.surface)
+            ColorSwatch("Error", colorScheme.error)
         }
 
         Row(
@@ -115,10 +118,10 @@ private fun ColorSwatch(name: String, color: Color) {
         Box(
             Modifier
                 .size(48.dp)
-                .background(color, shape = MaterialTheme.shapes.small)
+                .background(color, shape = shapes.small)
         )
         Spacer(Modifier.height(6.dp))
-        Text(name, style = MaterialTheme.typography.labelLarge)
+        Text(name, style = typography.labelLarge)
     }
 }
 
