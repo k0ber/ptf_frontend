@@ -1,9 +1,8 @@
-package org.patifiner.client.signup.ui
+package org.patifiner.client.signup
 
 import androidx.compose.runtime.Immutable
 import org.patifiner.client.base.BaseState
 import org.patifiner.client.base.Constants
-import org.patifiner.client.signup.CreateUserRequest
 
 @Immutable
 data class SignupState(

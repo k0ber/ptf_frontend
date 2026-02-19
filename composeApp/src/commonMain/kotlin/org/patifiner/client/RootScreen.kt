@@ -29,7 +29,7 @@ import org.patifiner.client.design.views.PtfScaffold
 import org.patifiner.client.design.views.PtfWarningText
 import org.patifiner.client.login.LoginScreen
 import org.patifiner.client.main.MainScreen
-import org.patifiner.client.signup.ui.SignupScreen
+import org.patifiner.client.signup.SignupScreen
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalDecomposeApi::class, ExperimentalSharedTransitionApi::class)
 @Composable

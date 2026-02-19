@@ -6,7 +6,7 @@ import com.arkivanov.mvikotlin.extensions.coroutines.coroutineExecutorFactory
 import org.patifiner.client.base.createDefault
 import org.patifiner.client.base.execute
 import org.patifiner.client.login.data.AuthRepository
-import org.patifiner.client.signup.ui.SignupState
+import org.patifiner.client.signup.SignupState
 
 interface SignupStore : Store<SignupIntent, SignupState, SignupLabel>
 
