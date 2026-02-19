@@ -15,6 +15,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
+import org.jetbrains.compose.resources.stringResource
 import org.patifiner.client.base.Constants
 import org.patifiner.client.base.showError
 import org.patifiner.client.base.takeIfOrEmpty
@@ -27,6 +28,15 @@ import org.patifiner.client.design.views.PrimaryButton
 import org.patifiner.client.design.views.PtfIntro
 import org.patifiner.client.design.views.PtfLinearProgress
 import org.patifiner.client.design.views.PtfLinkHint
+import patifinerclient.composeapp.generated.resources.Res
+import patifinerclient.composeapp.generated.resources.dont_have_account
+import patifinerclient.composeapp.generated.resources.email_incorrect
+import patifinerclient.composeapp.generated.resources.email_placeholder
+import patifinerclient.composeapp.generated.resources.loading_button
+import patifinerclient.composeapp.generated.resources.login_button
+import patifinerclient.composeapp.generated.resources.password_label
+import patifinerclient.composeapp.generated.resources.pwd_to_short
+import patifinerclient.composeapp.generated.resources.signup_link
 
 @Composable
 fun LoginScreen(
@@ -71,37 +81,41 @@ fun LoginContent(
 
     PtfScreen {
         PtfLinearProgress(isLoading = state.isLoading)
-
         Spacer(Modifier.weight(1f))
         PtfIntro(modifier = Modifier.fillMaxWidth())
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.height(16.dp))
         EmailField(
             modifier = centeredField(),
             value = email,
-            placeholder = "name@example.com",
+            placeholder = stringResource(Res.string.email_placeholder),
             onValueChange = onEmailChange,
             isError = email.isNotEmpty() && !emailValid,
-            supportingText = "Введите корректный e-mail".takeIfOrEmpty(email.isNotEmpty() && !emailValid),
+            supportingText = stringResource(Res.string.email_incorrect).takeIfOrEmpty(email.isNotEmpty() && !emailValid),
             imeAction = ImeAction.Next
         )
         Spacer(Modifier.height(4.dp))
         PasswordField(
             modifier = centeredField().focusRequester(passwordFocusRequester),
             value = pass,
-            label = "Password",
+            label = stringResource(Res.string.password_label),
             onValueChange = onPasswordChange,
             isError = pass.isNotEmpty() && !passValid,
-            supportingText = "Минимум 8 символов".takeIfOrEmpty(pass.isNotEmpty() && !passValid),
+            supportingText = stringResource(Res.string.pwd_to_short).takeIfOrEmpty(pass.isNotEmpty() && !passValid),
             imeAction = ImeAction.Done,
             onImeAction = onLogin
         )
+        Spacer(Modifier.height(16.dp))
         PrimaryButton(
-            text = if (state.isLoading) "Loading..." else "Login",
+            text = if (state.isLoading) stringResource(Res.string.loading_button) else stringResource(Res.string.login_button),
             enabled = emailValid && passValid && !state.isLoading,
             onClick = onLogin,
         )
         Spacer(Modifier.height(4.dp))
-        PtfLinkHint(text = "Don’t have an account?", linkText = "Sign Up", onClick = onSignup)
+        PtfLinkHint(
+            text = stringResource(Res.string.dont_have_account),
+            linkText = stringResource(Res.string.signup_link), 
+            onClick = onSignup
+        )
         Spacer(Modifier.weight(1f))
     }
 }
