@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.patifiner.client.base.asValue
-import org.patifiner.client.signup.ui.SignupState
+import org.patifiner.client.signup.SignupState
 
 class SignupComponent(
     componentContext: ComponentContext,

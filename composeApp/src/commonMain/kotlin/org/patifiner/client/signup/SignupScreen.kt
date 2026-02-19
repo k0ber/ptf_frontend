@@ -1,4 +1,4 @@
-package org.patifiner.client.signup.ui
+package org.patifiner.client.signup
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -19,12 +19,9 @@ import org.patifiner.client.design.views.PtfIntro
 import org.patifiner.client.design.views.PtfLinearProgress
 import org.patifiner.client.design.views.PtfLinkHint
 import org.patifiner.client.design.views.PtfTextField
-import org.patifiner.client.signup.SignupComponent
-import org.patifiner.client.signup.SignupIntent
 import org.patifiner.client.signup.SignupIntent.ChangeEmail
 import org.patifiner.client.signup.SignupIntent.ChangeName
 import org.patifiner.client.signup.SignupIntent.Signup
-import org.patifiner.client.signup.SignupLabel
 
 @Composable
 fun SignupScreen(
