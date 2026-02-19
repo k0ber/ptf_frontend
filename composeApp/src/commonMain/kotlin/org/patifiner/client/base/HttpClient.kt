@@ -30,7 +30,7 @@ fun createHttpClient(
     json: Json,
     config: ApiConfig,
     tokenStorage: TokenStorage,
-    authRepositoryProvider: () -> AuthRepository // Используем лямбду, чтобы избежать циклической зависимости в Koin
+    authRepositoryProvider: () -> AuthRepository // prevents cycle dependency in Koin
 ): HttpClient {
     return HttpClient(engine) {
         expectSuccess = false
