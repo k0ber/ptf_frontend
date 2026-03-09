@@ -10,8 +10,13 @@ on:
       - 'v*'
 
 jobs:
+  common_env:
+    uses: ./.github/workflows/_common_env.yml
+
   build:
+    needs: common_env
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -19,30 +24,29 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'temurin'
 
-      # Декодируем файл подписи из секрета
       - name: Decode Keystore
         run: echo "${{ secrets.KEYSTORE_FILE }}" | base64 --decode > ../release.keystore
 
-      # Собираем релизный билд
-      - name: Build with Gradle
+      - name: Build Release apk
         run: ./gradlew assembleRelease
         env:
+          ORG_GRADLE_PROJECT_versionName: ${{ needs.common_env.outputs.version_name }}
+          ORG_GRADLE_PROJECT_versionCode: ${{ needs.common_env.outputs.version_code }}
+          ORG_GRADLE_PROJECT_isCi: ${{ needs.common_env.outputs.is_ci }}
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-          VERSION_CODE: ${{ github.run_number }}
-          VERSION_NAME: ${{ github.ref_name || 'manual' }}
+          VERSION_CODE: ${{ needs.common_env.outputs.version_code }}
+          VERSION_NAME: ${{ needs.common_env.outputs.version_name }}
 
-      # Загрузка в RuStore
       - name: Upload to RuStore
         uses: ru-store/rustore-upload-action@v1.1.0
         with:
           key-id: ${{ secrets.RUSTORE_KEY_ID }}
           private-key: ${{ secrets.RUSTORE_PRIVATE_KEY }}
           app-id: org.patifiner.client
-          # Путь к APK может немного отличаться в зависимости от структуры проекта
-          bundle-path: composeApp/build/outputs/apk/release/composeApp-release.apk
+          bundle-path: androidApp/build/outputs/apk/release/composeApp-release.apk
           publish-type: "MANUAL"

@@ -37,9 +37,6 @@ data class KoinAppConfig(
 fun initKoin(config: KoinAppConfig, appDeclaration: KoinAppDeclaration = {}) =
     startKoin {
         appDeclaration()
-
-        Platform.initNapier()
-
         modules(appModule, module {
             single { config.engine }
             single { config.apiConfig }
@@ -47,9 +44,11 @@ fun initKoin(config: KoinAppConfig, appDeclaration: KoinAppDeclaration = {}) =
             single { Platform.settings() }
             single { Platform.networkObserver() }
         })
+
+        Platform.onAppInit() // should be called from platform entry point, not here?
     }
 
-private val appModule = module {
+val appModule = module {
     single {
         Json {
             prettyPrint = true
@@ -61,7 +60,6 @@ private val appModule = module {
     }
 
     single<TokenStorage> { TokenStorageImpl(settings = get()) }
-    single<StoreFactory> { DefaultStoreFactory() }
 
     single {
         createHttpClient(
@@ -75,14 +73,20 @@ private val appModule = module {
 
     single { AuthRepository(client = get(), tokenStorage = get()) }
 
+    // mvi
+    single<StoreFactory> {
+//        if (BuildConfig.IsDev) todo: use logging only for dev build
+// but it seems we need BuildKonfig for this
+//        LoggingStoreFactory(delegate = DefaultStoreFactory())
+//        else
+        DefaultStoreFactory()
+    }
+
     factoryOf(::LoginUseCase)
     factory<LoginStore> { LoginStoreFactory(factory = get(), loginUseCase = get()).create() }
-
     factory<SignupStore> { SignupStoreFactory(factory = get(), signupUseCase = get()).create() }
     factoryOf(::SignupUseCase)
-
     factoryOf(::LogoutUseCase)
-
 
     // Session scope
     scope(named("LoggedInScope")) {

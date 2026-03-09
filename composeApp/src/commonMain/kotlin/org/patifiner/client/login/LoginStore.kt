@@ -5,6 +5,8 @@ import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.coroutineExecutorFactory
 import org.patifiner.client.base.BaseState
+import org.patifiner.client.base.Constants
+import org.patifiner.client.base.PtfLog
 import org.patifiner.client.base.TokenRequest
 import org.patifiner.client.base.createDefault
 import org.patifiner.client.base.execute
@@ -15,7 +17,9 @@ interface LoginStore : Store<LoginIntent, LoginState, LoginLabel>
 @Immutable
 data class LoginState(
     val email: String = "",
+    val isEmailError: Boolean = false,
     val password: String = "",
+    val isPasswordError: Boolean = false,
     override val isLoading: Boolean = false
 ) : BaseState<LoginState> {
     override fun withLoading(isLoading: Boolean): LoginState = copy(isLoading = isLoading)
@@ -32,7 +36,7 @@ sealed interface LoginIntent {
     data object Login : LoginIntent
 }
 
-internal class LoginStoreFactory(
+class LoginStoreFactory(
     private val factory: StoreFactory,
     private val loginUseCase: LoginUseCase
 ) {
@@ -43,11 +47,19 @@ internal class LoginStoreFactory(
             executorFactory = coroutineExecutorFactory {
 
                 onIntent<LoginIntent.ChangeEmail> { intent ->
-                    dispatch { copy(email = intent.email) }
+                    dispatch {
+                        PtfLog.d { "ChangeEmail: ${intent.email}" }
+                        val isEmailError = !Constants.emailRegex.matches(email)
+                        copy(email = intent.email, isEmailError = isEmailError)
+                    }
                 }
 
                 onIntent<LoginIntent.ChangePassword> { intent ->
-                    dispatch { copy(password = intent.password) }
+                    dispatch {
+                        PtfLog.d { "ChangePwf: ${intent.password}" }
+                        val isPwdError = intent.password.length >= Constants.MIN_PASS_LNG
+                        copy(password = intent.password, isPasswordError = isPwdError)
+                    }
                 }
 
                 onIntent<LoginIntent.Login> {
@@ -60,6 +72,7 @@ internal class LoginStoreFactory(
         ) {}
 }
 
-class LoginUseCase(private val repo: AuthRepository) {
-    suspend operator fun invoke(tokenRequest: TokenRequest): Result<Unit> = repo.requestToken(tokenRequest)
+class LoginUseCase(private val repo: AuthRepository) { // redundant class
+    suspend operator fun invoke(tokenRequest: TokenRequest): Result<Unit> =
+        repo.requestToken(tokenRequest)
 }

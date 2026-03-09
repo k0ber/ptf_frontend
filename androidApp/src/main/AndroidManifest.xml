@@ -16,8 +16,14 @@
         android:supportsRtl="false"
         android:theme="@android:style/Theme.Material.Light.NoActionBar"
         tools:targetApi="33">
+
+        <profileable
+            android:shell="true"
+            tools:targetApi="33" />
+
         <activity
             android:name=".MainActivity"
+            android:theme="@style/Theme.App.Splash"
             android:exported="true"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>

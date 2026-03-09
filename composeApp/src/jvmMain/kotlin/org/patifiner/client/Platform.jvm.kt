@@ -19,8 +19,15 @@ actual object Platform {
     actual fun engineFactory(): HttpClientEngineFactory<*> = OkHttp
     actual fun networkObserver(): NetworkObserver = JvmNetworkObserver()
 
-    actual fun settings(): Settings = PreferencesSettings(Preferences.userRoot().node("patifiner_settings"))
-    actual fun initNapier() = Napier.base(DebugAntilog())
+    actual fun settings(): Settings = PreferencesSettings(
+        Preferences.userRoot().node("patifiner_settings")
+    )
 
-    actual fun appMainScope(): CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+    actual fun appMainScope(): CoroutineScope =
+        CoroutineScope(SupervisorJob() + Dispatchers.Main)
+
+    actual fun onAppInit() {
+        Napier.base(DebugAntilog())
+    }
+
 }

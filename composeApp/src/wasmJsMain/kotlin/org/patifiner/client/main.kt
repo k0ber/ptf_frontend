@@ -6,8 +6,8 @@ import androidx.compose.ui.window.ComposeViewport
 import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import com.arkivanov.essenty.lifecycle.resume
-import io.github.aakira.napier.Napier
 import kotlinx.browser.document
+import org.patifiner.client.base.PtfLog
 import org.w3c.dom.HTMLElement
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -24,7 +24,8 @@ fun main() {
         )
         RootComponent(componentContext = DefaultComponentContext(lifecycle = lifecycle))
     } catch (e: Throwable) {
-        Napier.e(tag = "WasmMain", throwable = e) { "Koin/RootComponent initialization failed" }
+        PtfLog.e(e) { "Koin/RootComponent initialization failed" }
+
         hideAppLoader()
         null
     }

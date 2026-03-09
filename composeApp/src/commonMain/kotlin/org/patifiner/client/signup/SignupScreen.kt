@@ -8,12 +8,15 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import org.jetbrains.compose.resources.stringResource
 import org.patifiner.client.base.showError
 import org.patifiner.client.base.takeIfOrEmpty
+import org.patifiner.client.base.trackCompositions
 import org.patifiner.client.design.PtfScreen
+import org.patifiner.client.design.PtfTheme
 import org.patifiner.client.design.centeredField
 import org.patifiner.client.design.views.EmailField
 import org.patifiner.client.design.views.PasswordField
@@ -29,14 +32,11 @@ import org.patifiner.client.signup.SignupIntent.ChangePassword
 import org.patifiner.client.signup.SignupIntent.Signup
 import patifinerclient.composeapp.generated.resources.Res
 import patifinerclient.composeapp.generated.resources.already_have_account
-import patifinerclient.composeapp.generated.resources.confirm_password_label
 import patifinerclient.composeapp.generated.resources.create_account_button
 import patifinerclient.composeapp.generated.resources.creating_button
 import patifinerclient.composeapp.generated.resources.email_incorrect
-import patifinerclient.composeapp.generated.resources.email_placeholder
 import patifinerclient.composeapp.generated.resources.login_link
 import patifinerclient.composeapp.generated.resources.name_label
-import patifinerclient.composeapp.generated.resources.password_label
 import patifinerclient.composeapp.generated.resources.passwords_dont_match
 import patifinerclient.composeapp.generated.resources.pwd_to_short
 
@@ -51,7 +51,9 @@ fun SignupScreen(
         component.labels.collect { label ->
             when (label) {
                 is SignupLabel.Error -> snackbarHostState.showError(label.message)
-                SignupLabel.Success -> { /* Navigate or show success */ }
+                SignupLabel.Success -> {
+                    /** handled in @RootComponent via repo */
+                }
             }
         }
     }
@@ -77,7 +79,7 @@ fun SignupContent(
     onSignup: () -> Unit,
     onBackToLogin: () -> Unit
 ) {
-    PtfScreen {
+    PtfScreen(name = "Signup") {
         PtfLinearProgress(isLoading = state.isLoading)
         PtfIntro()
         Spacer(Modifier.height(16.dp))
@@ -92,19 +94,17 @@ fun SignupContent(
         )
         Spacer(Modifier.height(8.dp))
         EmailField(
-            modifier = centeredField(),
+            modifier = centeredField().trackCompositions("SignupEmail"),
             value = state.email,
             onValueChange = onEmailChange,
-            placeholder = stringResource(Res.string.email_placeholder),
             isError = state.email.isNotEmpty() && !state.emailValid,
             supportingText = stringResource(Res.string.email_incorrect).takeIfOrEmpty(state.email.isNotEmpty() && !state.emailValid),
             imeAction = ImeAction.Next
         )
         Spacer(Modifier.height(8.dp))
         PasswordField(
-            modifier = centeredField(),
+            modifier = centeredField().trackCompositions("SignupPassword"),
             value = state.password,
-            label = stringResource(Res.string.password_label),
             onValueChange = onPasswordChange,
             isError = state.password.isNotEmpty() && !state.passwordValid,
             supportingText = stringResource(Res.string.pwd_to_short).takeIfOrEmpty(state.password.isNotEmpty() && !state.passwordValid),
@@ -114,7 +114,6 @@ fun SignupContent(
         PasswordField(
             modifier = centeredField(),
             value = state.confirm,
-            label = stringResource(Res.string.confirm_password_label),
             onValueChange = onConfirmPasswordChange,
             isError = state.confirm.isNotEmpty() && !state.confirmValid,
             supportingText = stringResource(Res.string.passwords_dont_match).takeIfOrEmpty(state.confirm.isNotEmpty() && !state.confirmValid),
@@ -130,8 +129,33 @@ fun SignupContent(
         Spacer(Modifier.height(4.dp))
         PtfLinkHint(
             text = stringResource(Res.string.already_have_account),
-            linkText = stringResource(Res.string.login_link), 
+            linkText = stringResource(Res.string.login_link),
             onClick = onBackToLogin
         )
     }
+}
+
+@Composable
+fun SignupPreview() {
+    SignupContent(
+        state = SignupState(isLoading = false, email = "preview@email.com", password = "password"),
+        onEmailChange = {},
+        onPasswordChange = {},
+        onConfirmPasswordChange = {},
+        onNameChange = {},
+        onSignup = {},
+        onBackToLogin = {}
+    )
+}
+
+@Preview
+@Composable
+fun LoginPreviewLight() {
+    PtfTheme { SignupPreview() }
+}
+
+@Preview
+@Composable
+fun LoginPreviewDark() {
+    PtfTheme(forceDarkMode = true) { SignupPreview() }
 }

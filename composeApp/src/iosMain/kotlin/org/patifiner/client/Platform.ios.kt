@@ -24,6 +24,9 @@ actual object Platform {
 
     @OptIn(ExperimentalSettingsImplementation::class)
     actual fun settings(): Settings = KeychainSettings("patifiner.app")
-    actual fun initNapier() = Napier.base(DebugAntilog())
     actual fun appMainScope(): CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+
+    actual fun onAppInit() {
+        Napier.base(DebugAntilog())
+    }
 }

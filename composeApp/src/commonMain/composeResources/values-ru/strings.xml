@@ -1,22 +1,29 @@
 <resources>
     <string name="app_name">Patifiner</string>
 
-    <!--#region REG    -->
-    <string name="email_incorrect">Введите корректный e-mail</string>
-    <string name="pwd_to_short">Минимум 8 символов</string>
-    <string name="name_label">Имя</string>
-    <string name="email_placeholder">name@example.com</string>
+    <!-- Util -->
+    <string name="no_connection">Проблемы с подключением к сети</string>
+
+    <!-- Inputs -->
     <string name="password_label">Пароль</string>
+    <string name="hide_password">Скрыть пароль"</string>
+    <string name="show_password">Показать пароль"</string>
     <string name="confirm_password_label">Подтвердите пароль</string>
     <string name="passwords_dont_match">Пароли не совпадают</string>
-    <string name="creating_button">Создание…</string>
-    <string name="create_account_button">Создать аккаунт</string>
-    <string name="already_have_account">Уже есть аккаунт?</string>
-    <string name="login_link">Войти</string>
-    <string name="loading_button">Загрузка…</string>
+    <string name="pwd_to_short">Минимум 8 символов</string>
+    <string name="email_placeholder">name@example.com</string>
+    <string name="email_incorrect">Введите корректный e-mail</string>
+
+    <!-- Login/Signup -->
+    <string name="email_label">E-mail"</string>
     <string name="login_button">Войти</string>
+    <string name="login_loading">Загрузка…</string>
     <string name="dont_have_account">Нет аккаунта?</string>
     <string name="signup_link">Зарегистрироваться</string>
-    <!--#endregion-->
+    <string name="name_label">Имя</string>
+    <string name="create_account_button">Создать аккаунт</string>
+    <string name="creating_button">Создание…</string>
+    <string name="already_have_account">Уже есть аккаунт?</string>
+    <string name="login_link">Войти</string>
 
 </resources>

@@ -28,8 +28,7 @@ import androidx.compose.ui.unit.dp
 import org.patifiner.client.base.showError
 import org.patifiner.client.design.PtfTheme
 import org.patifiner.client.design.centeredField
-import org.patifiner.client.design.icons.PtfIcons
-import org.patifiner.client.design.icons.ptficons.IcEmail
+import org.patifiner.client.design.icons.IcEmail
 import org.patifiner.client.design.screen
 import org.patifiner.client.design.views.PtfShadowedText
 import org.patifiner.client.design.views.PtfText
@@ -103,7 +102,7 @@ fun AddUserTopicContent(
                 placeholder = { Text("Search topics...") },
                 shape = RoundedCornerShape(20.dp), // todo: move TextFields colors to Design System
                 colors = OutlinedTextFieldDefaults.colors(unfocusedBorderColor = colorScheme.primary.copy(alpha = 0.4f), focusedBorderColor = colorScheme.primary),
-                leadingIcon = { Icon(imageVector = PtfIcons.IcEmail, contentDescription = null, tint = colorScheme.primary) })
+                leadingIcon = { Icon(imageVector = IcEmail, contentDescription = null, tint = colorScheme.primary) })
             Spacer(Modifier.height(8.dp))
             val showResults = state.query.isNotEmpty() && state.searchResult.isNotEmpty()
             TopicsTree(

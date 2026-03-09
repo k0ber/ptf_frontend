@@ -1,0 +1,118 @@
+name: Mobile Quality
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths-ignore:
+      - '**.md'
+      - '.gitignore'
+
+permissions:
+  contents: write
+  pull-requests: write
+  checks: write
+
+jobs:
+  common_env:
+    uses: ./.github/workflows/_common_env.yml
+
+  quality-check:
+    needs: common_env
+    runs-on: self-hosted
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Unit Tests
+        run: ./gradlew :composeApp:jvmTest --continue
+        continue-on-error: true
+
+      - name: Run Macrobenchmarks
+        run: ./gradlew :benchmark:connectedBenchmarkBenchmarkAndroidTest --continue
+        continue-on-error: true
+
+      - name: Collect All Results
+        if: always()
+        run: |
+          mkdir -p build/allure-results
+          
+          find composeApp/build/test-results/jvmTest -name "*.xml" -exec cp -rv {} build/allure-results/ \; || true          
+          find benchmark/build/outputs/connected_android_test_additional_output -name "*.json" -exec cp -rv {} build/allure-results/metrics.json \; || true
+          
+          cp composeApp/build/compose_compiler/android/main/composeApp-classes.txt build/allure-results/compose-classes.txt || true
+          cp composeApp/build/compose_compiler/android/main/composeApp-composables.txt build/allure-results/compose-composables.txt || true
+          cp composeApp/build/compose_compiler/android/main/composeApp-module.json build/allure-results/compose-metrics.json || true
+          
+          echo "Runner=${{ runner.name }}" > build/allure-results/environment.properties
+          echo "OS=${{ runner.os }}" >> build/allure-results/environment.properties
+          echo "Branch=${{ github.head_ref || github.ref_name }}" >> build/allure-results/environment.properties
+
+      - name: Load Allure history
+        uses: actions/checkout@v4
+        if: always()
+        with:
+          ref: gh-pages
+          path: gh-pages
+
+      - name: Performance Regression Check
+        uses: benchmark-action/github-action-benchmark@v1
+        if: always()
+        with:
+          tool: 'google_cpp'
+          output-file-path: build/allure-results/metrics.json
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          comment-on-alert: true
+          auto-push: true
+          fail-on-alert: true
+          alert-threshold: '120%'
+
+      - name: Build Allure Report
+        uses: simple-elf/allure-report-action@master
+        if: always()
+        with:
+          allure_results: build/allure-results
+          gh_pages: gh-pages
+          allure_report: allure-report
+          allure_history: allure-history
+          keep_reports: 20
+          subfolder: mobile/${{ github.run_number }}
+
+      - name: Deploy Report to GH Pages
+        uses: peaceiris/actions-gh-pages@v3
+        if: always()
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: allure-history
+          keep_files: true
+
+      - name: Create Redirect to Latest Mobile Report
+        if: always()
+        run: |
+          mkdir -p allure-history/mobile
+          echo '<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=./${{ github.run_number }}/" /></head></html>' > allure-history/mobile/index.html
+
+      - name: Post Allure Report link
+        uses: thollander/actions-comment-pull-request@v2
+        if: always()
+        with:
+          message: |
+            **Allure Test Report:** 
+            https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/mobile/${{ github.run_number }}/
+            ---
+
+      - name: Post cleanup
+        if: always()
+        run: |
+          ./gradlew --stop
+          rm -rf _work/* || true

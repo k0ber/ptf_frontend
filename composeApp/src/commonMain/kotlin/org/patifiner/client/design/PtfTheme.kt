@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -30,12 +31,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import org.patifiner.client.design.views.GradientBackground
 import org.patifiner.client.design.views.ptfTypography
 
 @Composable
-fun PtfTheme(forceDarkMode: Boolean? = null, content: @Composable () -> Unit) {
+fun PtfTheme(forceDarkMode: Boolean? = null, content: @Composable BoxScope.() -> Unit) {
+
     val isDark = forceDarkMode ?: isSystemInDarkTheme()
+
     MaterialTheme(
         colorScheme = if (isDark) darkScheme() else lightScheme(),
         typography = ptfTypography(),
@@ -44,13 +46,17 @@ fun PtfTheme(forceDarkMode: Boolean? = null, content: @Composable () -> Unit) {
             CompositionLocalProvider(
                 LocalSpacing provides PtfSpacing(),
                 LocalIndication provides ripple(
-                    color = colorScheme.primary.copy(alpha = if (isDark) 0.22f else 0.18f),
+                    color = colorScheme.primary.copy(
+                        alpha = if (isDark) 0.22f else 0.18f
+                    ),
                 )
             ) {
-                // app background to make screen transitions look better
-                GradientBackground(modifier = Modifier.fillMaxSize()) {
-                    content()
-                }
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(colorScheme.background),
+                    content = content
+                )
             }
         }
     )
@@ -160,22 +166,22 @@ fun ThemeColorsGrid(modifier: Modifier = Modifier) {
         contentPadding = PaddingValues(12.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(swatches, key = { it.name }) { s ->
+        items(swatches, key = { it.name }) { swatch ->
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp)
-                    .background(s.bg)
+                    .background(swatch.bg)
                     .padding(horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(s.name, color = s.fg, maxLines = 2, fontSize = 16.sp)
+                Text(swatch.name, color = swatch.fg, maxLines = 2, fontSize = 16.sp)
                 Box(
                     Modifier
                         .width(48.dp)
                         .height(24.dp)
-                        .background(s.fg)
+                        .background(swatch.fg)
                 )
             }
         }

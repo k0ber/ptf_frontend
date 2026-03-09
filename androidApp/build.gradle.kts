@@ -1,7 +1,11 @@
+val isCi: Boolean by extra
+val ptfVersionName: String by extra
+val ptfVersionCode: Int by extra
+
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.baselineprofile)
 }
 
 android {
@@ -11,26 +15,55 @@ android {
     defaultConfig {
         applicationId = "org.patifiner.client"
         minSdk = libs.versions.android.minSdk.get().toInt()
-        //noinspection OldTargetApi - 35 is ok
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = System.getenv("VERSION_CODE")?.toInt() ?: 1
-        versionName = System.getenv("VERSION_NAME") ?: "1.0.0"
+
+        versionCode = ptfVersionCode
+        versionName = ptfVersionName
     }
 
     signingConfigs {
         create("release") {
-            storeFile = file("../release.keystore").takeIf { it.exists() } ?: file("patifiner-release.jks")
-            storePassword = System.getenv("KEYSTORE_PASSWORD")
-            keyAlias = System.getenv("KEY_ALIAS")
-            keyPassword = System.getenv("KEY_PASSWORD")
+            if (isCi) {
+                storeFile = file(System.getenv("KEYSTORE_FILE_PATH"))
+                storePassword = System.getenv("KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("KEY_ALIAS")
+                keyPassword = System.getenv("KEY_PASSWORD")
+            } else {
+                val debugConfig = getByName("debug")
+                storeFile = debugConfig.storeFile
+                storePassword = debugConfig.storePassword
+                keyAlias = debugConfig.keyAlias
+                keyPassword = debugConfig.keyPassword
+            }
         }
     }
 
     buildTypes {
-        getByName("release") {
-            isMinifyEnabled = true
-            signingConfig = signingConfigs.getByName("release")
+        getByName("debug") {
+            buildConfigField("Boolean", "IS_DEV", "true")
         }
+
+        release {
+            signingConfig = signingConfigs.getByName("release")
+            isMinifyEnabled = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            buildConfigField("Boolean", "IS_DEV", "false")
+        }
+
+        create("releaseDebug") {
+            initWith(getByName("release"))
+            isDebuggable = true
+            applicationIdSuffix = ".dev"
+            buildConfigField("Boolean", "IS_DEV", "true")
+        }
+    }
+
+    buildFeatures {
+        buildConfig = true
+        compose = true
     }
 
     packaging {
@@ -40,24 +73,38 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 }
 
-kotlin {
-    dependencies {
-        implementation(projects.composeApp)
+composeCompiler {
+    includeSourceInformation = true
+    includeTraceMarkers = true
+}
 
-        implementation(libs.koin.android)
+baselineProfile {
+    from(project(":benchmark"))
+    filter { include("org.patifiner.client.**") }
+    saveInSrc = true
+}
 
-        implementation(libs.compose.ui.tooling.preview)
-        debugImplementation(libs.compose.ui.tooling)
+dependencies {
+    implementation(projects.composeApp)
 
-        implementation(libs.androidx.activity.compose)
-        implementation(libs.ktor.client.okhttp)
+    implementation(libs.google.android.material)
 
-        implementation(libs.decompose.core)
-        implementation(libs.decompose.extensions.android)
-    }
+    implementation(libs.androidx.core.splashscreen)
+    implementation(libs.androidx.activity.compose)
+
+    implementation(libs.koin.android)
+    implementation(libs.ktor.client.okhttp)
+    implementation(libs.decompose.core)
+    implementation(libs.decompose.extensions.android)
+
+    compileOnly(libs.compose.ui.tooling.preview) // double check is it really needed here or not?
+    debugImplementation(libs.compose.ui.tooling) // this to
+
+    baselineProfile(project(":benchmark"))
+    implementation(libs.androidx.profileinstaller)
 }

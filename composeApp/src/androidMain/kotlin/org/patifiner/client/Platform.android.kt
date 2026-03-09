@@ -24,12 +24,14 @@ actual object Platform : KoinComponent {
         return AndroidNetworkObserver(context)
     }
 
-    actual fun initNapier() = Napier.base(DebugAntilog())
-
     actual fun settings(): Settings {
         val context: Context = get()
         return SharedPreferencesSettings(context.getSharedPreferences("ptf_settings", Context.MODE_PRIVATE))
     }
 
     actual fun appMainScope(): CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+
+    actual fun onAppInit() {
+        Napier.base(DebugAntilog())
+    }
 }

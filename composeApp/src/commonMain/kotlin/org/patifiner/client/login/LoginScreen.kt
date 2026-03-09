@@ -16,9 +16,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import org.jetbrains.compose.resources.stringResource
-import org.patifiner.client.base.Constants
 import org.patifiner.client.base.showError
 import org.patifiner.client.base.takeIfOrEmpty
+import org.patifiner.client.base.trackCompositions
 import org.patifiner.client.design.PtfScreen
 import org.patifiner.client.design.PtfTheme
 import org.patifiner.client.design.centeredField
@@ -31,12 +31,12 @@ import org.patifiner.client.design.views.PtfLinkHint
 import patifinerclient.composeapp.generated.resources.Res
 import patifinerclient.composeapp.generated.resources.dont_have_account
 import patifinerclient.composeapp.generated.resources.email_incorrect
-import patifinerclient.composeapp.generated.resources.email_placeholder
-import patifinerclient.composeapp.generated.resources.loading_button
 import patifinerclient.composeapp.generated.resources.login_button
-import patifinerclient.composeapp.generated.resources.password_label
+import patifinerclient.composeapp.generated.resources.login_loading
 import patifinerclient.composeapp.generated.resources.pwd_to_short
 import patifinerclient.composeapp.generated.resources.signup_link
+
+const val LOGIN_EMAIL_FIELD_TAG: String = "LOGIN_EMAIL_FIELD_TAG"
 
 @Composable
 fun LoginScreen(
@@ -61,7 +61,7 @@ fun LoginScreen(
         onEmailChange = { component.onIntent(LoginIntent.ChangeEmail(it)) },
         onPasswordChange = { component.onIntent(LoginIntent.ChangePassword(it)) },
         onLogin = { component.onIntent(LoginIntent.Login) },
-        onSignup = component::onNavToSignup
+        onSignup = { component.onNavToSignup() },
     )
 }
 
@@ -76,44 +76,48 @@ fun LoginContent(
 ) {
     val email = state.email
     val pass = state.password
-    val emailValid = remember(email) { Regex(Constants.EMAIL_REGEX).matches(email) }
-    val passValid = pass.length >= Constants.MIN_PASS_LNG
 
-    PtfScreen {
+    PtfScreen(name = "Login") {
         PtfLinearProgress(isLoading = state.isLoading)
         Spacer(Modifier.weight(1f))
         PtfIntro(modifier = Modifier.fillMaxWidth())
         Spacer(Modifier.height(16.dp))
+
         EmailField(
-            modifier = centeredField(),
+            modifier = centeredField().trackCompositions(LOGIN_EMAIL_FIELD_TAG),
             value = email,
-            placeholder = stringResource(Res.string.email_placeholder),
             onValueChange = onEmailChange,
-            isError = email.isNotEmpty() && !emailValid,
-            supportingText = stringResource(Res.string.email_incorrect).takeIfOrEmpty(email.isNotEmpty() && !emailValid),
+            isError = email.isNotEmpty() && state.isEmailError,
+            supportingText = stringResource(Res.string.email_incorrect)
+                .takeIfOrEmpty(email.isNotEmpty() && state.isEmailError),
             imeAction = ImeAction.Next
         )
         Spacer(Modifier.height(4.dp))
+
         PasswordField(
             modifier = centeredField().focusRequester(passwordFocusRequester),
             value = pass,
-            label = stringResource(Res.string.password_label),
             onValueChange = onPasswordChange,
-            isError = pass.isNotEmpty() && !passValid,
-            supportingText = stringResource(Res.string.pwd_to_short).takeIfOrEmpty(pass.isNotEmpty() && !passValid),
+            isError = pass.isNotEmpty() && state.isPasswordError,
+            supportingText = stringResource(Res.string.pwd_to_short)
+                .takeIfOrEmpty(pass.isNotEmpty() && state.isPasswordError),
             imeAction = ImeAction.Done,
             onImeAction = onLogin
         )
         Spacer(Modifier.height(16.dp))
+
         PrimaryButton(
-            text = if (state.isLoading) stringResource(Res.string.loading_button) else stringResource(Res.string.login_button),
-            enabled = emailValid && passValid && !state.isLoading,
+            text =
+                if (state.isLoading) stringResource(Res.string.login_loading)
+                else stringResource(Res.string.login_button),
+            enabled = !state.isEmailError && !state.isPasswordError,
             onClick = onLogin,
         )
         Spacer(Modifier.height(4.dp))
+
         PtfLinkHint(
             text = stringResource(Res.string.dont_have_account),
-            linkText = stringResource(Res.string.signup_link), 
+            linkText = stringResource(Res.string.signup_link),
             onClick = onSignup
         )
         Spacer(Modifier.weight(1f))

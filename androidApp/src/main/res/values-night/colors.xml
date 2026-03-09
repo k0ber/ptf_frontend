@@ -1,0 +1,6 @@
+<resources>
+
+    <!--    Dark theme -->
+    <color name="splash_background">@color/splash_bg_dark</color>
+
+</resources>

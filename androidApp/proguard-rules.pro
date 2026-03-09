@@ -1,0 +1,4 @@
+-keep class com.arkivanov.decompose.router.stack.ChildStack { *; }
+-keep class com.arkivanov.decompose.value.Value { *; }
+-keep class org.patifiner.client.RootConfig** { *; }
+-keepattributes Signature, Annotation, InnerClasses, EnclosingMethod

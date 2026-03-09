@@ -14,10 +14,9 @@ import androidx.compose.ui.Modifier
 import com.arkivanov.decompose.extensions.compose.stack.Children
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import org.patifiner.client.design.PtfAnim
-import org.patifiner.client.design.icons.PtfIcons
-import org.patifiner.client.design.icons.ptficons.IcArrowDown
-import org.patifiner.client.design.icons.ptficons.IcArrowUp
-import org.patifiner.client.design.icons.ptficons.IcEmail
+import org.patifiner.client.design.icons.IcArrowDown
+import org.patifiner.client.design.icons.IcArrowUp
+import org.patifiner.client.design.icons.IcEmail
 import org.patifiner.client.profile.ui.ProfileScreen
 import org.patifiner.client.topics.ui.AddUserTopicScreen
 import org.patifiner.client.viewing.UserTopicsScreen
@@ -38,9 +37,9 @@ fun MainScreen(component: MainComponent, snackbarHost: SnackbarHostState) {
                         icon = {
                             Icon(
                                 imageVector = when (tab) {
-                                    Tab.PROFILE -> PtfIcons.IcArrowUp
-                                    Tab.TOPICS -> PtfIcons.IcArrowDown
-                                    Tab.ADD_TOPIC -> PtfIcons.IcEmail
+                                    Tab.PROFILE -> IcArrowUp
+                                    Tab.TOPICS -> IcArrowDown
+                                    Tab.ADD_TOPIC -> IcEmail
                                 },
                                 contentDescription = tab.name
                             )

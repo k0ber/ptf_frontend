@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -13,8 +12,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.CompositingStrategy
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.tooling.preview.Preview
 import org.patifiner.client.design.PtfTheme
 import kotlin.math.PI
@@ -36,7 +33,6 @@ fun GradientBackground(
         modifier = modifier
             .fillMaxSize()
             .background(colorScheme.background)
-            .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
             .drawWithCache {
                 val brush = Brush.linearGradient(
                     colors = colors,
@@ -72,12 +68,13 @@ private fun calculateEnd(size: Size, angle: Float): Offset {
 // ============================================================================================================
 @Preview
 @Composable
-fun GradientBackgroundLightPreview() {
-    PtfTheme(forceDarkMode = false) { }
+fun GradientBackgroundDarkPreview() {
+    PtfTheme(forceDarkMode = true) { }
 }
 
 @Preview
 @Composable
-fun GradientBackgroundDarkPreview() {
-    PtfTheme(forceDarkMode = true) { }
+fun GradientBackgroundLightPreview() {
+    PtfTheme(forceDarkMode = false) { }
 }
+
