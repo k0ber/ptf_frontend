@@ -13,23 +13,18 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -37,53 +32,82 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.jetbrains.compose.resources.stringResource
 import org.patifiner.client.design.PtfTheme
-import org.patifiner.client.design.icons.PtfIcons
-import org.patifiner.client.design.icons.ptficons.IcEmail
-import org.patifiner.client.design.icons.ptficons.IcPassword
-import org.patifiner.client.design.icons.ptficons.IcVisibilityOff
-import org.patifiner.client.design.icons.ptficons.IcVisibilityOn
+import org.patifiner.client.design.icons.IcEmail
+import org.patifiner.client.design.icons.IcPassword
+import org.patifiner.client.design.icons.IcVisibilityOff
+import org.patifiner.client.design.icons.IcVisibilityOn
+import patifinerclient.composeapp.generated.resources.Res
+import patifinerclient.composeapp.generated.resources.email_label
+import patifinerclient.composeapp.generated.resources.email_placeholder
+import patifinerclient.composeapp.generated.resources.hide_password
+import patifinerclient.composeapp.generated.resources.password_label
+import patifinerclient.composeapp.generated.resources.show_password
 
 @Composable
 fun PtfTextField(
     modifier: Modifier = Modifier,
     value: String,
     onValueChange: (String) -> Unit,
-    label: String = "",
-    placeholder: String = "",
+
+    label: String? = null,
+    placeholder: String? = null,
+    supportingText: String? = null,
+
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
     enabled: Boolean = true,
     isError: Boolean = false,
-    supportingText: String = "",
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     singleLine: Boolean = true,
     visualTransformation: VisualTransformation = VisualTransformation.None,
-    autofocus: Boolean = false,
     imeAction: ImeAction = ImeAction.Default,
     onImeAction: () -> Unit = {}
 ) {
-    val focusRequester = remember { FocusRequester() }
-    LaunchedEffect(autofocus) { if (autofocus) focusRequester.requestFocus() }
+    val labelComposable: (@Composable () -> Unit)? = remember(label) {
+        if (label != null) {
+            { FieldLabel(label) }
+        } else null
+    }
+
+    val placeholderComposable: (@Composable () -> Unit)? = remember(placeholder) {
+        if (placeholder != null) {
+            { FieldPlaceholder(placeholder) }
+        } else null
+    }
+
+    val supportingComposable: (@Composable () -> Unit)? = remember(supportingText, isError) {
+        if (supportingText != null) {
+            { FieldSupportingText(supportingText, isError) }
+        } else null
+    }
 
     OutlinedTextField(
-        modifier = modifier.focusRequester(focusRequester),
+        modifier = modifier,
         value = value,
         onValueChange = onValueChange,
         enabled = enabled,
         singleLine = singleLine,
         isError = isError,
+
         shape = RoundedCornerShape(14.dp),
+
         colors = OutlinedTextFieldDefaults.colors(
-            unfocusedBorderColor = colorScheme.primary,
+            unfocusedBorderColor = colorScheme.primary.copy(alpha = 0.6f),
+            focusedBorderColor = colorScheme.primary,
             errorBorderColor = colorScheme.error,
         ),
+
         textStyle = typography.bodyLarge,
-        label = if (label.isNotEmpty()) { { FieldLabel(label) } } else null,
-        placeholder = if (placeholder.isNotEmpty()) { { FieldPlaceholder(placeholder) } } else null,
-        supportingText = if (supportingText.isNotEmpty()) { { FieldSupportingText(supportingText) } } else null,
+
+        label = labelComposable,
+        placeholder = placeholderComposable,
+        supportingText = supportingComposable,
+
         leadingIcon = leadingIcon,
         trailingIcon = trailingIcon,
+
         keyboardOptions = keyboardOptions.copy(imeAction = imeAction),
         keyboardActions = KeyboardActions(
             onDone = { onImeAction() },
@@ -100,11 +124,10 @@ fun PtfTextField(
 fun EmailField(
     modifier: Modifier = Modifier,
     value: String,
-    placeholder: String = "name@example.com",
     onValueChange: (String) -> Unit,
+    label: String = stringResource(Res.string.email_label),
+    placeholder: String = stringResource(Res.string.email_placeholder),
     enabled: Boolean = true,
-    label: String = "E-mail",
-    autofocus: Boolean = false,
     isError: Boolean = false,
     supportingText: String = "",
     imeAction: ImeAction = ImeAction.Done,
@@ -117,7 +140,6 @@ fun EmailField(
         enabled = enabled,
         label = label,
         placeholder = placeholder,
-        autofocus = autofocus,
         isError = isError,
         supportingText = supportingText,
         imeAction = imeAction,
@@ -125,7 +147,7 @@ fun EmailField(
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
         leadingIcon = {
             Icon(
-                painter = rememberVectorPainter(PtfIcons.IcEmail),
+                imageVector = IcEmail,
                 contentDescription = null,
                 tint = colorScheme.primary
             )
@@ -137,11 +159,10 @@ fun EmailField(
 fun PasswordField(
     modifier: Modifier = Modifier,
     value: String,
-    placeholder: String = "",
     onValueChange: (String) -> Unit,
+    label: String = stringResource(Res.string.password_label),
+    placeholder: String = "",
     enabled: Boolean = true,
-    label: String,
-    autofocus: Boolean = false,
     isError: Boolean = false,
     supportingText: String = "",
     imeAction: ImeAction = ImeAction.Done,
@@ -156,7 +177,6 @@ fun PasswordField(
         enabled = enabled,
         label = label,
         placeholder = placeholder,
-        autofocus = autofocus,
         isError = isError,
         supportingText = supportingText,
         imeAction = imeAction,
@@ -164,7 +184,7 @@ fun PasswordField(
         visualTransformation = if (visible) VisualTransformation.None else PasswordVisualTransformation(),
         leadingIcon = {
             Icon(
-                painter = rememberVectorPainter(PtfIcons.IcPassword),
+                imageVector = IcPassword,
                 contentDescription = null,
                 tint = colorScheme.primary
             )
@@ -172,8 +192,8 @@ fun PasswordField(
         trailingIcon = {
             IconButton(onClick = { visible = !visible }) {
                 Icon(
-                    imageVector = if (visible) PtfIcons.IcVisibilityOn else PtfIcons.IcVisibilityOff,
-                    contentDescription = if (visible) "Скрыть пароль" else "Показать пароль",
+                    imageVector = if (visible) IcVisibilityOn else IcVisibilityOff,
+                    contentDescription = stringResource(if (visible) Res.string.hide_password else Res.string.show_password),
                     tint = colorScheme.primary
                 )
             }
@@ -182,20 +202,20 @@ fun PasswordField(
 }
 
 @Composable
-fun FieldLabel(text: String) {
+private fun FieldLabel(text: String) {
     Text(
         text = text,
         color = colorScheme.secondary,
         style = typography.labelLarge,
-        fontSize = 16.sp
+        fontSize = 14.sp
     )
 }
 
 @Composable
-fun FieldPlaceholder(text: String) {
+private fun FieldPlaceholder(text: String) {
     Text(
         text = text,
-        color = colorScheme.outline,
+        color = colorScheme.outline.copy(alpha = 0.7f),
         style = typography.bodyMedium,
         fontSize = 14.sp,
         maxLines = 1,
@@ -204,14 +224,13 @@ fun FieldPlaceholder(text: String) {
 }
 
 @Composable
-fun FieldSupportingText(text: String) {
+private fun FieldSupportingText(text: String, isError: Boolean) {
     Text(
         text = text,
-        color = colorScheme.outline,
-        style = typography.bodyMedium,
-        fontSize = 14.sp,
-        maxLines = 1,
-        softWrap = false
+        color = if (isError) colorScheme.error else colorScheme.outline,
+        style = typography.bodySmall,
+        fontSize = 12.sp,
+        maxLines = 2
     )
 }
 

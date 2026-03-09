@@ -1,0 +1,11 @@
+<resources>
+
+    <style name="Theme.App.Splash.Base" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_logo</item>
+        <item name="windowSplashScreenBackground">@color/splash_background</item>
+        <item name="postSplashScreenTheme">@style/Theme.App.Main</item>
+    </style>
+
+    <style name="Theme.App.Splash" parent="Theme.App.Splash.Base" />
+
+</resources>

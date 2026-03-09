@@ -1,0 +1,11 @@
+<resources>
+    <!-- Light Theme -->
+    <color name="splash_bg_light">#FFA6D6</color>
+
+    <!-- Dark Theme -->
+    <color name="splash_bg_dark">#FF1B1B23</color>
+
+    <!-- Light theme -->
+    <color name="splash_background">@color/splash_bg_light</color>
+
+</resources>

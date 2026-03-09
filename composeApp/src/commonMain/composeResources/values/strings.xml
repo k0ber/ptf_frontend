@@ -1,22 +1,29 @@
 <resources>
     <string name="app_name">Patifiner</string>
 
-    <!--#region REG    -->
-    <string name="email_incorrect">Invalid email address</string>
-    <string name="pwd_to_short">At least 8 characters</string>
-    <string name="name_label">Name</string>
-    <string name="email_placeholder">name@example.com</string>
+    <!-- Util -->
+    <string name="no_connection">Network is unavailable, check connection</string>
+
+    <!-- Inputs -->
     <string name="password_label">Password</string>
+    <string name="hide_password">Show password</string>
+    <string name="show_password">Hide password</string>
     <string name="confirm_password_label">Confirm password</string>
     <string name="passwords_dont_match">Passwords do not match</string>
-    <string name="creating_button">Creating…</string>
-    <string name="create_account_button">Create account</string>
-    <string name="already_have_account">Already have an account?</string>
-    <string name="login_link">Log in</string>
-    <string name="loading_button">Loading…</string>
+    <string name="pwd_to_short">At least 8 characters</string>
+    <string name="email_placeholder">name@example.com</string>
+    <string name="email_incorrect">Invalid email address</string>
+
+    <!-- Login/Signup -->
+    <string name="email_label">E-mail</string>
     <string name="login_button">Login</string>
+    <string name="login_loading">Loading…</string>
     <string name="dont_have_account">Don’t have an account?</string>
     <string name="signup_link">Sign Up</string>
-    <!--#endregion-->
+    <string name="name_label">Name</string>
+    <string name="create_account_button">Create account</string>
+    <string name="creating_button">Creating…</string>
+    <string name="already_have_account">Already have an account?</string>
+    <string name="login_link">Login</string>
 
 </resources>

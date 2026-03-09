@@ -23,9 +23,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import org.patifiner.client.design.icons.PtfIcons
-import org.patifiner.client.design.icons.ptficons.IcEmail
-import org.patifiner.client.design.icons.ptficons.IcVisibilityOff
+import org.patifiner.client.design.icons.IcEmail
+import org.patifiner.client.design.icons.IcVisibilityOff
 import org.patifiner.client.topics.UserTopicDto
 
 @Composable
@@ -45,7 +44,7 @@ fun UserTopicsScreen(component: UserTopicsComponent, snackbar: SnackbarHostState
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(onClick = component::onAddClick) {
-                Icon(PtfIcons.IcEmail, contentDescription = "Добавить")
+                Icon(IcEmail, contentDescription = "Добавить")
             }
         }
     ) { padding ->
@@ -83,7 +82,7 @@ fun UserTopicRow(
             Text(userTopic.topic.name, Modifier.weight(1f))
             Text(userTopic.level.name)
             IconButton(onClick = onRemove) {
-                Icon(PtfIcons.IcVisibilityOff, contentDescription = "Удалить")
+                Icon(IcVisibilityOff, contentDescription = "Удалить")
             }
         }
     }

@@ -10,7 +10,8 @@ services:
       - "traefik.http.routers.ptf-front.entrypoints=websecure"
       - "traefik.http.routers.ptf-front.tls.certresolver=myresolver"
       # Wasm
-      - "traefik.http.routers.ptf-front.middlewares=wasm-headers"
+      - "traefik.http.middlewares.compress-opt.compress=true"
+      - "traefik.http.routers.ptf-front.middlewares=wasm-headers,compress-opt"
       - "traefik.http.middlewares.wasm-headers.headers.customResponseHeaders.Cross-Origin-Embedder-Policy=require-corp"
       - "traefik.http.middlewares.wasm-headers.headers.customResponseHeaders.Cross-Origin-Opener-Policy=same-origin"
       # Nginx port

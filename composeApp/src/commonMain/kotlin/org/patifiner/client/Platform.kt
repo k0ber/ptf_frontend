@@ -10,13 +10,15 @@ enum class Os {
 
 @Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 expect object Platform {
+    val os: Os
+
     fun apiConfig(): ApiConfig
     fun engineFactory(): HttpClientEngineFactory<*>
     fun networkObserver(): NetworkObserver
     fun settings(): Settings
-    fun initNapier()
     fun appMainScope(): kotlinx.coroutines.CoroutineScope
-    val os: Os
+
+    fun onAppInit()
 }
 
 data class ApiConfig(val baseUrl: String, val port: Int)
