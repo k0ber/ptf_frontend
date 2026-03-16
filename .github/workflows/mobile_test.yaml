@@ -46,16 +46,28 @@ jobs:
         run: |
           mkdir -p build/allure-results
           
-          find composeApp/build/test-results/jvmTest -name "*.xml" -exec cp -rv {} build/allure-results/ \; || true          
-          find benchmark/build/outputs/connected_android_test_additional_output -name "*.json" -exec cp -rv {} build/allure-results/metrics.json \; || true
+          # 1. Unit-тесты
+          find composeApp/build/test-results/jvmTest -name "*.xml" -exec cp -v {} build/allure-results/ \; || true
           
+          # 2. Benchmarks
+          # Используем уникальный префикс или структуру папок
+          find benchmark/build/outputs/connected_android_test_additional_output -name "*.json" \
+          -exec bash -c 'cp -v "$1" "build/allure-results/benchmark_$(basename "$1")"' -- {} \; || true
+          
+          # 3. Performance Regression Check needs single file metrics.json
+          find benchmark/build/outputs/connected_android_test_additional_output -name "*.json" -print -quit | xargs -I {} cp {} build/allure-results/metrics.json || true
+          
+          # 4. Compose Metrics
           cp composeApp/build/compose_compiler/android/main/composeApp-classes.txt build/allure-results/compose-classes.txt || true
           cp composeApp/build/compose_compiler/android/main/composeApp-composables.txt build/allure-results/compose-composables.txt || true
           cp composeApp/build/compose_compiler/android/main/composeApp-module.json build/allure-results/compose-metrics.json || true
           
-          echo "Runner=${{ runner.name }}" > build/allure-results/environment.properties
-          echo "OS=${{ runner.os }}" >> build/allure-results/environment.properties
-          echo "Branch=${{ github.head_ref || github.ref_name }}" >> build/allure-results/environment.properties
+          # 5. Environment
+          {
+            echo "Runner=${{ runner.name }}"
+            echo "OS=${{ runner.os }}"
+            echo "Branch=${{ github.head_ref || github.ref_name }}"
+          } > build/allure-results/environment.properties
 
       - name: Load Allure history
         uses: actions/checkout@v4
