@@ -1,9 +1,0 @@
-package org.patifiner.client.base
-
-
-object Constants {
-    const val EMAIL_REGEX = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
-    const val MIN_PASS_LNG = 8
-
-    val emailRegex = Regex(EMAIL_REGEX)
-}

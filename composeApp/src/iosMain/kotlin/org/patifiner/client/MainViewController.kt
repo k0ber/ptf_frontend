@@ -1,24 +1,22 @@
 package org.patifiner.client
 
 import androidx.compose.ui.window.ComposeUIViewController
-import com.arkivanov.decompose.DefaultComponentContext
-import com.arkivanov.decompose.ExperimentalDecomposeApi
-import com.arkivanov.essenty.lifecycle.LifecycleRegistry
+import org.patifiner.client.root.RootScreen
 import platform.UIKit.UIViewController
 
 fun MainViewController(): UIViewController {
+
     initKoin(
         KoinAppConfig(
+            isDev = false,
             engine = Platform.engineFactory(),
             apiConfig = Platform.apiConfig(),
-            appScope = Platform.appMainScope()
+            appScope = Platform.appMainScope(),
         )
     )
 
-    val lifecycle = LifecycleRegistry()
-    val rootComponent = RootComponent(DefaultComponentContext(lifecycle))
-
     return ComposeUIViewController {
-        RootScreen(rootComponent)
+        RootScreen()
     }
+
 }

@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  version:
+  common_env:
     uses: ./.github/workflows/_common_env.yml
 
   publish:
@@ -29,7 +29,7 @@ jobs:
         env:
           ORG_GRADLE_PROJECT_versionName: ${{ needs.common_env.outputs.version_name }}
           ORG_GRADLE_PROJECT_versionCode: ${{ needs.common_env.outputs.version_code }}
-          ORG_GRADLE_PROJECT_isCi: ${{ needs.common_env.outputs.ic_ci }}
+          ORG_GRADLE_PROJECT_isCi: ${{ needs.common_env.outputs.is_ci }}
 
       - name: Login to GHCR
         uses: docker/login-action@v3

@@ -16,7 +16,7 @@ It is kotlin multiplatform compose application build with Gradle 9+
 ### Core & Architecture
 - [**Kotlin Multiplatform**](https://kotlinlang.org/docs/multiplatform.html)
 - [**Compose Multiplatform**](https://www.jetbrains.com/lp/compose-multiplatform/)
-- [**Decompose**](https://github.com/arkivanov/Decompose)
+- [**Navigation 3**](https://kotlinlang.org/docs/multiplatform/compose-navigation-3.html)
 - [**MVIKotlin**](https://github.com/arkivanov/MVIKotlin)
 - [**Koin (DI)**](https://insert-koin.io/)
 - [**Ktor**](https://ktor.io/)
@@ -73,7 +73,7 @@ It is kotlin multiplatform compose application build with Gradle 9+
 - run web release build locally
 
 ### Android
-`/gradlew :androidApp:generateBaselineProfile "-Pandroid.testInstrumentationRunnerArguments.class=com.patifiner.benchmark.BaselineProfileGenerator"`
+`./gradlew :androidApp:generateReleaseBaselineProfile`
 - requires real android device to be connected
 - generate Baseline Profiles `baseline-prof.txt` and `startup-prof.txt` which are used by R8 for release build
 

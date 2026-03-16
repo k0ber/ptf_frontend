@@ -1,15 +1,16 @@
 package org.patifiner.client
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
-import com.arkivanov.decompose.DefaultComponentContext
-import com.arkivanov.decompose.retainedComponent
-import com.arkivanov.essenty.lifecycle.LifecycleRegistry
+import org.patifiner.client.root.RootScreen
 
 class MainActivity : ComponentActivity() {
 
@@ -24,15 +25,9 @@ class MainActivity : ComponentActivity() {
         splashScreen.setKeepOnScreenCondition { !app.ready.value }
 
         setContent {
-            val start = System.currentTimeMillis()
-//            val rootComponent = RootComponent(DefaultComponentContext(LifecycleRegistry()))
-            // todo: you aren't need retainedComponent - it's heavy (about 40ms on emulator)
-            val rootComponent = retainedComponent { componentContext ->
-                RootComponent(componentContext = componentContext)
+            Box(Modifier.semantics { testTagsAsResourceId = true }) { // ui automator support
+                RootScreen()
             }
-            Log.w("PTF", "rootComponent init took: ${System.currentTimeMillis() - start}")
-
-            RootScreen(rootComponent)
         }
     }
 }

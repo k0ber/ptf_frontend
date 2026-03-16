@@ -1,53 +1,51 @@
 package org.patifiner.client
 
 import com.arkivanov.mvikotlin.core.store.StoreFactory
+import com.arkivanov.mvikotlin.logging.store.LoggingStoreFactory
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import io.ktor.client.engine.HttpClientEngineFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.Json
+import org.koin.core.KoinApplication
+import org.koin.core.annotation.KoinExperimentalAPI
 import org.koin.core.context.startKoin
-import org.koin.core.module.dsl.factoryOf
-import org.koin.core.module.dsl.scopedOf
-import org.koin.core.qualifier.named
-import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
-import org.patifiner.client.base.createHttpClient
-import org.patifiner.client.login.LoadProfileUseCase
-import org.patifiner.client.login.LoginStore
-import org.patifiner.client.login.LoginStoreFactory
-import org.patifiner.client.login.LoginUseCase
-import org.patifiner.client.login.LogoutUseCase
-import org.patifiner.client.login.data.AuthRepository
-import org.patifiner.client.login.data.TokenStorage
-import org.patifiner.client.login.data.TokenStorageImpl
-import org.patifiner.client.signup.SignupStore
-import org.patifiner.client.signup.SignupStoreFactory
-import org.patifiner.client.signup.SignupUseCase
-import org.patifiner.client.topics.AddUserTopicUseCase
-import org.patifiner.client.topics.LoadUserTopicsTreeUseCase
-import org.patifiner.client.topics.SearchTopicsUseCase
-import org.patifiner.client.topics.data.TopicsRepository
+import org.patifiner.client.core.createHttpClient
+import org.patifiner.client.root.login.data.AuthRepository
+import org.patifiner.client.root.login.data.TokenStorage
+import org.patifiner.client.root.login.data.TokenStorageImpl
+import org.patifiner.client.root.main.mainModule
+import org.patifiner.client.root.rootModule
 
 data class KoinAppConfig(
     val engine: HttpClientEngineFactory<*>,
     val apiConfig: ApiConfig,
-    val appScope: CoroutineScope
+    val appScope: CoroutineScope,
+    val isDev: Boolean,
+    val isBenchmark: Boolean = false,
 )
 
-fun initKoin(config: KoinAppConfig, appDeclaration: KoinAppDeclaration = {}) =
+fun initKoin(config: KoinAppConfig, appDeclaration: (KoinApplication.() -> Unit)? = null) =
     startKoin {
-        appDeclaration()
-        modules(appModule, module {
-            single { config.engine }
-            single { config.apiConfig }
-            single { config.appScope }
-            single { Platform.settings() }
-            single { Platform.networkObserver() }
-        })
 
-        Platform.onAppInit() // should be called from platform entry point, not here?
-    }
+        appDeclaration?.invoke(this)
 
+        modules(
+            module {
+                single { config }
+                single { config.engine }
+                single { config.apiConfig }
+                single { config.appScope }
+                single { Platform.settings() }
+                single { Platform.networkObserver() }
+            },
+            appModule,
+            rootModule,
+            mainModule,
+        )
+    }.also { Platform.onAppInit() }
+
+@OptIn(KoinExperimentalAPI::class)
 val appModule = module {
     single {
         Json {
@@ -75,25 +73,8 @@ val appModule = module {
 
     // mvi
     single<StoreFactory> {
-//        if (BuildConfig.IsDev) todo: use logging only for dev build
-// but it seems we need BuildKonfig for this
-//        LoggingStoreFactory(delegate = DefaultStoreFactory())
-//        else
-        DefaultStoreFactory()
-    }
-
-    factoryOf(::LoginUseCase)
-    factory<LoginStore> { LoginStoreFactory(factory = get(), loginUseCase = get()).create() }
-    factory<SignupStore> { SignupStoreFactory(factory = get(), signupUseCase = get()).create() }
-    factoryOf(::SignupUseCase)
-    factoryOf(::LogoutUseCase)
-
-    // Session scope
-    scope(named("LoggedInScope")) {
-        scopedOf(::TopicsRepository)
-        scopedOf(::LoadProfileUseCase)
-        scopedOf(::LoadUserTopicsTreeUseCase)
-        scopedOf(::SearchTopicsUseCase)
-        scopedOf(::AddUserTopicUseCase)
+        val base = DefaultStoreFactory()
+        val config: KoinAppConfig = get()
+        if (config.isDev) LoggingStoreFactory(base) else base
     }
 }

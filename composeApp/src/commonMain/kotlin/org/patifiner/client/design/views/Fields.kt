@@ -33,7 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
-import org.patifiner.client.design.PtfTheme
+import org.patifiner.client.design.PtfPreview
 import org.patifiner.client.design.icons.IcEmail
 import org.patifiner.client.design.icons.IcPassword
 import org.patifiner.client.design.icons.IcVisibilityOff
@@ -292,11 +292,11 @@ fun FieldsPreview() {
 @Preview
 @Composable
 fun FieldsPreviewLight() {
-    PtfTheme { FieldsPreview() }
+    PtfPreview { FieldsPreview() }
 }
 
 @Preview
 @Composable
 fun FieldsPreviewDark() {
-    PtfTheme(forceDarkMode = true) { FieldsPreview() }
+    PtfPreview(forceDarkMode = true) { FieldsPreview() }
 }

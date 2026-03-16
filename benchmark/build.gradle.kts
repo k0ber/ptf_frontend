@@ -48,13 +48,6 @@ dependencies {
     implementation(libs.compose.material3)
     implementation(libs.compose.runtime)
 
-    // Decompose
-    implementation(libs.decompose.core)
-    implementation(libs.decompose.extensions.compose)
-    implementation(libs.essenty.lifecycle)
-    implementation(libs.essenty.statekeeper)
-    implementation(libs.essenty.lifecycle)
-
     // Mvi
     implementation(libs.mvikotlin.core)
     implementation(libs.mvikotlin.main)
@@ -67,23 +60,16 @@ dependencies {
 
     // Tests
     implementation(libs.androidx.test.ext.junit)
+    implementation(libs.androidx.compose.ui.test.junit4)
     implementation(libs.koin.test)
     implementation(libs.koin.test.junit4)
     implementation(libs.koin.android)
     implementation(libs.mockk.android)
-    implementation(libs.androidx.test.ext.junit)
     implementation(libs.settings.test)
-    implementation(libs.androidx.compose.ui.test.junit4)
+
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
 
 baselineProfile {
-    @Suppress("UnstableApiUsage")
-    enableEmulatorDisplay = true
-
     useConnectedDevices = true
-
-    if (isCi) {
-        managedDevices = mutableListOf("pixel6Api31")
-    }
 }

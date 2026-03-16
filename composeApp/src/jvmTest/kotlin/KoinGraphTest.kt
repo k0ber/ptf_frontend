@@ -6,18 +6,29 @@ import kotlinx.coroutines.CoroutineScope
 import org.junit.Test
 import org.koin.core.annotation.KoinExperimentalAPI
 import org.koin.test.KoinTest
-import org.koin.test.verify.verify
+import org.koin.test.verify.verifyAll
 import org.patifiner.client.ApiConfig
+import org.patifiner.client.KoinAppConfig
 import org.patifiner.client.NetworkObserver
 import org.patifiner.client.appModule
+import org.patifiner.client.root.RootNavigator
+import org.patifiner.client.root.login.data.AuthRepository
+import org.patifiner.client.root.login.data.TokenStorage
+import org.patifiner.client.root.main.MainNavigator
+import org.patifiner.client.root.main.mainModule
+import org.patifiner.client.root.rootModule
 
-// koin verify(..) requires jvm, so we can't put it in common tests
+// koin verifyAll(..) requires jvm, so we can't put it in common tests
 class CheckModulesTest : KoinTest {
 
     @OptIn(KoinExperimentalAPI::class)
     @Test
     fun checkAllModules() {
-        appModule.verify(
+        listOf(
+            appModule,
+            rootModule,
+            mainModule
+        ).verifyAll(
             extraTypes = listOf(
                 HttpClientEngineFactory::class,
                 HttpClientEngine::class,
@@ -25,7 +36,14 @@ class CheckModulesTest : KoinTest {
                 CoroutineScope::class,
                 Settings::class,
                 NetworkObserver::class,
-                HttpClient::class
+                HttpClient::class,
+                KoinAppConfig::class,
+
+                AuthRepository::class,
+                TokenStorage::class,
+
+                RootNavigator::class,
+                MainNavigator::class
             )
         )
     }
