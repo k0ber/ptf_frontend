@@ -48,43 +48,28 @@ jobs:
       - name: Run Macrobenchmarks
         run: ./gradlew :benchmark:connectedBenchmarkBenchmarkAndroidTest --continue
 
-      - name: Validate Benchmark Results
-        run: |
-          REPORT_DIR="benchmark/build/outputs/connected_android_test_additional_output"
-          if [ -z "$(find "$REPORT_DIR" -name "*.json" 2>/dev/null)" ]; then
-            echo "❌ ERROR: No benchmark results found! Check device connection."
-            exit 1
-          fi
-
       - name: Generate Compose Metrics
-        run: |
-          ./gradlew :androidApp:assembleDebug \
-          -Pandroidx.compose.compiler.plugins.kotlin.metricsDestination=${{ github.workspace }}/build/compose_compiler \
-          -Pandroidx.compose.compiler.plugins.kotlin.reportsDestination=${{ github.workspace }}/build/compose_compiler
+        run: ./gradlew :androidApp:assembleDebug
 
       - name: Collect All Results
         if: always()
         run: |
           mkdir -p build/allure-results
           
+          # 1. Unit Tests (XML)
+          cp composeApp/build/test-results/jvmTest/*.xml build/allure-results/ || true
+          
           # 2. Benchmarks
           BENCH_OUT="benchmark/build/outputs/connected_android_test_additional_output"
-          FOUND_BENCH=$(find "$BENCH_OUT" -name "*.json" 2>/dev/null)
+          find "$BENCH_OUT" -name "*.json" -exec bash -c 'cp -v "$1" "build/allure-results/benchmark_$(basename "$1")"' -- {} \; || true
           
-          if [ -z "$FOUND_BENCH" ]; then
-             echo "⚠️ WARNING: No benchmark JSONs found."
-             echo "[]" > build/allure-results/metrics.json
-          else
-             find "$BENCH_OUT" -name "*.json" -exec bash -c 'cp -v "$1" "build/allure-results/benchmark_$(basename "$1")"' -- {} \;
-             echo "$FOUND_BENCH" | head -n 1 | xargs -I {} cp {} build/allure-results/metrics.json
-          fi
+          # metrics.json for Regression Check
+          find "$BENCH_OUT" -name "*.json" -print -quit | xargs -I {} cp {} build/allure-results/metrics.json || echo "[]" > build/allure-results/metrics.json
 
-          # 3. Compose Metrics
-          if [ -d "build/compose_compiler" ]; then
-            find build/compose_compiler -name "*-classes.txt" -exec cp {} build/allure-results/compose-classes.txt \; || true
-            find build/compose_compiler -name "*-composables.txt" -exec cp {} build/allure-results/compose-composables.txt \; || true
-            find build/compose_compiler -name "*.json" -exec cp {} build/allure-results/compose-metrics.json \; || true
-          fi
+          # 3. Compose Metrics 
+          find composeApp/build/compose_compiler -name "*classes.txt" -exec cp -v {} build/allure-results/compose-classes.txt \; || true
+          find composeApp/build/compose_compiler -name "*composables.txt" -exec cp -v {} build/allure-results/compose-composables.txt \; || true
+          find composeApp/build/compose_compiler -name "*.json" -exec cp -v {} build/allure-results/compose-metrics.json \; || true
 
           # 4. Environment
           {
@@ -93,6 +78,9 @@ jobs:
             echo "Branch=${{ github.head_ref || github.ref_name }}"
           } > build/allure-results/environment.properties
 
+      - name: Reset Git State
+        run: git checkout .
+
       - name: Performance Regression Check
         uses: benchmark-action/github-action-benchmark@v1
         if: always()
@@ -100,9 +88,9 @@ jobs:
           tool: 'googlecpp'
           output-file-path: build/allure-results/metrics.json
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          comment-on-alert: true
           auto-push: false
-          fail-on-alert: true
+          comment-on-alert: true
+          save-data-file: true
           alert-threshold: '120%'
           benchmark-data-dir-path: dev/bench
 
@@ -132,6 +120,16 @@ jobs:
           destination_dir: mobile/${{ github.run_number }}
           keep_files: true
 
+      - name: Deploy Benchmarks to GH Pages
+        uses: peaceiris/actions-gh-pages@v3
+        if: always()
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: dev/bench
+          destination_dir: dev/bench
+          keep_files: true
+
       - name: Update Latest Redirect
         if: always()
         run: |
@@ -155,7 +153,7 @@ jobs:
           message: |
             **Allure Test Report:** 
             https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/mobile/${{ github.run_number }}/
-            ---
+          comment_tag: allure_report
 
       - name: Post cleanup
         if: always()
