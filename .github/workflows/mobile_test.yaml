@@ -39,7 +39,14 @@ jobs:
 
       - name: Run Macrobenchmarks
         run: ./gradlew :benchmark:connectedBenchmarkBenchmarkAndroidTest --continue
-        continue-on-error: true
+
+      - name: Validate Benchmark Results
+        run: |
+          REPORT_DIR="benchmark/build/outputs/connected_android_test_additional_output"
+          if [ ! -d "$REPORT_DIR" ] || [ -z "$(ls -A $REPORT_DIR/*.json 2>/dev/null)" ]; then
+            echo "❌ ERROR: No benchmark results found! Check if Android device is connected."
+            exit 1
+          fi
 
       - name: Collect All Results
         if: always()
