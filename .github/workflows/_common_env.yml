@@ -18,20 +18,13 @@ jobs:
       version_code: ${{ steps.vars.outputs.version_code }}
       is_ci: "true"
     steps:
-      - name: Determine Version
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Extract version from gradle.properties
         id: vars
+        shell: bash
         run: |
-          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
-            RAW_TAG="${{ github.ref_name }}"
-            echo "version_name=${RAW_TAG#v}" >> $GITHUB_OUTPUT
-            echo "version_code=${{ github.run_number }}" >> $GITHUB_OUTPUT
-          elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            BODY="${{ github.event.pull_request.body }}"
-            TAG=$(echo "$BODY" | grep -oP '/release\s+\K(v[0-9]+\.[0-9]+\.[0-9]+)' || echo "")
-            CLEAN_TAG=${TAG#v}
-            echo "version_name=${CLEAN_TAG:-main}" >> $GITHUB_OUTPUT
-            echo "version_code=${{ github.run_number }}" >> $GITHUB_OUTPUT
-          else
-            echo "version_name=dev" >> $GITHUB_OUTPUT
-            echo "version_code=1" >> $GITHUB_OUTPUT
-          fi
+          VERSION=$(grep '^versionName=' gradle.properties | cut -d'=' -f2)
+          echo "version_name=$VERSION" >> $GITHUB_OUTPUT
+          echo "version_code=${{ github.run_number }}" >> $GITHUB_OUTPUT
