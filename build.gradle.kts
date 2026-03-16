@@ -10,6 +10,13 @@ plugins {
 }
 
 // region .ENV
+val isReleaseBuild: Boolean = providers.gradleProperty("release")
+    .map { it.toBoolean() }.orElse(providers.provider {
+        val taskNames = gradle.startParameter.taskNames.joinToString(",").lowercase()
+        taskNames.contains("release") || taskNames.contains("bundle")
+    })
+    .getOrElse(false)
+
 val isCiBuild = providers.gradleProperty("isCi")
     .getOrElse("false").toBoolean()
 
@@ -20,7 +27,8 @@ val versionCode = providers.gradleProperty("versionCode")
     .getOrElse("1").toInt()
 
 subprojects {
-    extra.set("isCi", isCiBuild)
+    extra.set("isReleaseBuild", isReleaseBuild)
+    extra.set("isCiBuild", isCiBuild)
     extra.set("ptfVersionCode", versionCode)
     extra.set("ptfVersionName", versionName)
 }

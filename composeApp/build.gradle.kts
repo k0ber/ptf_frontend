@@ -13,6 +13,7 @@ plugins {
     alias(libs.plugins.stability.analyzer)
 }
 
+val isReleaseBuild: Boolean by extra
 val ptfVersionName: String by extra
 val ptfVersionCode: Int by extra
 
@@ -23,12 +24,16 @@ val allureAgent: Configuration by configurations.creating {
     isTransitive = false
 }
 
+val agentFileProvider: Provider<File> = provider { allureAgent.singleFile }
+val allureResultsDir: String = layout.projectDirectory
+    .dir("../build/allure-results")
+    .asFile.absolutePath
+
 tasks.withType<Test>().configureEach {
-    val allureResultsDir = rootProject.layout.buildDirectory.dir("allure-results")
-    systemProperty("allure.results.directory", allureResultsDir.get().asFile.absolutePath)
+    systemProperty("allure.results.directory", allureResultsDir)
+    val agentPath = agentFileProvider.map { it.absolutePath }
     doFirst {
-        val agentFile = allureAgent.singleFile
-        jvmArgs("-javaagent:${agentFile.absolutePath}")
+        jvmArgs("-javaagent:${agentPath.get()}")
     }
     testLogging { events("passed", "skipped", "failed") }
 }
@@ -179,8 +184,4 @@ compose {
 dependencies {
     androidRuntimeClasspath(libs.compose.ui.tooling)
     allureAgent(libs.aspectj.weaver)
-}
-
-val isReleaseBuild = gradle.startParameter.taskNames.any {
-    it.contains("release", ignoreCase = true)
 }
