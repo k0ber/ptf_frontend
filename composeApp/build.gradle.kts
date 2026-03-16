@@ -169,7 +169,7 @@ compose {
             nativeDistributions {
                 targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
                 packageName = "org.patifiner.client"
-                packageVersion = ptfVersionName
+                packageVersion = ptfVersionName.replaceFirst(Regex("^0"), "1") // MAJOR is required to be > 0
             }
         }
     }

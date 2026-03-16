@@ -45,6 +45,7 @@ jobs:
           push: true
           tags: |
             ghcr.io/${{ github.repository }}:latest
+            ghcr.io/${{ github.repository }}:${{ needs.common_env.outputs.version_name }}
             ghcr.io/${{ github.repository }}:${{ github.sha }}
 
       - name: Copy docker-compose via SCP

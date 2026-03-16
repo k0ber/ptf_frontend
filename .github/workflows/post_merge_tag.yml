@@ -1,0 +1,36 @@
+name: Create Tag on Merge
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'gradle.properties'
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get version
+        id: get_version
+        run: |
+          VERSION=$(grep '^versionName=' gradle.properties | cut -d'=' -f2)
+          echo "v=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Create and Push Tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="v${{ steps.get_version.outputs.v }}"
+          
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          if ! git rev-parse "$TAG" >/dev/null 2>&1; then
+            git tag $TAG
+            git push origin $TAG
+          else
+            echo "Tag $TAG already exists"
+          fi
