@@ -10,6 +10,8 @@ import androidx.test.uiautomator.Until
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.patifiner.client.root.login.SIGNUP_LINK_TAG
+import org.patifiner.client.root.signup.LOGIN_LINK_TAG
 
 @RunWith(AndroidJUnit4::class)
 class ChangeTabsBenchmark {
@@ -26,16 +28,14 @@ class ChangeTabsBenchmark {
     ) {
         startActivityAndWait()
 
-        val signupLink = "Don’t have an account?"   // stringResource(Res.string.already_have_account)
-        val loginLink = "Already have an account?"  // find a way to use resources in benchmark tests
-
-        device.wait( // simplify syntax
-            Until.findObject(By.textContains(signupLink)),
-            1_000
+        device.wait(
+            Until.findObject(By.res(SIGNUP_LINK_TAG)),
+            2_000
         )?.click() ?: throw IllegalStateException("Signup link not found")
 
         device.wait(
-            Until.findObject(By.textContains(loginLink)), 1_000
-        ) ?: throw IllegalStateException("Login link not found")
+            Until.findObject(By.res(LOGIN_LINK_TAG)),
+            2_000
+        )?.click() ?: throw IllegalStateException("Login link not found - navigation failed")
     }
 }

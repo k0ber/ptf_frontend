@@ -8,6 +8,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.patifiner.client.design.icons.PtfIcons
+import org.patifiner.client.root.login.SIGNUP_LINK_TAG
+import org.patifiner.client.root.signup.LOGIN_LINK_TAG
 
 /**
  * This class generates a Baseline Profile and a Startup Profile for the app.
@@ -34,17 +36,19 @@ class BaselineProfileGenerator {
 
         device.waitForIdle()
 
-//        val signupLink = "Don’t have an account?"
-//        val loginLink = "Already have an account?"
-//
-//        device.wait(
-//            Until.findObject(By.textContains(signupLink)), 2_000
-//        )?.click() ?: throw IllegalStateException("Signup link not found")
-//
-//        device.wait(
-//            Until.findObject(By.textContains(loginLink)), 2_000
-//        )?.click() ?: throw IllegalStateException("Login link not found")
-//
-//        device.wait(Until.hasObject(By.textContains(signupLink)), 1_000)
+        device.wait(
+            Until.findObject(By.res(SIGNUP_LINK_TAG)),
+            2_000
+        )?.click() ?: throw IllegalStateException("Signup link not found")
+
+        device.wait(
+            Until.findObject(By.res(LOGIN_LINK_TAG)),
+            2_000
+        )?.click() ?: throw IllegalStateException("Login link not found - navigation failed")
+
+        device.wait(
+            Until.hasObject(By.res(SIGNUP_LINK_TAG)),
+            2_000
+        )
     }
 }

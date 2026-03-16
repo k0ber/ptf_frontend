@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import org.patifiner.client.design.PtfTheme
+import org.patifiner.client.design.PtfPreview
 
 @Composable
 fun Chip(
@@ -45,7 +45,7 @@ fun Chip(
 @Preview
 @Composable
 fun ChipsLightPreview() {
-    PtfTheme(forceDarkMode = false) {
+    PtfPreview {
         Row {
             Chip(text = "Interest Chip", selected = false, onClick = {})
             Chip(text = "Interest Chip", selected = true, onClick = {})
@@ -56,7 +56,7 @@ fun ChipsLightPreview() {
 @Preview
 @Composable
 fun ChipsDarkPreview() {
-    PtfTheme(forceDarkMode = true) {
+    PtfPreview(forceDarkMode = true) {
         Row {
             Chip(text = "Interest Chip", selected = false, onClick = {})
             Chip(text = "Interest Chip", selected = true, onClick = {})

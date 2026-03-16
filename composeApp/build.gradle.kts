@@ -10,6 +10,7 @@ plugins {
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.stability.analyzer)
 }
 
 val ptfVersionName: String by extra
@@ -66,6 +67,8 @@ kotlin {
         commonMain.dependencies {
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
+            implementation(libs.koin.compose.navigation3)
 
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.auth)
@@ -80,14 +83,9 @@ kotlin {
             implementation(libs.compose.components.resources)
             implementation(libs.compose.ui.tooling.preview)
 
-            implementation(libs.compose.lifecycle.viewmodel)
-            implementation(libs.compose.lifecycle.runtime)
-
-            implementation(libs.decompose.core)
-            implementation(libs.decompose.extensions.compose)
-            implementation(libs.decompose.extensions.compose.experimental)
-            implementation(libs.essenty.lifecycle)
-            implementation(libs.essenty.statekeeper)
+            implementation(libs.androidx.lifecycle.viewmodel.compose)
+            implementation(libs.androidx.lifecycle.runtime.compose)
+            implementation(libs.androidx.navigation3.ui)
 
             implementation(libs.mvikotlin.core)
             implementation(libs.mvikotlin.main)
@@ -101,7 +99,10 @@ kotlin {
 
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.kotlinx.datetime)
+            implementation(libs.kotlinx.collections.immutable)
+
             implementation(libs.napier)
+            implementation(libs.compose.stability.runtime)
         }
         jvmMain.dependencies {
             implementation(compose.desktop.currentOs)
@@ -124,14 +125,21 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.okhttp)
-            implementation(libs.decompose.extensions.android)
             implementation(libs.koin.android)
-            implementation(libs.compose.ui.tooling) // is it needed for proper work of layout inspector?
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
             implementation(libs.settings.core)
         }
+    }
+}
+
+composeStabilityAnalyzer {
+    stabilityValidation {
+        enabled.set(!isReleaseBuild)
+        outputDir.set(layout.projectDirectory.dir("stability"))
+        ignoredClasses.set(listOf(".*Preview.*", ".*ComposableSingletons.*"))
+        failOnStabilityChange.set(!isReleaseBuild)
     }
 }
 
@@ -171,4 +179,8 @@ compose {
 dependencies {
     androidRuntimeClasspath(libs.compose.ui.tooling)
     allureAgent(libs.aspectj.weaver)
+}
+
+val isReleaseBuild = gradle.startParameter.taskNames.any {
+    it.contains("release", ignoreCase = true)
 }

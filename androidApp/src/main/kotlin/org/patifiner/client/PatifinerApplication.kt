@@ -11,9 +11,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.getKoin
 import org.koin.android.ext.koin.androidContext
-import org.patifiner.client.base.PtfLog
-import org.patifiner.client.login.LoginUseCase
-import org.patifiner.client.login.data.AuthRepository
+import org.patifiner.client.core.PtfLog
+import org.patifiner.client.root.login.data.AuthRepository
 import kotlin.system.measureTimeMillis
 
 class PatifinerApplication : Application() {
@@ -34,6 +33,7 @@ class PatifinerApplication : Application() {
             val totalTime = measureTimeMillis {
                 initKoin(
                     KoinAppConfig(
+                        isDev = BuildConfig.IS_DEV,
                         engine = Platform.engineFactory(),
                         apiConfig = Platform.apiConfig(),
                         appScope = Platform.appMainScope()
@@ -43,7 +43,6 @@ class PatifinerApplication : Application() {
                 // warm up complex instances in bg
                 getKoin().get<HttpClient>()
                 getKoin().get<AuthRepository>()
-                getKoin().get<LoginUseCase>()
             }
             PtfLog.i { "Koin init took $totalTime ms" }
             _ready.value = true

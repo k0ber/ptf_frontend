@@ -1,27 +1,31 @@
 package com.patifiner.benchmark.tests
 
-import androidx.compose.ui.test.StateRestorationTester
-import androidx.compose.ui.test.junit4.createComposeRule
-import org.junit.Rule
+import androidx.compose.ui.test.assertTextContains
+import androidx.compose.ui.test.junit4.StateRestorationTester
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performTextInput
 import org.junit.Test
-import org.patifiner.client.RootScreen
+import org.patifiner.client.root.RootScreen
+import org.patifiner.client.root.login.LOGIN_EMAIL_FIELD_TAG
 
-class LoginStateRestorationTest {
+class LoginStateRestorationTest : BasePerformanceTest() {
 
-//    @get:Rule
-//    val composeTestRule = createComposeRule()
-//
-//    @Test
-//    fun onRecreation_stateIsRestored() {
-//        val restorationTester = StateRestorationTester(composeTestRule)
-//
-//        restorationTester.setContent { RootScreen() }
-//
-//        val loginInput = "abc@dd.ee"
-//        loginField.input = loginInput
-//
-//        restorationTester.emulateSavedInstanceStateRestore()
-//
-//        assert(loginField.value, loginInput, "state changed after recreation")
-//    }
+    @Test
+    fun loginEmailIsRestored() {
+        val restorationTester = StateRestorationTester(composeRule)
+        restorationTester.setContent { RootScreen() }
+
+        val testEmail = "perfectionist@test.com"
+
+        composeRule.onNodeWithTag(LOGIN_EMAIL_FIELD_TAG)
+            .performTextInput(testEmail)
+
+        restorationTester.emulateSavedInstanceStateRestore()
+
+        composeRule.waitForIdle()
+
+        composeRule.onNodeWithTag(LOGIN_EMAIL_FIELD_TAG)
+            .assertTextContains(testEmail)
+
+    }
 }

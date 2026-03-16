@@ -25,7 +25,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import org.patifiner.client.design.PtfTheme
+import org.patifiner.client.design.PtfPreview
 
 /**
  * todo: change params order according to official guideline https://android.googlesource.com/platform/frameworks/support/+/androidx-main/compose/docs/compose-component-api-guidelines.md
@@ -57,11 +57,11 @@ fun PtfShadowedText(text: String, fontSize: Int = 32, modifier: Modifier = Modif
             fontSize = fontSize.sp,
             letterSpacing = 2.sp,
             color = colorScheme.tertiary,
-//            shadow = Shadow(
-//                color = colorScheme.primary.copy(alpha = 0.6f),
-//                offset = Offset(0f, 0f), // смещение (0,0) = ровное свечение
-//                blurRadius = 24f            // радиус размытия
-//            )
+            shadow = Shadow(
+                color = colorScheme.tertiary.copy(alpha = 0.6f),
+                offset = Offset(0f, 0f),
+                blurRadius = 24f
+            )
         )
     )
 }
@@ -165,11 +165,11 @@ fun TextsPreview() {
 @Preview
 @Composable
 fun TextPreviewLight() {
-    PtfTheme { TextsPreview() }
+    PtfPreview { TextsPreview() }
 }
 
 @Preview
 @Composable
 fun TextsPreviewDark() {
-    PtfTheme(forceDarkMode = true) { TextsPreview() }
+    PtfPreview(forceDarkMode = true) { TextsPreview() }
 }

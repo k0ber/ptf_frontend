@@ -18,7 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import org.patifiner.client.design.PtfTheme
+import org.patifiner.client.design.PtfPreview
 
 @Composable
 fun PrimaryButton(
@@ -70,12 +70,12 @@ fun ButtonsPreview() {
 @Preview
 @Composable
 fun ButtonsPreviewLight() {
-    PtfTheme(forceDarkMode = false) { ButtonsPreview() }
+    PtfPreview { ButtonsPreview() }
 }
 
 @Preview
 @Composable
 fun ButtonsPreviewDark() {
-    PtfTheme(forceDarkMode = true) { ButtonsPreview() }
+    PtfPreview(forceDarkMode = true) { ButtonsPreview() }
 }
 // endregion

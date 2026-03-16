@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,7 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import org.patifiner.client.design.PtfTheme
+import org.patifiner.client.design.PtfPreview
 
 @Composable
 fun PtfLinearProgress(
@@ -88,7 +87,7 @@ fun PtfLinearProgress(
 @Preview
 @Composable
 fun ProgressPreview() {
-    PtfTheme {
+    PtfPreview {
         Column {
             PtfWarningText("Progress is empty in preview")
             PtfLinearProgress(isLoading = true)

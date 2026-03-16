@@ -10,7 +10,11 @@ import com.russhwolf.settings.Settings
 import io.ktor.client.HttpClient
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestScope
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -19,12 +23,18 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.GlobalContext.startKoin
 import org.koin.core.context.GlobalContext.stopKoin
 import org.koin.dsl.module
+import org.patifiner.client.KoinAppConfig
 import org.patifiner.client.NetworkObserver
 import org.patifiner.client.appModule
-import org.patifiner.client.login.data.AuthRepository
+import org.patifiner.client.root.login.data.AuthRepository
+import org.patifiner.client.root.main.mainModule
+import org.patifiner.client.root.rootModule
 
 @RunWith(AndroidJUnit4::class)
 abstract class BasePerformanceTest {
+
+    private val testDispatcher = StandardTestDispatcher()
+    protected val testScope = TestScope(testDispatcher + Job())
 
     @get:Rule
     val composeRule =
@@ -37,16 +47,30 @@ abstract class BasePerformanceTest {
     @Before
     fun baseSetup() {
         isAssertOnMainThreadEnabled = false
+        stopKoin()
 
         startKoin {
             androidContext(InstrumentationRegistry.getInstrumentation().targetContext)
             allowOverride(true)
-            modules(appModule, module {
-                single { authRepo }
-                single { networkObserver }
-                single { httpClient }
-                single<Settings> { MapSettings() }
-            })
+            modules(
+                appModule,
+                rootModule,
+                mainModule,
+                module {
+                    single {
+                        KoinAppConfig(
+                            isDev = true,
+                            engine = mockk(),
+                            apiConfig = mockk(),
+                            appScope = testScope
+                        )
+                    }
+                    single { authRepo }
+                    single { networkObserver }
+                    single { httpClient }
+                    single<CoroutineScope> { testScope }
+                    single<Settings> { MapSettings() }
+                })
         }
 
         every { authRepo.tokenFlow } returns MutableStateFlow(null)

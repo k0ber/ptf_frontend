@@ -53,9 +53,10 @@ android {
             buildConfigField("Boolean", "IS_DEV", "false")
         }
 
-        create("releaseDebug") {
+        create("dev") {
             initWith(getByName("release"))
-            isDebuggable = true
+            matchingFallbacks.add("release")
+            isDebuggable = false
             applicationIdSuffix = ".dev"
             buildConfigField("Boolean", "IS_DEV", "true")
         }
@@ -85,7 +86,12 @@ composeCompiler {
 
 baselineProfile {
     from(project(":benchmark"))
-    filter { include("org.patifiner.client.**") }
+//    filter { include("org.patifiner.client.**") }
+    variants {
+        filter {
+            it.name == "release"
+        }
+    }
     saveInSrc = true
 }
 
@@ -97,13 +103,10 @@ dependencies {
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.activity.compose)
 
+    implementation(libs.compose.foundation)
+
     implementation(libs.koin.android)
     implementation(libs.ktor.client.okhttp)
-    implementation(libs.decompose.core)
-    implementation(libs.decompose.extensions.android)
-
-    compileOnly(libs.compose.ui.tooling.preview) // double check is it really needed here or not?
-    debugImplementation(libs.compose.ui.tooling) // this to
 
     baselineProfile(project(":benchmark"))
     implementation(libs.androidx.profileinstaller)
