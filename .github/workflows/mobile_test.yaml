@@ -22,6 +22,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          clean: true
+          fetch-depth: 0
+
+      - name: Configure Git for Self-Hosted
+        run: |
+          git config --global credential.helper ""
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Set up JDK 21
         uses: actions/setup-java@v4
@@ -35,7 +44,6 @@ jobs:
 
       - name: Unit Tests
         run: ./gradlew :composeApp:jvmTest --continue
-        continue-on-error: true
 
       - name: Run Macrobenchmarks
         run: ./gradlew :benchmark:connectedBenchmarkBenchmarkAndroidTest --continue
@@ -43,45 +51,47 @@ jobs:
       - name: Validate Benchmark Results
         run: |
           REPORT_DIR="benchmark/build/outputs/connected_android_test_additional_output"
-          if [ ! -d "$REPORT_DIR" ] || [ -z "$(ls -A $REPORT_DIR/*.json 2>/dev/null)" ]; then
-            echo "❌ ERROR: No benchmark results found! Check if Android device is connected."
+          if [ -z "$(find "$REPORT_DIR" -name "*.json" 2>/dev/null)" ]; then
+            echo "❌ ERROR: No benchmark results found! Check device connection."
             exit 1
           fi
+
+      - name: Generate Compose Metrics
+        run: |
+          ./gradlew :androidApp:assembleDebug \
+          -Pandroidx.compose.compiler.plugins.kotlin.metricsDestination=${{ github.workspace }}/build/compose_compiler \
+          -Pandroidx.compose.compiler.plugins.kotlin.reportsDestination=${{ github.workspace }}/build/compose_compiler
 
       - name: Collect All Results
         if: always()
         run: |
           mkdir -p build/allure-results
           
-          # 1. Unit-тесты
-          find composeApp/build/test-results/jvmTest -name "*.xml" -exec cp -v {} build/allure-results/ \; || true
-          
           # 2. Benchmarks
-          # Используем уникальный префикс или структуру папок
-          find benchmark/build/outputs/connected_android_test_additional_output -name "*.json" \
-          -exec bash -c 'cp -v "$1" "build/allure-results/benchmark_$(basename "$1")"' -- {} \; || true
+          BENCH_OUT="benchmark/build/outputs/connected_android_test_additional_output"
+          FOUND_BENCH=$(find "$BENCH_OUT" -name "*.json" 2>/dev/null)
           
-          # 3. Performance Regression Check needs single file metrics.json
-          find benchmark/build/outputs/connected_android_test_additional_output -name "*.json" -print -quit | xargs -I {} cp {} build/allure-results/metrics.json || true
-          
-          # 4. Compose Metrics
-          cp composeApp/build/compose_compiler/android/main/composeApp-classes.txt build/allure-results/compose-classes.txt || true
-          cp composeApp/build/compose_compiler/android/main/composeApp-composables.txt build/allure-results/compose-composables.txt || true
-          cp composeApp/build/compose_compiler/android/main/composeApp-module.json build/allure-results/compose-metrics.json || true
-          
-          # 5. Environment
+          if [ -z "$FOUND_BENCH" ]; then
+             echo "⚠️ WARNING: No benchmark JSONs found."
+             echo "[]" > build/allure-results/metrics.json
+          else
+             find "$BENCH_OUT" -name "*.json" -exec bash -c 'cp -v "$1" "build/allure-results/benchmark_$(basename "$1")"' -- {} \;
+             echo "$FOUND_BENCH" | head -n 1 | xargs -I {} cp {} build/allure-results/metrics.json
+          fi
+
+          # 3. Compose Metrics
+          if [ -d "build/compose_compiler" ]; then
+            find build/compose_compiler -name "*-classes.txt" -exec cp {} build/allure-results/compose-classes.txt \; || true
+            find build/compose_compiler -name "*-composables.txt" -exec cp {} build/allure-results/compose-composables.txt \; || true
+            find build/compose_compiler -name "*.json" -exec cp {} build/allure-results/compose-metrics.json \; || true
+          fi
+
+          # 4. Environment
           {
             echo "Runner=${{ runner.name }}"
             echo "OS=${{ runner.os }}"
             echo "Branch=${{ github.head_ref || github.ref_name }}"
           } > build/allure-results/environment.properties
-
-      - name: Load Allure history
-        uses: actions/checkout@v4
-        if: always()
-        with:
-          ref: gh-pages
-          path: gh-pages
 
       - name: Performance Regression Check
         uses: benchmark-action/github-action-benchmark@v1
@@ -91,20 +101,28 @@ jobs:
           output-file-path: build/allure-results/metrics.json
           github-token: ${{ secrets.GITHUB_TOKEN }}
           comment-on-alert: true
-          auto-push: true
+          auto-push: false
           fail-on-alert: true
           alert-threshold: '120%'
+          benchmark-data-dir-path: dev/bench
+
+      - name: Load Allure history
+        uses: actions/checkout@v4
+        if: always()
+        with:
+          ref: gh-pages
+          path: gh-pages
 
       - name: Generate Allure Report
         if: always()
         run: |
-          allure generate build/allure-results -o allure-report --clean
           if [ -d "gh-pages/mobile/history" ]; then
-            cp -r gh-pages/mobile/history build/allure-results/
-            allure generate build/allure-results -o allure-report --clean
+            mkdir -p build/allure-results/history
+            cp -r gh-pages/mobile/history/* build/allure-results/history/
           fi
+          allure generate build/allure-results -o allure-report --clean
 
-      - name: Deploy Report to GH Pages
+      - name: Deploy Reports to GH Pages
         uses: peaceiris/actions-gh-pages@v3
         if: always()
         with:
@@ -114,7 +132,7 @@ jobs:
           destination_dir: mobile/${{ github.run_number }}
           keep_files: true
 
-      - name: Create Latest Report Redirect
+      - name: Update Latest Redirect
         if: always()
         run: |
           mkdir -p allure-report-latest
@@ -143,4 +161,8 @@ jobs:
         if: always()
         run: |
           ./gradlew --stop
-          rm -rf _work/* || true
+          rm -rf $HOME/actions_github_pages_* || true
+          rm -rf build/
+          rm -rf benchmark/build/
+          rm -rf composeApp/build/
+          rm -rf gh-pages/
