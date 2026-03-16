@@ -110,40 +110,34 @@ jobs:
           fi
           allure generate build/allure-results -o allure-report --clean
 
-      - name: Deploy Reports to GH Pages
-        uses: peaceiris/actions-gh-pages@v3
-        if: always()
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_branch: gh-pages
-          publish_dir: allure-report
-          destination_dir: mobile/${{ github.run_number }}
-          keep_files: true
-
-      - name: Deploy Benchmarks to GH Pages
-        uses: peaceiris/actions-gh-pages@v3
-        if: always()
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_branch: gh-pages
-          publish_dir: dev/bench
-          destination_dir: dev/bench
-          keep_files: true
-
-      - name: Update Latest Redirect
+      - name: Prepare Assets for Deployment
         if: always()
         run: |
-          mkdir -p allure-report-latest
-          echo '<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=./${{ github.run_number }}/" /></head></html>' > allure-report-latest/index.html
+          # Create folder structure as it should appear in gh-pages
+          mkdir -p deploy_out/mobile/${{ github.run_number }}
+          mkdir -p deploy_out/dev/bench
+          
+          # 1. Copy Allure Report
+          if [ -d "allure-report" ]; then
+            cp -r allure-report/* deploy_out/mobile/${{ github.run_number }}/
+          fi
+          
+          # 2. Copy updated benchmark data from dev/bench
+          # These files were updated/created by the Performance Regression Check step
+          if [ -d "dev/bench" ] && [ "$(ls -A dev/bench)" ]; then
+            cp -r dev/bench/* deploy_out/dev/bench/
+          fi
+          
+          # 3. Create a redirect link
+          echo '<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=./${{ github.run_number }}/" /></head></html>' > deploy_out/mobile/index.html
 
-      - name: Deploy Redirect to GH Pages
+      - name: Deploy to GH Pages
         uses: peaceiris/actions-gh-pages@v3
         if: always()
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
-          publish_dir: allure-report-latest
-          destination_dir: mobile
+          publish_dir: deploy_out
           keep_files: true
 
       - name: Post Allure Report link
@@ -158,9 +152,11 @@ jobs:
       - name: Post cleanup
         if: always()
         run: |
-          ./gradlew --stop
+          # restore after git checkout
+          chmod +x gradlew || true
+          ./gradlew --stop || true
+          
           rm -rf $HOME/actions_github_pages_* || true
-          rm -rf build/
-          rm -rf benchmark/build/
-          rm -rf composeApp/build/
-          rm -rf gh-pages/
+          
+          rm -rf build/ allure-report/ deploy_out/ dev/bench/ gh-pages/
+          rm -rf benchmark/build/ composeApp/build/ androidApp/build/
