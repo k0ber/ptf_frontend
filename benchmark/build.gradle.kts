@@ -1,5 +1,3 @@
-val isCi: Boolean by extra
-
 plugins {
     alias(libs.plugins.android.test)
     alias(libs.plugins.compose.compiler)

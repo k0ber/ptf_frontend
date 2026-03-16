@@ -1,4 +1,4 @@
-val isCi: Boolean by extra
+val isCiBuild: Boolean by extra
 val ptfVersionName: String by extra
 val ptfVersionCode: Int by extra
 
@@ -23,7 +23,7 @@ android {
 
     signingConfigs {
         create("release") {
-            if (isCi) {
+            if (isCiBuild) {
                 storeFile = file(System.getenv("KEYSTORE_FILE_PATH"))
                 storePassword = System.getenv("KEYSTORE_PASSWORD")
                 keyAlias = System.getenv("KEY_ALIAS")
