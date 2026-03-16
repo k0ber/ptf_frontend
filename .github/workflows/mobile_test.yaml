@@ -68,7 +68,7 @@ jobs:
         uses: benchmark-action/github-action-benchmark@v1
         if: always()
         with:
-          tool: 'google_cpp'
+          tool: 'googlecpp'
           output-file-path: build/allure-results/metrics.json
           github-token: ${{ secrets.GITHUB_TOKEN }}
           comment-on-alert: true
@@ -76,16 +76,14 @@ jobs:
           fail-on-alert: true
           alert-threshold: '120%'
 
-      - name: Build Allure Report
-        uses: simple-elf/allure-report-action@master
+      - name: Generate Allure Report
         if: always()
-        with:
-          allure_results: build/allure-results
-          gh_pages: gh-pages
-          allure_report: allure-report
-          allure_history: allure-history
-          keep_reports: 20
-          subfolder: mobile/${{ github.run_number }}
+        run: |
+          allure generate build/allure-results -o allure-report --clean
+          if [ -d "gh-pages/mobile/history" ]; then
+            cp -r gh-pages/mobile/history build/allure-results/
+            allure generate build/allure-results -o allure-report --clean
+          fi
 
       - name: Deploy Report to GH Pages
         uses: peaceiris/actions-gh-pages@v3
@@ -93,14 +91,25 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
-          publish_dir: allure-history
+          publish_dir: allure-report
+          destination_dir: mobile/${{ github.run_number }}
           keep_files: true
 
-      - name: Create Redirect to Latest Mobile Report
+      - name: Create Latest Report Redirect
         if: always()
         run: |
-          mkdir -p allure-history/mobile
-          echo '<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=./${{ github.run_number }}/" /></head></html>' > allure-history/mobile/index.html
+          mkdir -p allure-report-latest
+          echo '<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=./${{ github.run_number }}/" /></head></html>' > allure-report-latest/index.html
+
+      - name: Deploy Redirect to GH Pages
+        uses: peaceiris/actions-gh-pages@v3
+        if: always()
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: allure-report-latest
+          destination_dir: mobile
+          keep_files: true
 
       - name: Post Allure Report link
         uses: thollander/actions-comment-pull-request@v2
