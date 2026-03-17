@@ -62,26 +62,42 @@ jobs:
           # 2. Android UI Test Results
           find benchmark/build/outputs/androidTest-results -name "*.xml" -exec cp -v {} build/allure-results/ \; || true
           
-          # 3. Benchmarks Metrics for Regression Check
+          # 3. Benchmarks Metrics
           BENCH_OUT="benchmark/build/outputs/connected_android_test_additional_output"
-          find "$BENCH_OUT" -name "*.json" -print -quit | xargs -I {} cp {} build/allure-results/metrics.json || echo "[]" > build/allure-results/metrics.json
+          RAW_BENCH_JSON=$(find "$BENCH_OUT" -name "*.json" -not -name "*-*-*.json" -print -quit)
           
-          # 4. Copy files for Allure Attachments
-          find build/compose_compiler -name "*classes.txt" -exec cp -v {} build/allure-results/compose-classes.txt \; || true
-          find build/compose_compiler -name "*composables.txt" -exec cp -v {} build/allure-results/compose-composables.txt \; || true
-          find build/compose_compiler -name "*.json" -exec cp -v {} build/allure-results/compose-metrics.json \; || true
-          find "$BENCH_OUT" -name "*.json" -exec bash -c 'cp -v "$1" "build/allure-results/benchmark_data.json"' -- {} \; || true
-      
-          # 5. Create synthetic Allure Test (Performance & Stability)
+          if [ -n "$RAW_BENCH_JSON" ]; then
+            cp "$RAW_BENCH_JSON" build/allure-results/benchmark_data.json
+            cp "$RAW_BENCH_JSON" build/allure-results/metrics.json
+            
+            # Pickup Median benchmarks
+            STARTUP=$(jq -r '.benchmarks[] | select(.name=="measureColdStartup") | .metrics.timeToInitialDisplayMs.median' "$RAW_BENCH_JSON" 2>/dev/null || echo "N/A")
+            FRAMES=$(jq -r '.benchmarks[] | select(.name=="measureLoginToSignup") | .metrics.frameCount.median' "$RAW_BENCH_JSON" 2>/dev/null || echo "N/A")
+            BENCH_SUMMARY="Median Startup: ${STARTUP}ms, Median Frames: ${FRAMES}"
+          else
+            echo "[]" > build/allure-results/metrics.json
+            BENCH_SUMMARY="No benchmark data found"
+          fi
+          
+          # 4. Compose Metrics
+          find . -name "*-classes.txt" -not -path "*/_test-*" -exec cp -v {} build/allure-results/compose-classes.txt \; || true
+          find . -name "*-composables.txt" -not -path "*/_test-*" -exec cp -v {} build/allure-results/compose-composables.txt \; || true
+          find . -name "*.json" -path "*/compose_compiler/*" -exec cp -v {} build/allure-results/compose-metrics.json \; || true
+          
+          # Prevents empty files in Allure
+          [ -s build/allure-results/compose-classes.txt ] || echo "No classes data found" > build/allure-results/compose-classes.txt
+          [ -s build/allure-results/compose-composables.txt ] || echo "No composables data found" > build/allure-results/compose-composables.txt
+          [ -s build/allure-results/compose-metrics.json ] || echo "{}" > build/allure-results/compose-metrics.json
+
+          # 5. Создание синтетического теста Allure
           cat <<EOF > build/allure-results/performance-result.json
           {
             "uuid": "perf-$(date +%s)",
             "historyId": "performance-and-stability",
-            "fullName": "Performance and Stability Metrics",
-            "name": "Performance and Stability Metrics",
+            "name": "Performance & Compose Metrics",
             "status": "passed",
             "stage": "finished",
-            "description": "Compose compiler metrics and Macrobenchmark raw data",
+            "description": "Device: Pixel 10 Pro XL. $BENCH_SUMMARY",
             "attachments": [
               { "name": "Compose Classes", "source": "compose-classes.txt", "type": "text/plain" },
               { "name": "Compose Composables", "source": "compose-composables.txt", "type": "text/plain" },
@@ -93,7 +109,7 @@ jobs:
           }
           EOF
           
-          # 6. Allure Executor (Trends & CI Link)
+          # 6. Executor info
           cat <<EOF > build/allure-results/executor.json
           {
             "name": "GitHub Actions",
@@ -150,6 +166,7 @@ jobs:
         run: |
           # Create folder structure as it should appear in gh-pages
           mkdir -p deploy_out/mobile/${{ github.run_number }}
+          mkdir -p deploy_out/mobile/metrics
           mkdir -p deploy_out/dev/bench
           
           # 1. Copy Allure Report
@@ -157,8 +174,11 @@ jobs:
             cp -r allure-report/* deploy_out/mobile/${{ github.run_number }}/
           fi
           
-          # 2. Copy updated benchmark data from dev/bench
-          # These files were updated/created by the Performance Regression Check step
+          # 2. Copy Raw Metrics for direct links in PR
+          cp build/allure-results/compose-metrics.json deploy_out/mobile/metrics/compose-metrics-${{ github.run_number }}.json || true
+          cp build/allure-results/benchmark_data.json deploy_out/mobile/metrics/benchmark-${{ github.run_number }}.json || true
+    
+          # 3. Copy benchmark data for history
           if [ -d "dev/bench" ] && [ "$(ls -A dev/bench)" ]; then
             cp -r dev/bench/* deploy_out/dev/bench/
           fi
@@ -181,11 +201,9 @@ jobs:
         with:
           message: |
             ### 📊 Test Quality Report
-            **Allure Report:** [View Full Report](https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/mobile/${{ github.run_number }}/)
-            
-            **Raw Metrics (JSON/Text):**
-            - [Compose Metrics](https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/mobile/${{ github.run_number }}/data/attachments/compose-metrics.json)
-            - [Benchmark Data](https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/mobile/${{ github.run_number }}/data/attachments/benchmark_data.json)
+            - [Allure Report](https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/mobile/${{ github.run_number }}/)
+            - [Compose Metrics](https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/mobile/metrics/compose-metrics-${{ github.run_number }}.json)
+            - [Macrobenchmark](https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/mobile/metrics/benchmark-${{ github.run_number }}.json)
           comment_tag: allure_report
 
       - name: Post cleanup
