@@ -23,11 +23,12 @@ android {
 
     signingConfigs {
         create("release") {
-            if (isCiBuild) {
-                storeFile = file(System.getenv("KEYSTORE_FILE_PATH"))
-                storePassword = System.getenv("KEYSTORE_PASSWORD")
-                keyAlias = System.getenv("KEY_ALIAS")
-                keyPassword = System.getenv("KEY_PASSWORD")
+            val keystorePath = System.getenv("KEYSTORE_FILE_PATH") ?: ""
+            if (isCiBuild && keystorePath.isNotEmpty()) {
+                storeFile = file(keystorePath)
+                storePassword = System.getenv("KEYSTORE_PASSWORD") ?: ""
+                keyAlias = System.getenv("KEY_ALIAS") ?: ""
+                keyPassword = System.getenv("KEY_PASSWORD") ?: ""
             } else {
                 val debugConfig = getByName("debug")
                 storeFile = debugConfig.storeFile
