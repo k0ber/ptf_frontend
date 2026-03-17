@@ -1,0 +1,7 @@
+"DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
+"","4","generateBaselineProfiles","","2026-03-17","skipped","2026-03-17","","com.patifiner.benchmark.BaselineProfileGenerator","com.patifiner.benchmark.BaselineProfileGenerator",""
+"","60547","measureColdStartup","","2026-03-17","passed","2026-03-17","","com.patifiner.benchmark.BaselineProfileGenerator","com.patifiner.benchmark.performance.ColdStartupBenchmark",""
+"Device: Pixel 10 Pro XL. Median Startup: 190.499167ms, Median Frames: 40.0","0","Performance & Compose Metrics","","2026-03-17","passed","2026-03-17","","","",""
+"","733","loginEmailIsRestored","","2026-03-17","passed","2026-03-17","","com.patifiner.benchmark.BaselineProfileGenerator","com.patifiner.benchmark.tests.LoginStateRestorationTest",""
+"","53844","measureLoginToSignup","","2026-03-17","passed","2026-03-17","","com.patifiner.benchmark.BaselineProfileGenerator","com.patifiner.benchmark.performance.ChangeTabsBenchmark",""
+"","405","checkAllModules[jvm]","","2026-03-16","passed","2026-03-16","","CheckModulesTest[jvm]","CheckModulesTest",""
