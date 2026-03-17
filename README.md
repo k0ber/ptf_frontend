@@ -3,13 +3,13 @@
 [![Build Status](https://github.com/k0ber/ptf_frontend/actions/workflows/mobile_test.yaml/badge.svg)](https://github.com/k0ber/ptf_frontend/actions/workflows/mobile_test.yaml)
 [![Mobile Report](https://img.shields.io/badge/Allure%20Report-mobile-blue)](https://k0ber.github.io/ptf_frontend/mobile/)
 
+Kotlin multiplatform compose application build with Gradle 9+
+
 Front-end part of social platform "Patifiner" - application for discover real connections based on your interests
 
 Back-end part available here: [ptf_backend](https://github.com/k0ber/ptf_backend)
 
 ---
-
-It is kotlin multiplatform compose application build with Gradle 9+
 
 ## Stack
 
@@ -22,7 +22,7 @@ It is kotlin multiplatform compose application build with Gradle 9+
 - [**Ktor**](https://ktor.io/)
 - [**KotlinX Serialization**](https://github.com/Kotlin/kotlinx.serialization)
 - [**KotlinX Datetime**](https://github.com/Kotlin/kotlinx-datetime)
-- [**Kotlin Logging**](https://github.com/oshai/kotlin-logging)
+- [**Napier Logging**](https://github.com/AAkira/Napier)
 - [**Multiplatform Settings**](https://github.com/russhwolf/multiplatform-settings)
 
 ### Web
@@ -38,28 +38,30 @@ It is kotlin multiplatform compose application build with Gradle 9+
 - **Swing**
 
 ### Testing & Quality
+- **Kotlin test**
+- **Junit 4**
+- **UiAutomator**
 - [**Macrobenchmark**](https://developer.android.com/topic/performance/benchmarking/macrobenchmark-overview)
 - [**Baseline Profiles**](https://developer.android.com/topic/performance/baselineprofiles/overview)
 - [**Allure Report**](https://allurereport.org/)
-- **UiAutomator**
-- **Junit 4**
-- **Kotlin test**
-- **Mockk**
 
 ---
 
 ## Project structure
 
-├── `:androidApp` — entry point for android build
-├── `:iosApp` — entry point for iOS Xproject build
-├── `:benchmark` — baseline generation and performance tests for android
-└── `:composeApp` — main module for compose multiplatform
-    ├── `androidMain` — android specific staff, contains manifest with required permissions
-    ├── `commonMain` — shared code across all targets, project base
-    ├── `iosMain` — entry point for iOS app (MainViewController.kt) and platform specific staff
-    ├── `jvmMain` — entry point for Desktop, platform specific staff
-    ├── `jvmTest` — unit tests module
-    └── `wasmJsMain` — entry point for Web app, contains `index.html` and `styles.css`
+```
+.
+├── :androidApp         entry point for android build
+├── :iosApp             entry point for iOS Xproject build
+├── :benchmark          baseline generation and performance tests for android
+└── :composeApp         main module for compose multiplatform
+    ├── androidMain     android specific staff, contains manifest with required permissions
+    ├── commonMain      shared code across all targets, project base
+    ├── iosMain         entry point for iOS app (MainViewController.kt) and platform specific staff
+    ├── jvmMain         entry point for Desktop, platform specific staff
+    ├── jvmTest         unit tests module
+    └── wasmJsMain      entry point for Web app, contains `index.html` and `styles.css`
+```
 
 ---
 
@@ -84,7 +86,7 @@ It is kotlin multiplatform compose application build with Gradle 9+
 
 `./gradlew :benchmark:connectedBenchmarkBenchmarkAndroidTest`
 - android performance tests for tracking frames rate, you should have android device connected and seen via `adb devices`
-- test results and traces location is TODO 
+- test results and traces located in `benchmark/build/outputs/connected_android_test_additional_output/`.
 
 ### iOS
 `./gradlew :composeApp:iosSimulatorArm64Run -Pcompose.ios.simulator.device="iPhone 16e"`
@@ -97,3 +99,7 @@ It is kotlin multiplatform compose application build with Gradle 9+
 ### Unit tests
 `./gradlew :composeApp:jvmTest`
 - run junit tests
+
+---
+
+[License](https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode)
