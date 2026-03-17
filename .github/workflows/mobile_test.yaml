@@ -62,16 +62,50 @@ jobs:
           # 2. Benchmarks
           BENCH_OUT="benchmark/build/outputs/connected_android_test_additional_output"
           find "$BENCH_OUT" -name "*.json" -exec bash -c 'cp -v "$1" "build/allure-results/benchmark_$(basename "$1")"' -- {} \; || true
-          
-          # metrics.json for Regression Check
           find "$BENCH_OUT" -name "*.json" -print -quit | xargs -I {} cp {} build/allure-results/metrics.json || echo "[]" > build/allure-results/metrics.json
+          
+          # 3. Create synthetic Allure Test for Benchmarks & Compose Metrics
+          cat <<EOF > build/allure-results/manual-results.json
+          {
+            "uuid": "performance-$(date +%s)",
+            "historyId": "performance-metrics",
+            "name": "Performance & Stability Metrics",
+            "status": "passed",
+            "stage": "finished",
+            "steps": [],
+            "attachments": [
+              { "name": "Compose Classes", "source": "compose-classes.txt", "type": "text/plain" },
+              { "name": "Compose Composables", "source": "compose-composables.txt", "type": "text/plain" },
+              { "name": "Compose Metrics JSON", "source": "compose-metrics.json", "type": "application/json" }
+            ],
+            "parameters": [],
+            "start": $(date +%s000),
+            "stop": $(date +%s000)
+          }
+          EOF
+          
+          # 4. Copy actual files for attachments
+          find build/compose_compiler -name "*classes.txt" -exec cp -v {} build/allure-results/compose-classes.txt \; || true
+          find build/compose_compiler -name "*composables.txt" -exec cp -v {} build/allure-results/compose-composables.txt \; || true
+          find build/compose_compiler -name "*.json" -exec cp -v {} build/allure-results/compose-metrics.json \; || true
 
-          # 3. Compose Metrics 
-          find composeApp/build/compose_compiler -name "*classes.txt" -exec cp -v {} build/allure-results/compose-classes.txt \; || true
-          find composeApp/build/compose_compiler -name "*composables.txt" -exec cp -v {} build/allure-results/compose-composables.txt \; || true
-          find composeApp/build/compose_compiler -name "*.json" -exec cp -v {} build/allure-results/compose-metrics.json \; || true
+          # 5. Benchmarks Data (copying into attachments folder)
+          find "$BENCH_OUT" -name "*.json" -exec bash -c 'cp -v "$1" "build/allure-results/benchmark_$(basename "$1")"' -- {} \; || true
 
-          # 4. Environment
+          # 6. Allure Executor
+          cat <<EOF > build/allure-results/executor.json
+          {
+            "name": "GitHub Actions",
+            "type": "github",
+            "reportName": "Mobile Quality Report",
+            "buildName": "Run #${{ github.run_number }}",
+            "buildOrder": "${{ github.run_number }}",
+            "buildUrl": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
+            "reportUrl": "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/mobile/${{ github.run_number }}/"
+          }
+          EOF
+
+          # 7. Environment
           {
             echo "Runner=${{ runner.name }}"
             echo "OS=${{ runner.os }}"
