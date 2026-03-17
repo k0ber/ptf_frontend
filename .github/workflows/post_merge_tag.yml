@@ -1,11 +1,17 @@
 name: Create Tag on Merge
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 on:
   push:
     branches:
       - main
     paths:
       - 'gradle.properties'
+
+permissions:
+  contents: write
 
 jobs:
   tag:
