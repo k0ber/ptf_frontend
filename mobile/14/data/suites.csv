@@ -1,0 +1,7 @@
+"DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
+"Compose compiler metrics and Macrobenchmark raw data","0","Performance and Stability Metrics","","2026-03-17","passed","2026-03-17","","","",""
+"","3","generateBaselineProfiles","","2026-03-17","skipped","2026-03-17","","com.patifiner.benchmark.BaselineProfileGenerator","com.patifiner.benchmark.BaselineProfileGenerator",""
+"","42180","measureColdStartup","","2026-03-17","passed","2026-03-17","","com.patifiner.benchmark.BaselineProfileGenerator","com.patifiner.benchmark.performance.ColdStartupBenchmark",""
+"","546","loginEmailIsRestored","","2026-03-17","passed","2026-03-17","","com.patifiner.benchmark.BaselineProfileGenerator","com.patifiner.benchmark.tests.LoginStateRestorationTest",""
+"","51667","measureLoginToSignup","","2026-03-17","passed","2026-03-17","","com.patifiner.benchmark.BaselineProfileGenerator","com.patifiner.benchmark.performance.ChangeTabsBenchmark",""
+"","405","checkAllModules[jvm]","","2026-03-16","passed","2026-03-16","","CheckModulesTest[jvm]","CheckModulesTest",""
