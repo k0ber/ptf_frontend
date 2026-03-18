@@ -1,0 +1,1 @@
+{"total":3,"items":[{"uid":"803ba5fd6e3f3b5bc791937f3c464247","name":"com.patifiner.benchmark.BaselineProfileGenerator","statistic":{"failed":2,"broken":0,"skipped":1,"passed":1,"unknown":0,"total":4}},{"uid":"b8c2c586b9d9f877148e699e7f5ddbc0","name":"CheckModulesTest[jvm]","statistic":{"failed":0,"broken":0,"skipped":0,"passed":1,"unknown":0,"total":1}}]}
