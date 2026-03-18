@@ -6,8 +6,10 @@ name: Deploy to RuStore
 on:
   workflow_dispatch:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - main
+    paths:
+      - 'gradle.properties'
 
 jobs:
   common_env:
