@@ -5,8 +5,10 @@ env:
 
 on:
   push:
-    tags: [ "v*" ]
-  workflow_dispatch:
+    branches:
+      - main
+    paths:
+      - 'gradle.properties'
 
 jobs:
   common_env:

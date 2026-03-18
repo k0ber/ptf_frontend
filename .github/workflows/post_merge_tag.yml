@@ -18,6 +18,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
 
       - name: Get version
         id: get_version
@@ -26,10 +29,9 @@ jobs:
           echo "v=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Create and Push Tag
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          TAG="v${{ steps.get_version.outputs.v }}"
+          VERSION=$(grep '^versionName=' gradle.properties | cut -d'=' -f2)
+          TAG="v$VERSION"
           
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
