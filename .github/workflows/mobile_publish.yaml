@@ -3,11 +3,13 @@ name: Deploy to RuStore
 # обязательно проверить версию и доки для экшена ru-store/rustore-upload-action@v1.1.0
 # на момент создания пайплайна этому экшену 4 дня
 
+# upd: ru-store/rustore-upload-action@v1.1.0 больше не существует, попробовать https://github.com/romankurnovskii/rustore
+
 on:
   workflow_dispatch:
   push:
     branches:
-      - main
+      - disable
     paths:
       - 'gradle.properties'
 
