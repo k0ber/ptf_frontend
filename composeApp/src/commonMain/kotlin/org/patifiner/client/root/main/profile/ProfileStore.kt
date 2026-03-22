@@ -19,7 +19,7 @@ data class ProfileState(
     val userDto: UserDto? = null,
     override val isLoading: Boolean = false
 ) : BaseState<ProfileState> {
-    override fun withLoading(isLoading: Boolean): ProfileState = ProfileState(isLoading = isLoading)
+    override fun withLoading(isLoading: Boolean): ProfileState = copy(isLoading = isLoading)
 }
 
 sealed interface ProfileIntent {
@@ -48,7 +48,7 @@ class ProfileStoreFactory(
                 onAction<ProfileAction.LoadInitial> {
                     execute(
                         useCase = { loadProfile() },
-                        onSuccessData = { data -> ProfileState(userDto = data) },
+                        onSuccessData = { data -> copy(userDto = data) },
                         errorFactory = ProfileLabel::Error
                     )
                 }
@@ -56,7 +56,7 @@ class ProfileStoreFactory(
                 onIntent<ProfileIntent.Refresh> {
                     execute(
                         useCase = { loadProfile() },
-                        onSuccessData = { data -> ProfileState(userDto = data) },
+                        onSuccessData = { data -> copy(userDto = data) },
                         errorFactory = ProfileLabel::Error
                     )
                 }

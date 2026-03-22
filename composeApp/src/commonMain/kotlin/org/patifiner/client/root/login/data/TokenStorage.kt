@@ -3,12 +3,13 @@ package org.patifiner.client.root.login.data
 import com.russhwolf.settings.Settings
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import org.patifiner.client.core.PtfLog
 
 private const val ACCESS_KEY = "access_token"
 private const val REFRESH_KEY = "refresh_token"
+private const val INTRO_REQUIRED_KEY = "intro_required"
 
 interface TokenStorage {
+    var isIntroRequired: Boolean // todo: use state flow instead?
     val tokenFlow: StateFlow<String?>
     var accessToken: String?
     var refreshToken: String?
@@ -17,10 +18,7 @@ interface TokenStorage {
 
 class TokenStorageImpl(private val settings: Settings) : TokenStorage {
 
-    private val _tokenFlow: MutableStateFlow<String?> get() {
-        PtfLog.d { "Read Settings for initial token check" }
-        return MutableStateFlow(settings.getStringOrNull(ACCESS_KEY))
-    }
+    private val _tokenFlow: MutableStateFlow<String?> = MutableStateFlow(settings.getStringOrNull(ACCESS_KEY))
 
     override val tokenFlow: StateFlow<String?> = _tokenFlow
 
@@ -37,8 +35,14 @@ class TokenStorageImpl(private val settings: Settings) : TokenStorage {
             if (value == null) settings.remove(REFRESH_KEY) else settings.putString(REFRESH_KEY, value)
         }
 
+    override var isIntroRequired: Boolean // not related to tokens, shouldn't be here
+        get() = settings.getBoolean(INTRO_REQUIRED_KEY, false)
+        set(value) = settings.putBoolean(INTRO_REQUIRED_KEY, value)
+
+
     override fun clear() {
         accessToken = null
         refreshToken = null
+        isIntroRequired = false
     }
 }

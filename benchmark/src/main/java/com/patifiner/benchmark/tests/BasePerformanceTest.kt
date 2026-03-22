@@ -22,11 +22,13 @@ import org.junit.runner.RunWith
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.GlobalContext.startKoin
 import org.koin.core.context.GlobalContext.stopKoin
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import org.patifiner.client.KoinAppConfig
 import org.patifiner.client.NetworkObserver
 import org.patifiner.client.appModule
 import org.patifiner.client.root.login.data.AuthRepository
+import org.patifiner.client.root.login.data.SessionManager
 import org.patifiner.client.root.main.mainModule
 import org.patifiner.client.root.rootModule
 
@@ -43,6 +45,7 @@ abstract class BasePerformanceTest {
     val authRepo = mockk<AuthRepository>(relaxed = true)
     val networkObserver = mockk<NetworkObserver>(relaxed = true)
     val httpClient = mockk<HttpClient>(relaxed = true)
+    val sessionManager = mockk<SessionManager>(relaxed = true)
 
     @Before
     fun baseSetup() {
@@ -68,13 +71,17 @@ abstract class BasePerformanceTest {
                     single { authRepo }
                     single { networkObserver }
                     single { httpClient }
+                    single(named("unauth_client")) { httpClient }
+                    single { sessionManager }
                     single<CoroutineScope> { testScope }
                     single<Settings> { MapSettings() }
                 })
         }
 
-        every { authRepo.tokenFlow } returns MutableStateFlow(null)
         every { networkObserver.isOnline } returns MutableStateFlow(true)
+
+        every { sessionManager.accessTokenFlow } returns MutableStateFlow(null)
+        every { sessionManager.isIntroRequired } returns false
     }
 
     @After

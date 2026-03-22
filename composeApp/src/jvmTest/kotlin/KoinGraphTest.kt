@@ -13,8 +13,11 @@ import org.patifiner.client.NetworkObserver
 import org.patifiner.client.appModule
 import org.patifiner.client.root.RootNavigator
 import org.patifiner.client.root.login.data.AuthRepository
+import org.patifiner.client.root.login.data.SessionManager
 import org.patifiner.client.root.login.data.TokenStorage
 import org.patifiner.client.root.main.MainNavigator
+import org.patifiner.client.root.main.intro.IntroNavigator
+import org.patifiner.client.root.main.intro.user.UserInteractor
 import org.patifiner.client.root.main.mainModule
 import org.patifiner.client.root.rootModule
 
@@ -41,9 +44,13 @@ class CheckModulesTest : KoinTest {
 
                 AuthRepository::class,
                 TokenStorage::class,
+                SessionManager::class,
 
                 RootNavigator::class,
-                MainNavigator::class
+                MainNavigator::class,
+                IntroNavigator::class,
+
+                UserInteractor::class,
             )
         )
     }

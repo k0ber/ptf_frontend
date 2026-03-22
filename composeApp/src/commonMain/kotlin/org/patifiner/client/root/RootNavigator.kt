@@ -6,39 +6,32 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import org.koin.core.component.KoinComponent
-import org.koin.core.qualifier.named
-import org.koin.core.scope.Scope
-import org.patifiner.client.root.login.data.AuthRepository
-import org.patifiner.client.root.main.SESSION_SCOPE
+import org.patifiner.client.root.login.data.SessionManager
 
 class RootNavigator(
-    authRepository: AuthRepository,
     appScope: CoroutineScope,
+    private val sessionManager: SessionManager,
 ) : KoinComponent {
 
     val backStack = mutableStateListOf<PtfRoute>()
         .apply {
-            val hasToken = authRepository.tokenFlow.value != null
+            val hasToken = sessionManager.accessTokenFlow.value != null
             if (hasToken) {
-                openSession()
-                add(PtfRoute.Main)
+                sessionManager.openAuthScope()
+                add(chooseStartRoute())
             } else {
                 add(PtfRoute.Login)
             }
         }
 
-    private var authScope: Scope? = null
-
     init {
-        authRepository.tokenFlow.drop(1) // first read on backStack init
+        sessionManager.accessTokenFlow.drop(1) // first read on backStack init
             .onEach { token ->
                 val currentRoot = backStack.lastOrNull()
                 if (token != null && currentRoot !is PtfRoute.Main) {
-                    openSession()
                     backStack.clear()
-                    backStack.add(PtfRoute.Main)
+                    backStack.add(chooseStartRoute())
                 } else if (token == null && currentRoot !is PtfRoute.Login) {
-                    closeSession()
                     backStack.clear()
                     backStack.add(PtfRoute.Login)
                 }
@@ -54,17 +47,13 @@ class RootNavigator(
         backStack.removeLastOrNull()
     }
 
-    private fun openSession() {
-        if (authScope == null) {
-            authScope = getKoin().createScope(
-                "session_id",
-                named(SESSION_SCOPE)
-            )
-        }
+    fun completeIntro() {
+        sessionManager.onIntroCompleted()
+        backStack.clear()
+        backStack.add(PtfRoute.Main)
     }
 
-    private fun closeSession() {
-        authScope?.close()
-        authScope = null
-    }
+    private fun chooseStartRoute(): PtfRoute =
+        if (sessionManager.isIntroRequired) PtfRoute.Intro else PtfRoute.Main
+
 }

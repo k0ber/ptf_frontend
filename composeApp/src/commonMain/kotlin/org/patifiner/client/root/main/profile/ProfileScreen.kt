@@ -16,8 +16,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.patifiner.client.core.Gender
+import org.patifiner.client.core.UserDto
+import org.patifiner.client.core.UserLanguage
 import org.patifiner.client.design.PtfPreview
-import org.patifiner.client.design.PtfTheme
+import org.patifiner.client.design.views.PtfText
 import org.patifiner.client.root.RootSnackbarHost
 
 @Composable
@@ -49,9 +52,9 @@ fun ProfileContent(
     ) {
         Spacer(Modifier.height(16.dp))
         state.userDto?.let {
-            Text("ID: ${it.id}")
-            Text("Name: ${it.name}")
-            Text("Email: ${it.email}")
+            PtfText("ID: ${it.id}")
+            PtfText("Name: ${it.name}")
+            PtfText("Email: ${it.email}")
         }
 
         Spacer(Modifier.height(16.dp))
@@ -74,6 +77,22 @@ fun ProfileContent(
 @Composable
 fun ProfilePreview() {
     PtfPreview {
-        ProfileContent(ProfileState())
+        ProfileContent(
+            ProfileState(
+                UserDto(
+                    id = 1,
+                    name = "Mikle",
+                    avatarUrl = "",
+                    photos = emptyList(),
+                    birthDate = null,
+                    email = "test@email",
+                    cityId = 1,
+                    cityName = "Pkh",
+                    gender = Gender.MALE,
+                    languages = emptyList(),
+                    locale = "en",
+                ), isLoading = false
+            )
+        )
     }
 }

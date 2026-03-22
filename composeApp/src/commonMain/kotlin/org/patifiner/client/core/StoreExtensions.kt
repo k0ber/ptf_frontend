@@ -32,6 +32,7 @@ inline fun <Intent : Any, Action : Any, reified State : BaseState<State>, Label 
 fun <S : BaseState<S>, L : Any, T> CoroutineExecutorScope<S, StateReducer<S>, *, L>.execute(
     useCase: suspend () -> Result<T>,
     onSuccessData: (S.(T) -> S)? = null,
+    onSuccess: ((T) -> Unit)? = null,
     errorFactory: ((String) -> L)? = null
 ) {
     if (state().isLoading) return
@@ -42,10 +43,10 @@ fun <S : BaseState<S>, L : Any, T> CoroutineExecutorScope<S, StateReducer<S>, *,
         useCase()
             .onSuccess { data ->
                 onSuccessData?.let { reducerWithData -> dispatch { reducerWithData(data) } }
+                onSuccess?.invoke(data) // are two lambdas for success necessary?
             }
             .onFailure { throwable ->
-                val msg = throwable.toUserMessage()
-                errorFactory?.let { publish(it(msg)) }
+                errorFactory?.let { publish(it(throwable.message ?: "Unknown error")) }
             }
 
         dispatch { withLoading(false) }
