@@ -20,16 +20,16 @@ import io.ktor.http.append
 import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import org.koin.mp.KoinPlatform.getKoin
 import org.patifiner.client.ApiConfig
 import org.patifiner.client.root.login.data.AuthRepository
-import org.patifiner.client.root.login.data.TokenStorage
+import org.patifiner.client.root.login.data.SessionManager
 
 fun createHttpClient(
     engine: HttpClientEngineFactory<*>,
     json: Json,
     config: ApiConfig,
-    tokenStorage: TokenStorage,
-    authRepositoryProvider: () -> AuthRepository // prevents cycle dependency in Koin
+    sessionManager: SessionManager?,
 ): HttpClient {
     return HttpClient(engine) {
         expectSuccess = false
@@ -49,17 +49,25 @@ fun createHttpClient(
             sanitizeHeader { header -> header == HttpHeaders.Authorization }
         }
 
-        install(Auth) {
-            bearer {
-                loadTokens {
-                    tokenStorage.accessToken?.let { BearerTokens(it, tokenStorage.refreshToken ?: "") }
-                }
-                refreshTokens {
-                    val result = authRepositoryProvider().refreshTokens()
-                    result.getOrNull()?.let { BearerTokens(it.accessToken, it.refreshToken) }
-                }
-                sendWithoutRequest { request ->
-                    request.attributes.getOrNull(AuthRequiredKey) ?: true
+        if (sessionManager != null) {
+            install(Auth) {
+                bearer {
+                    loadTokens {
+                        val accessToken = sessionManager.accessToken
+                        val refreshToken = sessionManager.refreshToken
+                        accessToken?.let { BearerTokens(it, refreshToken ?: "") }
+                    }
+                    refreshTokens {
+                        val repo = getKoin().get<AuthRepository>()
+                        val result = repo.refreshTokens()
+
+                        result.getOrNull()?.let {
+                            BearerTokens(it.accessToken, it.refreshToken)
+                        }
+                    }
+                    sendWithoutRequest { request ->
+                        request.attributes.getOrNull(AuthRequiredKey) ?: true
+                    }
                 }
             }
         }

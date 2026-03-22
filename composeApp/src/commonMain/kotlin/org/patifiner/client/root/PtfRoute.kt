@@ -16,6 +16,8 @@ sealed interface PtfRoute : NavKey {
         override val requiresAuth = false
     }
 
+    @Serializable data object Intro : PtfRoute
+
     @Serializable data object Main : PtfRoute
 
 }

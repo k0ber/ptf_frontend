@@ -64,7 +64,7 @@ class LoginStoreFactory(
 
                 onIntent<LoginIntent.Login> {
                     execute(
-                        useCase = { repo.requestToken(TokenRequest(state().email, state().password)) },
+                        useCase = { repo.login(TokenRequest(state().email, state().password)) },
                         errorFactory = LoginLabel::Error
                     )
                 }

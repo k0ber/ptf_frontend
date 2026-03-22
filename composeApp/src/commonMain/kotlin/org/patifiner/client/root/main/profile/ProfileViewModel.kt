@@ -1,19 +1,19 @@
 package org.patifiner.client.root.main.profile
 
 import org.patifiner.client.core.PtfViewModel
-import org.patifiner.client.root.RootNavigator
 import org.patifiner.client.root.main.MainNavigator
+import org.patifiner.client.root.main.MainTabRoute
 
 class ProfileViewModel(
     store: ProfileStore,
-    private val rootNavigator: RootNavigator,
-    private val navigator: MainNavigator,
+    private val mainNavigator: MainNavigator,
 ) : PtfViewModel<ProfileIntent, ProfileState, ProfileLabel>(store) {
 
     fun onNavToMyTopics() {
+        mainNavigator.navigateTo(MainTabRoute.UserTopics)
     }
 
     fun onNavToAddTopic() {
-//         navigator.navigateToTab(MainTabRoute.AddUserTopic)
+        mainNavigator.navigateTo(MainTabRoute.AddUserTopic)
     }
 }

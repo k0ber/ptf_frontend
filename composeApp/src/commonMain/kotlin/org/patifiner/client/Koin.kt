@@ -7,11 +7,12 @@ import io.ktor.client.engine.HttpClientEngineFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.Json
 import org.koin.core.KoinApplication
-import org.koin.core.annotation.KoinExperimentalAPI
 import org.koin.core.context.startKoin
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import org.patifiner.client.core.createHttpClient
 import org.patifiner.client.root.login.data.AuthRepository
+import org.patifiner.client.root.login.data.SessionManager
 import org.patifiner.client.root.login.data.TokenStorage
 import org.patifiner.client.root.login.data.TokenStorageImpl
 import org.patifiner.client.root.main.mainModule
@@ -22,7 +23,6 @@ data class KoinAppConfig(
     val apiConfig: ApiConfig,
     val appScope: CoroutineScope,
     val isDev: Boolean,
-    val isBenchmark: Boolean = false,
 )
 
 fun initKoin(config: KoinAppConfig, appDeclaration: (KoinApplication.() -> Unit)? = null) =
@@ -45,7 +45,6 @@ fun initKoin(config: KoinAppConfig, appDeclaration: (KoinApplication.() -> Unit)
         )
     }.also { Platform.onAppInit() }
 
-@OptIn(KoinExperimentalAPI::class)
 val appModule = module {
     single {
         Json {
@@ -58,18 +57,17 @@ val appModule = module {
     }
 
     single<TokenStorage> { TokenStorageImpl(settings = get()) }
-
+    single { SessionManager(tokenStorage = get()) }
     single {
-        createHttpClient(
-            engine = get(),
-            json = get(),
-            config = get(),
-            tokenStorage = get(),
-            authRepositoryProvider = { get() }
+        AuthRepository(
+            unauthClient = get(named("unauth_client")),
+            authClient = get(),
+            sessionManager = get()
         )
     }
 
-    single { AuthRepository(client = get(), tokenStorage = get()) }
+    single { createHttpClient(engine = get(), json = get(), config = get(), sessionManager = get()) }
+    single(named("unauth_client")) { createHttpClient(engine = get(), json = get(), config = get(), sessionManager = null) }
 
     // mvi
     single<StoreFactory> {

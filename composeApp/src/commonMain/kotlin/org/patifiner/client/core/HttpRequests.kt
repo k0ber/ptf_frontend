@@ -6,6 +6,7 @@ import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.post
+import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.util.AttributeKey
 
@@ -20,6 +21,15 @@ suspend inline fun <reified T : Any, reified R : Any> HttpClient.post(
     body: T,
     authRequired: Boolean = true
 ): R = post(urlString) {
+    authRequired(authRequired)
+    setBody(body)
+}.body()
+
+suspend inline fun <reified T : Any, reified R : Any> HttpClient.put(
+    urlString: String,
+    body: T,
+    authRequired: Boolean = true
+): R = put(urlString) {
     authRequired(authRequired)
     setBody(body)
 }.body()
