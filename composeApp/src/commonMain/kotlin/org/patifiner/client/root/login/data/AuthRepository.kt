@@ -9,12 +9,14 @@ import org.patifiner.client.core.RefreshTokenRequest
 import org.patifiner.client.core.TokenRequest
 import org.patifiner.client.core.TokenResponse
 import org.patifiner.client.core.UserDto
+import org.patifiner.client.core.delete
 import org.patifiner.client.core.get
 import org.patifiner.client.core.post
 import org.patifiner.client.core.put
-import org.patifiner.client.root.signup.CreateUserRequest
-import org.patifiner.client.root.signup.UpdateUserRequest
-import org.patifiner.client.root.signup.UserCreatedResponse
+import org.patifiner.client.root.main.data.CreateUserRequest
+import org.patifiner.client.root.main.data.DeletePhotoRequest
+import org.patifiner.client.root.main.data.UpdateUserRequest
+import org.patifiner.client.root.main.data.UserCreatedResponse
 
 
 class AuthRepository(
@@ -60,12 +62,16 @@ class AuthRepository(
     suspend fun uploadAvatar(imageBytes: ByteArray, fileName: String): Result<UserDto> = runCatching {
         authClient.post(
             "/user/me/photo", MultiPartFormDataContent(
-            formData {
-                append("image", imageBytes, Headers.build {
-                    append(HttpHeaders.ContentType, "image/jpeg")
-                    append(HttpHeaders.ContentDisposition, "filename=\"$fileName\"")
-                })
-            }
-        ))
+                formData {
+                    append("image", imageBytes, Headers.build {
+                        append(HttpHeaders.ContentType, "image/jpeg")
+                        append(HttpHeaders.ContentDisposition, "filename=\"$fileName\"")
+                    })
+                }
+            ))
+    }
+
+    suspend fun deletePhoto(url: String): Result<UserDto> = runCatching {
+        authClient.delete("/user/me/photo", DeletePhotoRequest(url))
     }
 }

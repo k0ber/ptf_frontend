@@ -3,6 +3,7 @@ package org.patifiner.client.root.signup
 import androidx.compose.runtime.Immutable
 import org.patifiner.client.core.BaseState
 import org.patifiner.client.core.Constants
+import org.patifiner.client.root.main.data.CreateUserRequest
 
 @Immutable
 data class SignupState(

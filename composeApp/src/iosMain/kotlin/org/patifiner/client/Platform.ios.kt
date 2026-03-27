@@ -11,6 +11,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
+import org.patifiner.client.core.PtfDispatchers
 
 @Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 actual object Platform {
@@ -25,6 +26,11 @@ actual object Platform {
     @OptIn(ExperimentalSettingsImplementation::class)
     actual fun settings(): Settings = KeychainSettings("patifiner.app")
     actual fun appMainScope(): CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+    actual fun dispatchers(): PtfDispatchers = object : PtfDispatchers {
+        override val main = Dispatchers.Main // `Main.immediate` may execute inline on a non-main thread when called from Swift bridges.
+        override val default = Dispatchers.Default
+        override val io = Dispatchers.Default.limitedParallelism(4) // IO-like dispatcher
+    }
 
     actual fun onAppInit() {
         Napier.base(DebugAntilog())

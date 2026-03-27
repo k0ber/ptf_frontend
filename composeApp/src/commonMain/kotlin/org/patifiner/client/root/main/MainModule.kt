@@ -12,9 +12,8 @@ import org.koin.dsl.module
 import org.koin.dsl.navigation3.navigation
 import org.koin.mp.KoinPlatform.getKoin
 import org.patifiner.client.root.PtfRoute
-import org.patifiner.client.root.login.LoadProfileUseCase
-import org.patifiner.client.root.login.LogoutUseCase
 import org.patifiner.client.root.login.data.SessionManager
+import org.patifiner.client.root.main.data.UserStorage
 import org.patifiner.client.root.main.intro.IntroNavigator
 import org.patifiner.client.root.main.intro.IntroRoute
 import org.patifiner.client.root.main.intro.IntroScreen
@@ -23,9 +22,8 @@ import org.patifiner.client.root.main.intro.events.EventsIntroScreen
 import org.patifiner.client.root.main.intro.events.EventsIntroStoreFactory
 import org.patifiner.client.root.main.intro.events.EventsIntroViewModel
 import org.patifiner.client.root.main.intro.topics.TopicsIntroScreen
+import org.patifiner.client.root.main.intro.topics.TopicsIntroStoreFactory
 import org.patifiner.client.root.main.intro.topics.TopicsIntroViewModel
-import org.patifiner.client.root.main.intro.user.UpdateProfileUseCase
-import org.patifiner.client.root.main.intro.user.UploadAvatarUseCase
 import org.patifiner.client.root.main.intro.user.UserInfoIntroScreen
 import org.patifiner.client.root.main.intro.user.UserInfoIntroStoreFactory
 import org.patifiner.client.root.main.intro.user.UserInfoIntroViewModel
@@ -52,16 +50,13 @@ val mainModule = module {
         scopedOf(::IntroNavigator)
 
         scopedOf(::TopicsRepository)
+        scopedOf(::UserStorage)
 
         // rework use cases to interactors - main idea is to gather business logic by data it works with
         scopedOf(::UserInteractor)
-        scopedOf(::LoadProfileUseCase)
-        scopedOf(::LogoutUseCase)
         scopedOf(::LoadUserTopicsTreeUseCase)
         scopedOf(::SearchTopicsUseCase)
         scopedOf(::AddUserTopicUseCase)
-        scopedOf(::UpdateProfileUseCase)
-        scopedOf(::UploadAvatarUseCase)
 
         viewModelOf(::MainViewModel)
         viewModelOf(::ProfileViewModel)
@@ -72,10 +67,12 @@ val mainModule = module {
         viewModelOf(::TopicsIntroViewModel)
         viewModelOf(::EventsIntroViewModel)
 
-        factory { ProfileStoreFactory(factory = get(), loadProfile = get(), logoutUseCase = get()).create() }
+        factory { ProfileStoreFactory(factory = get(), userInteractor = get()).create() }
         factory { AddTopicsStoreFactory(factory = get(), loadTree = get(), search = get(), addTopic = get()).create() }
         factory { ShowTopicsStoreFactory(factory = get(), repo = get()).create() }
+
         factory { UserInfoIntroStoreFactory(factory = get(), userInteractor = get()).create() }
+        factory { TopicsIntroStoreFactory(factory = get()).create() }
         factory { EventsIntroStoreFactory(factory = get()).create() }
     }
 

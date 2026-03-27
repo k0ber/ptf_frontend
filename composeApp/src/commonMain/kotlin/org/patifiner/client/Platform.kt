@@ -3,6 +3,7 @@ package org.patifiner.client
 import com.russhwolf.settings.Settings
 import io.ktor.client.engine.HttpClientEngineFactory
 import kotlinx.coroutines.flow.StateFlow
+import org.patifiner.client.core.PtfDispatchers
 
 enum class Os {
     ANDROID, IOS, WEB, DESC
@@ -17,7 +18,7 @@ expect object Platform {
     fun networkObserver(): NetworkObserver
     fun settings(): Settings
     fun appMainScope(): kotlinx.coroutines.CoroutineScope
-
+    fun dispatchers(): PtfDispatchers
     fun onAppInit()
 }
 

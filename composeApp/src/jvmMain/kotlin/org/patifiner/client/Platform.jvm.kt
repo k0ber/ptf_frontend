@@ -9,6 +9,7 @@ import io.ktor.client.engine.okhttp.OkHttp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import org.patifiner.client.core.PtfDispatchers
 import java.util.prefs.Preferences
 
 @Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
@@ -25,6 +26,12 @@ actual object Platform {
 
     actual fun appMainScope(): CoroutineScope =
         CoroutineScope(SupervisorJob() + Dispatchers.Main)
+
+    actual fun dispatchers(): PtfDispatchers = object : PtfDispatchers {
+        override val main = Dispatchers.Main.immediate
+        override val default = Dispatchers.Default
+        override val io = Dispatchers.IO
+    }
 
     actual fun onAppInit() {
         Napier.base(DebugAntilog())

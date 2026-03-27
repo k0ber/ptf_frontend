@@ -38,6 +38,7 @@ fun initKoin(config: KoinAppConfig, appDeclaration: (KoinApplication.() -> Unit)
                 single { config.appScope }
                 single { Platform.settings() }
                 single { Platform.networkObserver() }
+                single { Platform.dispatchers() }
             },
             appModule,
             rootModule,

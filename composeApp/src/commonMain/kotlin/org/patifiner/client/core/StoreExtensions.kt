@@ -31,6 +31,7 @@ inline fun <Intent : Any, Action : Any, reified State : BaseState<State>, Label 
 
 fun <S : BaseState<S>, L : Any, T> CoroutineExecutorScope<S, StateReducer<S>, *, L>.execute(
     useCase: suspend () -> Result<T>,
+    loading: (S.(Boolean) -> S)? = null,
     onSuccessData: (S.(T) -> S)? = null,
     onSuccess: ((T) -> Unit)? = null,
     errorFactory: ((String) -> L)? = null
@@ -38,17 +39,19 @@ fun <S : BaseState<S>, L : Any, T> CoroutineExecutorScope<S, StateReducer<S>, *,
     if (state().isLoading) return
 
     launch {
-        dispatch { withLoading(true) }
+        loading?.let { reducer -> dispatch { reducer(true) } }
+            ?: state().withLoading(true)
 
         useCase()
             .onSuccess { data ->
                 onSuccessData?.let { reducerWithData -> dispatch { reducerWithData(data) } }
-                onSuccess?.invoke(data) // are two lambdas for success necessary?
+                onSuccess?.invoke(data)
             }
             .onFailure { throwable ->
                 errorFactory?.let { publish(it(throwable.message ?: "Unknown error")) }
             }
 
-        dispatch { withLoading(false) }
+        loading?.let { reducer -> dispatch { reducer(false) } }
+            ?: state().withLoading(false)
     }
 }

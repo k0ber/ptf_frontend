@@ -41,6 +41,15 @@ suspend inline fun <reified R : Any> HttpClient.get(
     authRequired(authRequired)
 }.body()
 
+suspend inline fun <reified T : Any, reified R : Any> HttpClient.delete(
+    urlString: String,
+    body: T,
+    authRequired: Boolean = true
+): R = delete(urlString) {
+    authRequired(authRequired)
+    setBody(body)
+}.body()
+
 suspend inline fun <reified R : Any> HttpClient.getSearch(
     urlString: String,
     query: String,

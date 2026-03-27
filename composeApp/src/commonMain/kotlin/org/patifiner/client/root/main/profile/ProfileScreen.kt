@@ -82,7 +82,6 @@ fun ProfilePreview() {
                 UserDto(
                     id = 1,
                     name = "Mikle",
-                    avatarUrl = "",
                     photos = emptyList(),
                     birthDate = null,
                     email = "test@email",
