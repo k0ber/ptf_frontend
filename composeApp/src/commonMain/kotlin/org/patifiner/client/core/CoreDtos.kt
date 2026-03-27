@@ -7,10 +7,9 @@ import kotlinx.serialization.Serializable
 @Serializable data class TokenResponse(val accessToken: String, val refreshToken: String)
 @Serializable data class RefreshTokenRequest(val refreshToken: String)
 
-@Serializable class UserDto(
+@Serializable data class UserDto(
     val id: Long,
     val name: String,
-    val avatarUrl: String? = null,
     val photos: List<String> = emptyList(),
     val birthDate: LocalDate?,
     val email: String,

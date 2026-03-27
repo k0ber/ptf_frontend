@@ -9,8 +9,7 @@ import org.patifiner.client.core.BaseState
 import org.patifiner.client.core.UserDto
 import org.patifiner.client.core.createDefault
 import org.patifiner.client.core.execute
-import org.patifiner.client.root.login.LoadProfileUseCase
-import org.patifiner.client.root.login.LogoutUseCase
+import org.patifiner.client.root.main.intro.user.UserInteractor
 
 interface ProfileStore : Store<ProfileIntent, ProfileState, ProfileLabel>
 
@@ -20,6 +19,39 @@ data class ProfileState(
     override val isLoading: Boolean = false
 ) : BaseState<ProfileState> {
     override fun withLoading(isLoading: Boolean): ProfileState = copy(isLoading = isLoading)
+}
+
+class ProfileStoreFactory(
+    private val factory: StoreFactory,
+    private val userInteractor: UserInteractor,
+) {
+    fun create(): ProfileStore =
+        object : ProfileStore, Store<ProfileIntent, ProfileState, ProfileLabel>
+        by factory.createDefault(
+            initialState = ProfileState(),
+            executorFactory = coroutineExecutorFactory {
+                onAction<ProfileAction.LoadInitial> {
+                    execute(
+                        useCase = { userInteractor.loadProfile() },
+                        onSuccessData = { data -> copy(userDto = data) },
+                        errorFactory = ProfileLabel::Error
+                    )
+                }
+
+                onIntent<ProfileIntent.Refresh> {
+                    execute(
+                        useCase = { userInteractor.loadProfile() },
+                        onSuccessData = { data -> copy(userDto = data) },
+                        errorFactory = ProfileLabel::Error
+                    )
+                }
+
+                onIntent<ProfileIntent.Logout> {
+                    userInteractor.logout()
+                }
+            },
+            bootstrapper = coroutineBootstrapper { dispatch(ProfileAction.LoadInitial) }
+        ) {}
 }
 
 sealed interface ProfileIntent {
@@ -33,38 +65,4 @@ sealed interface ProfileLabel {
 
 private sealed interface ProfileAction {
     data object LoadInitial : ProfileAction
-}
-
-class ProfileStoreFactory(
-    private val factory: StoreFactory,
-    private val loadProfile: LoadProfileUseCase,
-    private val logoutUseCase: LogoutUseCase
-) {
-    fun create(): ProfileStore =
-        object : ProfileStore, Store<ProfileIntent, ProfileState, ProfileLabel>
-        by factory.createDefault(
-            initialState = ProfileState(),
-            executorFactory = coroutineExecutorFactory {
-                onAction<ProfileAction.LoadInitial> {
-                    execute(
-                        useCase = { loadProfile() },
-                        onSuccessData = { data -> copy(userDto = data) },
-                        errorFactory = ProfileLabel::Error
-                    )
-                }
-
-                onIntent<ProfileIntent.Refresh> {
-                    execute(
-                        useCase = { loadProfile() },
-                        onSuccessData = { data -> copy(userDto = data) },
-                        errorFactory = ProfileLabel::Error
-                    )
-                }
-
-                onIntent<ProfileIntent.Logout> {
-                    logoutUseCase()
-                }
-            },
-            bootstrapper = coroutineBootstrapper { dispatch(ProfileAction.LoadInitial) }
-        ) {}
 }

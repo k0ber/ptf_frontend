@@ -11,6 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import org.patifiner.client.core.PtfDispatchers
 
 @Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 actual object Platform {
@@ -27,6 +28,12 @@ actual object Platform {
 
     actual fun appMainScope(): CoroutineScope =
         CoroutineScope(SupervisorJob() + Dispatchers.Main)
+
+    actual fun dispatchers(): PtfDispatchers = object : PtfDispatchers {
+        override val main = Dispatchers.Main.immediate
+        override val default = Dispatchers.Default
+        override val io = Dispatchers.Default
+    }
 
     actual fun onAppInit() {
         Napier.base(DebugAntilog())

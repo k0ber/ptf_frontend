@@ -1,5 +1,6 @@
 @file:OptIn(ExperimentalWasmDsl::class)
 
+import com.android.ide.common.symbols.parseMinifiedKeepRules
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -87,6 +88,12 @@ kotlin {
             implementation(libs.compose.ui)
             implementation(libs.compose.components.resources)
             implementation(libs.compose.ui.tooling.preview)
+
+            implementation(libs.filekit.core)
+            implementation(libs.filekit.compose)
+            implementation(libs.filekit.coil)
+            implementation(libs.coil.compose)
+            implementation(libs.coil.network.ktor)
 
             implementation(libs.androidx.lifecycle.viewmodel.compose)
             implementation(libs.androidx.lifecycle.runtime.compose)
@@ -176,6 +183,8 @@ compose {
                 packageName = "org.patifiner.client"
                 packageVersion = ptfVersionName.replaceFirst(Regex("^0"), "1") // MAJOR is required to be > 0
             }
+            // todo test proguard on desktop
+            parseMinifiedKeepRules(project.file("proguard-rules.pro"))
         }
     }
 }

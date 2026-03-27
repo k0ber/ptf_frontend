@@ -12,6 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
+import org.patifiner.client.core.PtfDispatchers
 
 @Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 actual object Platform : KoinComponent {
@@ -30,6 +31,12 @@ actual object Platform : KoinComponent {
     }
 
     actual fun appMainScope(): CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+
+    actual fun dispatchers(): PtfDispatchers = object : PtfDispatchers {
+        override val main = Dispatchers.Main.immediate
+        override val default = Dispatchers.Default
+        override val io = Dispatchers.IO
+    }
 
     actual fun onAppInit() {
         Napier.base(DebugAntilog())

@@ -16,6 +16,10 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import coil3.ImageLoader
+import coil3.compose.setSingletonImageLoaderFactory
+import coil3.request.crossfade
+import io.github.vinceglb.filekit.coil.addPlatformFileSupport
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.compose.navigation3.koinEntryProvider
@@ -36,6 +40,13 @@ fun RootScreen() {
     val navigator: RootNavigator = koinInject()
     val isOnline by Platform.networkObserver().isOnline.collectAsStateWithLifecycle()
     val snackbarHost = remember { SnackbarHostState() }
+
+    setSingletonImageLoaderFactory { context ->
+        ImageLoader.Builder(context)
+            .components { addPlatformFileSupport() }
+            .crossfade(true)
+            .build()
+    }
 
     CompositionLocalProvider(RootSnackbarHost provides snackbarHost) {
         PtfTheme {
