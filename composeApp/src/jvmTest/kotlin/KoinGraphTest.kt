@@ -14,7 +14,7 @@ import org.patifiner.client.appModule
 import org.patifiner.client.root.RootNavigator
 import org.patifiner.client.root.login.data.AuthRepository
 import org.patifiner.client.root.login.data.SessionManager
-import org.patifiner.client.root.login.data.TokenStorage
+import org.patifiner.client.root.login.data.SessionStorage
 import org.patifiner.client.root.main.MainNavigator
 import org.patifiner.client.root.main.intro.IntroNavigator
 import org.patifiner.client.root.main.intro.user.UserInteractor
@@ -43,7 +43,7 @@ class CheckModulesTest : KoinTest {
                 KoinAppConfig::class,
 
                 AuthRepository::class,
-                TokenStorage::class,
+                SessionStorage::class,
                 SessionManager::class,
 
                 RootNavigator::class,

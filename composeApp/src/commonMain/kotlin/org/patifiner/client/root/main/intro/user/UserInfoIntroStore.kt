@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import org.patifiner.client.core.BaseState
 import org.patifiner.client.core.Gender
+import org.patifiner.client.core.PtfLog
 import org.patifiner.client.core.UserDto
 import org.patifiner.client.core.createDefault
 import org.patifiner.client.core.execute
@@ -35,8 +36,9 @@ internal class UserInfoIntroStoreFactory(
     private val factory: StoreFactory,
     private val userInteractor: UserInteractor
 ) {
-    fun create(): UserInfoStore =
-        object : UserInfoStore, Store<UserInfoIntent, UserInfoState, UserInfoLabel>
+    fun create(): UserInfoStore {
+        PtfLog.d { "UserInfoStore.create hc = ${this.hashCode()}" }
+        return object : UserInfoStore, Store<UserInfoIntent, UserInfoState, UserInfoLabel>
         by factory.createDefault(
             initialState = UserInfoState(user = userInteractor.getDraftSync() ?: UserDto.empty()),
             bootstrapper = coroutineBootstrapper { dispatch(UserInfoAction.Init) },
@@ -45,6 +47,7 @@ internal class UserInfoIntroStoreFactory(
                 onAction<UserInfoAction.Init> {
                     execute(
                         useCase = { userInteractor.loadProfile() },
+                        loading = { copy(isLoading = it) },
                         onSuccessData = { newUser ->
                             launch { userInteractor.saveDraft(newUser) }
                             dispatch { copy(user = newUser) }
@@ -107,7 +110,6 @@ internal class UserInfoIntroStoreFactory(
                         useCase = { userInteractor.updateProfile(state().toUpdateProfileRequest()) },
                         loading = { withLoading(it) },
                         onSuccess = { _: UserDto ->
-                            // todo: update state ?
                             publish(UserInfoLabel.Saved)
                         },
                         errorFactory = { msg: String -> UserInfoLabel.Error(msg) }
@@ -115,21 +117,12 @@ internal class UserInfoIntroStoreFactory(
                 }
             },
         ) {}
+    }
 }
 
 fun UserInfoState.updateUser(update: UserDto.() -> UserDto): UserInfoState {
     return copy(user = user.update())
 }
-
-suspend fun UserInfoState.updateUser(
-    interactor: UserInteractor,
-    update: UserDto.() -> UserDto
-): UserInfoState {
-    val updatedUser = user.update()
-    interactor.saveDraft(updatedUser)
-    return copy(user = updatedUser)
-}
-
 
 fun UserDto.Companion.empty() = UserDto( // todo: not cool
     id = 0, name = "", photos = emptyList(), birthDate = null,

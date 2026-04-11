@@ -26,6 +26,7 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import org.patifiner.client.KoinAppConfig
 import org.patifiner.client.NetworkObserver
+import org.patifiner.client.UNAUTH_CLIENT
 import org.patifiner.client.appModule
 import org.patifiner.client.root.login.data.AuthRepository
 import org.patifiner.client.root.login.data.SessionManager
@@ -71,7 +72,7 @@ abstract class BasePerformanceTest {
                     single { authRepo }
                     single { networkObserver }
                     single { httpClient }
-                    single(named("unauth_client")) { httpClient }
+                    single(named(UNAUTH_CLIENT)) { httpClient }
                     single { sessionManager }
                     single<CoroutineScope> { testScope }
                     single<Settings> { MapSettings() }

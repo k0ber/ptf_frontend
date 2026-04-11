@@ -21,6 +21,7 @@ import coil3.compose.setSingletonImageLoaderFactory
 import coil3.request.crossfade
 import io.github.vinceglb.filekit.coil.addPlatformFileSupport
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.getKoin
 import org.koin.compose.koinInject
 import org.koin.compose.navigation3.koinEntryProvider
 import org.koin.core.annotation.KoinExperimentalAPI
@@ -28,6 +29,7 @@ import org.patifiner.client.Platform
 import org.patifiner.client.design.PtfTheme
 import org.patifiner.client.design.views.PtfAlert
 import org.patifiner.client.design.views.PtfScaffold
+import org.patifiner.client.root.login.data.SessionManager
 import patifinerclient.composeapp.generated.resources.Res
 import patifinerclient.composeapp.generated.resources.no_connection
 
@@ -38,6 +40,8 @@ private const val animDurationMs = 400
 fun RootScreen() {
 
     val navigator: RootNavigator = koinInject()
+    val sessionManager: SessionManager = koinInject()
+
     val isOnline by Platform.networkObserver().isOnline.collectAsStateWithLifecycle()
     val snackbarHost = remember { SnackbarHostState() }
 
@@ -58,7 +62,9 @@ fun RootScreen() {
                     NavDisplay(
                         backStack = navigator.backStack,
                         onBack = { navigator.pop() },
-                        entryProvider = koinEntryProvider(),
+                        entryProvider = koinEntryProvider(
+//                            scope = sessionManager.cachedUserId?.let { getKoin().getScopeOrNull(it) }
+                        ),
                         transitionSpec = {
                             slideInHorizontally(
                                 initialOffsetX = { it },
@@ -86,9 +92,7 @@ fun RootScreen() {
                                 animationSpec = tween(animDurationMs)
                             ) + fadeOut()
                         },
-                        entryDecorators = listOf(
-                            rememberSaveableStateHolderNavEntryDecorator(),
-                        )
+                        entryDecorators = listOf(rememberSaveableStateHolderNavEntryDecorator()),
                     )
                 }
             }
