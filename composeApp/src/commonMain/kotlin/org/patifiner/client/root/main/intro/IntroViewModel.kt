@@ -1,9 +1,10 @@
 package org.patifiner.client.root.main.intro
 
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import org.patifiner.client.root.RootNavigator
-import org.patifiner.client.root.login.data.AuthRepository
 
+@Stable
 class IntroViewModel(
     val navigator: IntroNavigator,
     private val rootNavigator: RootNavigator,

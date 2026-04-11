@@ -6,6 +6,7 @@ import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.coroutineBootstrapper
 import com.arkivanov.mvikotlin.extensions.coroutines.coroutineExecutorFactory
 import org.patifiner.client.core.BaseState
+import org.patifiner.client.core.PtfLog
 import org.patifiner.client.core.UserDto
 import org.patifiner.client.core.createDefault
 import org.patifiner.client.core.execute
@@ -31,8 +32,10 @@ class ProfileStoreFactory(
             initialState = ProfileState(),
             executorFactory = coroutineExecutorFactory {
                 onAction<ProfileAction.LoadInitial> {
+                    PtfLog.d { "Profile Init" }
                     execute(
                         useCase = { userInteractor.loadProfile() },
+                        loading = { withLoading(it) },
                         onSuccessData = { data -> copy(userDto = data) },
                         errorFactory = ProfileLabel::Error
                     )
@@ -41,6 +44,7 @@ class ProfileStoreFactory(
                 onIntent<ProfileIntent.Refresh> {
                     execute(
                         useCase = { userInteractor.loadProfile() },
+                        loading = { withLoading(it) },
                         onSuccessData = { data -> copy(userDto = data) },
                         errorFactory = ProfileLabel::Error
                     )

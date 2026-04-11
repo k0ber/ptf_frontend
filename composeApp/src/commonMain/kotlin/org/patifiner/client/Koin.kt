@@ -6,17 +6,20 @@ import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import io.ktor.client.engine.HttpClientEngineFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.Json
+import org.koin.compose.getKoin
 import org.koin.core.KoinApplication
 import org.koin.core.context.startKoin
 import org.koin.core.qualifier.named
+import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import org.patifiner.client.core.createHttpClient
 import org.patifiner.client.root.login.data.AuthRepository
 import org.patifiner.client.root.login.data.SessionManager
-import org.patifiner.client.root.login.data.TokenStorage
-import org.patifiner.client.root.login.data.TokenStorageImpl
+import org.patifiner.client.root.login.data.SessionStorage
 import org.patifiner.client.root.main.mainModule
 import org.patifiner.client.root.rootModule
+
+const val UNAUTH_CLIENT = "unauth_client"
 
 data class KoinAppConfig(
     val engine: HttpClientEngineFactory<*>,
@@ -57,20 +60,18 @@ val appModule = module {
         }
     }
 
-    single<TokenStorage> { TokenStorageImpl(settings = get()) }
-    single { SessionManager(tokenStorage = get()) }
+    single(named(UNAUTH_CLIENT)) { createHttpClient(engine = get(), json = get(), config = get(), sessionManager = null) }
+
+    single<SessionStorage> { SessionStorage(settings = get()) }
+    single { SessionManager(sessionStorage = get()) }
     single {
         AuthRepository(
-            unauthClient = get(named("unauth_client")),
-            authClient = get(),
+            unauthClient = get(named(UNAUTH_CLIENT)),
             sessionManager = get()
         )
     }
 
-    single { createHttpClient(engine = get(), json = get(), config = get(), sessionManager = get()) }
-    single(named("unauth_client")) { createHttpClient(engine = get(), json = get(), config = get(), sessionManager = null) }
-
-    // mvi
+    // todo: move to view models?
     single<StoreFactory> {
         val base = DefaultStoreFactory()
         val config: KoinAppConfig = get()

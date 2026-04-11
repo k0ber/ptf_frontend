@@ -33,6 +33,7 @@ class AddTopicsStoreFactory(
                 onAction<AddUserTopicsAction.Init> {
                     execute(
                         useCase = { loadTree() },
+                        loading = { withLoading(it) },
                         onSuccessData = { data -> copy(userTopicsTree = data) },
                         errorFactory = AddTopicsEvent::Error
                     )

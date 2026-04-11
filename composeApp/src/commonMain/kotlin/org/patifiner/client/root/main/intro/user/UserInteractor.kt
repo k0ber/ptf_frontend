@@ -6,25 +6,29 @@ import io.github.vinceglb.filekit.readBytes
 import org.patifiner.client.core.UserDto
 import org.patifiner.client.root.login.data.AuthRepository
 import org.patifiner.client.root.main.data.UpdateUserRequest
+import org.patifiner.client.root.main.data.UserRepository
 import org.patifiner.client.root.main.data.UserStorage
 
 class UserInteractor(
     private val authRepository: AuthRepository,
+    private val userRepository: UserRepository,
     private val userStorage: UserStorage
 ) {
-    suspend fun loadProfile(): Result<UserDto> = authRepository.loadProfile()
+    suspend fun loadProfile(): Result<UserDto> = userRepository.loadProfile()
 
     fun logout(): Result<Unit> = authRepository.logout()
 
     suspend fun uploadAvatar(file: PlatformFile): Result<UserDto> {
         // todo: check file extension and size
-        return authRepository.uploadAvatar(file.readBytes(), file.name)
+        return userRepository.uploadAvatar(file.readBytes(), file.name)
     }
 
-    suspend fun updateProfile(request: UpdateUserRequest): Result<UserDto> =
-        authRepository.updateProfile(request)
+    suspend fun updateProfile(request: UpdateUserRequest): Result<UserDto> {
+        return userRepository.updateProfile(request)
+            .onSuccess { userStorage.clear() }
+    }
 
-    suspend fun deletePhoto(url: String): Result<UserDto> = authRepository.deletePhoto(url)
+    suspend fun deletePhoto(url: String): Result<UserDto> = userRepository.deletePhoto(url)
 
     suspend fun getDraft(): UserDto? = userStorage.getDraft()
 

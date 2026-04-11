@@ -9,7 +9,7 @@ import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutorScope
 import kotlinx.coroutines.launch
 
 interface BaseState<out S : BaseState<S>> {
-    val isLoading: Boolean
+    val isLoading: Boolean // used for prevent multiple requests
     fun withLoading(isLoading: Boolean): S
 }
 
@@ -29,6 +29,7 @@ inline fun <Intent : Any, Action : Any, reified State : BaseState<State>, Label 
     bootstrapper = bootstrapper
 )
 
+// todo: `loading = { withLoading(it) }` -> boilerplate
 fun <S : BaseState<S>, L : Any, T> CoroutineExecutorScope<S, StateReducer<S>, *, L>.execute(
     useCase: suspend () -> Result<T>,
     loading: (S.(Boolean) -> S)? = null,

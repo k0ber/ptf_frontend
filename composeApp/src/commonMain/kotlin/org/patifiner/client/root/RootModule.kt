@@ -30,15 +30,6 @@ val rootModule = module {
     viewModelOf(::LoginViewModel)
     viewModelOf(::SignupViewModel)
 
-    navigation<PtfRoute.Login> {
-        LoginScreen(
-            viewModel = koinViewModel<LoginViewModel>(),
-        )
-    }
-
-    navigation<PtfRoute.Signup> {
-        SignupScreen(
-            viewModel = koinViewModel<SignupViewModel>(),
-        )
-    }
+    navigation<PtfRoute.Login> { LoginScreen(viewModel = koinViewModel<LoginViewModel>()) }
+    navigation<PtfRoute.Signup> { SignupScreen(viewModel = koinViewModel<SignupViewModel>()) }
 }

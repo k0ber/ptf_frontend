@@ -2,17 +2,25 @@
 
 package org.patifiner.client.root.main
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import org.koin.compose.LocalKoinScope
+import org.koin.compose.koinInject
+import org.koin.compose.scope.rememberKoinScope
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
+import org.koin.core.module.Module
+import org.koin.core.module.dsl.onClose
 import org.koin.core.module.dsl.scopedOf
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.core.qualifier.named
-import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import org.koin.dsl.navigation3.navigation
-import org.koin.mp.KoinPlatform.getKoin
+import org.patifiner.client.core.authScopedViewModel
+import org.patifiner.client.core.createHttpClient
 import org.patifiner.client.root.PtfRoute
 import org.patifiner.client.root.login.data.SessionManager
+import org.patifiner.client.root.main.data.UserRepository
 import org.patifiner.client.root.main.data.UserStorage
 import org.patifiner.client.root.main.intro.IntroNavigator
 import org.patifiner.client.root.main.intro.IntroRoute
@@ -46,11 +54,14 @@ const val SESSION_SCOPE = "SessionScope"
 
 val mainModule = module {
     scope(named(SESSION_SCOPE)) {
+        scoped { createHttpClient(engine = get(), json = get(), config = get(), sessionManager = get()) }
+
         scopedOf(::MainNavigator)
         scopedOf(::IntroNavigator)
 
+        scopedOf(::UserStorage) { onClose { it?.clear() } } // todo: clear draft when app close ?
+        scopedOf(::UserRepository)
         scopedOf(::TopicsRepository)
-        scopedOf(::UserStorage)
 
         // rework use cases to interactors - main idea is to gather business logic by data it works with
         scopedOf(::UserInteractor)
@@ -58,6 +69,7 @@ val mainModule = module {
         scopedOf(::SearchTopicsUseCase)
         scopedOf(::AddUserTopicUseCase)
 
+        // ViewModels
         viewModelOf(::MainViewModel)
         viewModelOf(::ProfileViewModel)
         viewModelOf(::ShowTopicsViewModel)
@@ -77,18 +89,15 @@ val mainModule = module {
     }
 
     // Main tabs
-    navigation<PtfRoute.Main> { MainScreen(koinViewModel(scope = getSessionScope())) }
-    navigation<MainTabRoute.Profile> { ProfileScreen(koinViewModel(scope = getSessionScope())) }
-    navigation<MainTabRoute.UserTopics> { ShowTopicsScreen(koinViewModel(scope = getSessionScope())) }
-    navigation<MainTabRoute.AddUserTopic> { AddTopicsScreen(koinViewModel(scope = getSessionScope())) }
+    navigation<PtfRoute.Main> { MainScreen(authScopedViewModel()) }
+    navigation<MainTabRoute.Profile> { ProfileScreen(authScopedViewModel()) }
+    navigation<MainTabRoute.UserTopics> { ShowTopicsScreen(authScopedViewModel()) }
+    navigation<MainTabRoute.AddUserTopic> { AddTopicsScreen(authScopedViewModel()) }
 
     // Intro
-    navigation<PtfRoute.Intro> { IntroScreen(koinViewModel(scope = getSessionScope())) }
-    navigation<IntroRoute.UserInfo> { UserInfoIntroScreen(koinViewModel(scope = getSessionScope())) }
-    navigation<IntroRoute.Topics> { TopicsIntroScreen(koinViewModel(scope = getSessionScope())) }
-    navigation<IntroRoute.Events> { EventsIntroScreen(koinViewModel(scope = getSessionScope())) }
+    navigation<PtfRoute.Intro> { IntroScreen(authScopedViewModel()) }
+    navigation<IntroRoute.UserInfo> { UserInfoIntroScreen(authScopedViewModel()) }
+    navigation<IntroRoute.Topics> { TopicsIntroScreen(authScopedViewModel()) }
+    navigation<IntroRoute.Events> { EventsIntroScreen(authScopedViewModel()) }
 
 }
-
-// I don't like it. RootNavigator owns this scope
-private fun getSessionScope(): Scope = getKoin().get<SessionManager>().scope
