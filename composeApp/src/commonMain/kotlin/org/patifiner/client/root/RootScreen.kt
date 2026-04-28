@@ -21,7 +21,6 @@ import coil3.compose.setSingletonImageLoaderFactory
 import coil3.request.crossfade
 import io.github.vinceglb.filekit.coil.addPlatformFileSupport
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.getKoin
 import org.koin.compose.koinInject
 import org.koin.compose.navigation3.koinEntryProvider
 import org.koin.core.annotation.KoinExperimentalAPI
@@ -62,9 +61,7 @@ fun RootScreen() {
                     NavDisplay(
                         backStack = navigator.backStack,
                         onBack = { navigator.pop() },
-                        entryProvider = koinEntryProvider(
-//                            scope = sessionManager.cachedUserId?.let { getKoin().getScopeOrNull(it) }
-                        ),
+                        entryProvider = koinEntryProvider(),
                         transitionSpec = {
                             slideInHorizontally(
                                 initialOffsetX = { it },

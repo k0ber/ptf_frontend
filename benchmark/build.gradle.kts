@@ -46,11 +46,6 @@ dependencies {
     implementation(libs.compose.material3)
     implementation(libs.compose.runtime)
 
-    // Mvi
-    implementation(libs.mvikotlin.core)
-    implementation(libs.mvikotlin.main)
-    implementation(libs.mvikotlin.coroutines)
-
     // Bench
     implementation(libs.androidx.uiautomator)
     implementation(libs.androidx.espresso.core)

@@ -1,5 +1,6 @@
 package org.patifiner.client.root.main.topics
 
+import androidx.compose.runtime.Immutable
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -15,6 +16,7 @@ data class TopicDto(
     val childrenIds: List<Long> = emptyList()
 )
 
+@Immutable
 @Serializable
 data class UserTopicDto(
     val id: Long,

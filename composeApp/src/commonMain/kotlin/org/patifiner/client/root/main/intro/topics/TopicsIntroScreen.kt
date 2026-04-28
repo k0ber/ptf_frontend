@@ -8,31 +8,53 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.orbitmvi.orbit.compose.collectAsState
+import org.orbitmvi.orbit.compose.collectSideEffect
+import org.patifiner.client.core.showError
 import org.patifiner.client.design.PtfPreview
 import org.patifiner.client.design.views.Chip
 import org.patifiner.client.design.views.PrimaryButton
+import org.patifiner.client.design.views.PtfLinearProgress
 import org.patifiner.client.design.views.PtfScreen
 import org.patifiner.client.design.views.PtfShadowedText
 import org.patifiner.client.design.views.PtfText
+import org.patifiner.client.root.RootSnackbarHost
 
 @Composable
 fun TopicsIntroScreen(viewModel: TopicsIntroViewModel) {
+    val state by viewModel.collectAsState()
+    val snackbarHost = RootSnackbarHost.current
+
+    viewModel.collectSideEffect { sideEffect ->
+        when (sideEffect) {
+            is TopicsIntroSideEffect.Error -> snackbarHost.showError(sideEffect.message)
+        }
+    }
+
     TopicsIntroContent(
-        onNext = { viewModel.onNext() }
+        state = state,
+        onNext = viewModel::onNext,
+        onSearchChange = viewModel::changeSearch
     )
 }
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun TopicsIntroContent(
-    onNext: () -> Unit
+    state: TopicsIntroState,
+    onNext: () -> Unit,
+    onSearchChange: (String) -> Unit,
+    // onTopicClick: (String) -> Unit
 ) {
     val mockTopics = listOf("Music", "Sport", "Art", "Tech", "Food", "Travel", "Games", "Movies", "Books", "Dance")
 
     PtfScreen {
+        PtfLinearProgress(isLoading = state.status.isLoading)
+
         Spacer(Modifier.weight(1f))
 
         PtfShadowedText("TOPICS")
@@ -78,7 +100,11 @@ fun TopicsIntroContent(
 
 @Composable
 fun TopicsIntroPreview() {
-    TopicsIntroContent(onNext = {})
+    TopicsIntroContent(
+        state = TopicsIntroState(),
+        onNext = {},
+        onSearchChange = {}
+    )
 }
 
 @Preview

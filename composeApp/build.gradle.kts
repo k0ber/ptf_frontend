@@ -99,10 +99,9 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(libs.androidx.navigation3.ui)
 
-            implementation(libs.mvikotlin.core)
-            implementation(libs.mvikotlin.main)
-            implementation(libs.mvikotlin.coroutines)
-            implementation(libs.mvikotlin.logging)
+            implementation(libs.orbit.core)
+            implementation(libs.orbit.viewmodel)
+            implementation(libs.orbit.compose)
 
             implementation(libs.settings.core)
             implementation(libs.settings.coroutines)

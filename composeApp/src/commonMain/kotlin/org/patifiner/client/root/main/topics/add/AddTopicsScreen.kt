@@ -13,15 +13,14 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.orbitmvi.orbit.compose.collectAsState
+import org.orbitmvi.orbit.compose.collectSideEffect
 import org.patifiner.client.core.showError
 import org.patifiner.client.design.PtfPreview
 import org.patifiner.client.design.centeredField
@@ -36,30 +35,23 @@ import org.patifiner.client.root.main.topics.add.ui.topics.TopicsTree
 
 @Composable
 fun AddTopicsScreen(viewModel: AddTopicsViewModel) {
-    val state: AddTopicsState by viewModel.state.collectAsStateWithLifecycle()
-    val keyboardController = LocalSoftwareKeyboardController.current
-    val focusManager = LocalFocusManager.current
+    val state by viewModel.collectAsState()
     val snackbarHost = RootSnackbarHost.current
+    val focusManager = LocalFocusManager.current
 
-    LaunchedEffect(Unit) {
-        viewModel.labels.collect { event ->
-            when (event) {
-                is AddTopicsEvent.Error -> snackbarHost.showError(event.message)
-                is AddTopicsEvent.CloseKeyboard -> {
-//                    focusManager.clearFocus()
-//                    keyboardController?.hide()
-                }
-            }
+    viewModel.collectSideEffect { event ->
+        when (event) {
+            is AddTopicsSideEffect.Error -> snackbarHost.showError(event.message)
         }
     }
 
     AddUserTopicContent(
         state = state,
-        onQueryChange = { viewModel.onIntent(AddTopicsIntent.QueryChange(it)) },
-        onTopicClick = { viewModel.onIntent(AddTopicsIntent.ClickTopic(it)) },
-        onDraftChange = { viewModel.onIntent(AddTopicsIntent.ChangeDraft(it)) },
-        onDraftDismiss = { viewModel.onIntent(AddTopicsIntent.DismissDraft) },
-        onDraftConfirm = { viewModel.onIntent(AddTopicsIntent.ConfirmDraft(it)) },
+        onQueryChange = viewModel::onQueryChange,
+        onTopicClick = viewModel::clickTopic,
+        onDraftChange = viewModel::changeDraft,
+        onDraftDismiss = viewModel::dismissDraft,
+        onDraftConfirm = viewModel::confirmDraft,
     )
 }
 

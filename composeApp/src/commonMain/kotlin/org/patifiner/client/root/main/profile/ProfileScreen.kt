@@ -15,25 +15,35 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.orbitmvi.orbit.compose.collectAsState
+import org.orbitmvi.orbit.compose.collectSideEffect
 import org.patifiner.client.core.Gender
 import org.patifiner.client.core.UserDto
-import org.patifiner.client.core.UserLanguage
+import org.patifiner.client.core.showError
 import org.patifiner.client.design.PtfPreview
+import org.patifiner.client.design.views.PtfLinearProgress
 import org.patifiner.client.design.views.PtfText
 import org.patifiner.client.root.RootSnackbarHost
 
 @Composable
 fun ProfileScreen(viewModel: ProfileViewModel) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
+    val state by viewModel.collectAsState()
     val snackbarHost = RootSnackbarHost.current
+
+    viewModel.collectSideEffect { sideEffect ->
+        when (sideEffect) {
+            is ProfileSideEffect.Error -> snackbarHost.showError(sideEffect.message)
+            ProfileSideEffect.ProfileUpdated -> { /* todo ? */
+            }
+        }
+    }
 
     ProfileContent(
         state = state,
-        onRefresh = { viewModel.onIntent(ProfileIntent.Refresh) },
-        onLogout = { viewModel.onIntent(ProfileIntent.Logout) },
-        onNavToAddTopic = { viewModel.onNavToAddTopic() },
-        onNavToMyTopics = { viewModel.onNavToMyTopics() },
+        onRefresh = viewModel::refreshProfile,
+        onLogout = viewModel::logout,
+        onNavToAddTopic = viewModel::onNavToAddTopic,
+        onNavToMyTopics = viewModel::onNavToMyTopics,
     )
 }
 
@@ -45,21 +55,26 @@ fun ProfileContent(
     onNavToMyTopics: () -> Unit = {},
     onNavToAddTopic: () -> Unit = {},
 ) {
+    val user = state.user
+    val isLoading = state.status.isLoading
+
     Column(
         Modifier.fillMaxSize().padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Spacer(Modifier.height(16.dp))
-        state.userDto?.let {
-            PtfText("ID: ${it.id}")
-            PtfText("Name: ${it.name}")
-            PtfText("Email: ${it.email}")
-        }
+        PtfLinearProgress(isLoading = isLoading)
 
         Spacer(Modifier.height(16.dp))
-        Button(onClick = onRefresh, enabled = !state.isLoading) {
-            Text(if (state.isLoading) "Loading..." else "Refresh profile")
+
+        PtfText("ID: ${user.id}")
+        PtfText("Name: ${user.name}")
+        PtfText("Email: ${user.email}")
+
+        Spacer(Modifier.height(16.dp))
+
+        Button(onClick = onRefresh, enabled = !isLoading) {
+            Text(if (isLoading) "Loading..." else "Refresh profile")
         }
         Button(onClick = onLogout, colors = ButtonDefaults.buttonColors()) {
             Text("Logout")
@@ -90,7 +105,7 @@ fun ProfilePreview() {
                     gender = Gender.MALE,
                     languages = emptyList(),
                     locale = "en",
-                ), isLoading = false
+                )
             )
         )
     }

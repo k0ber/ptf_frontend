@@ -1,8 +1,10 @@
 package org.patifiner.client.root.signup
 
 import androidx.compose.runtime.Immutable
-import org.patifiner.client.core.BaseState
 import org.patifiner.client.core.Constants
+import org.patifiner.client.core.ScreenStatus
+import org.patifiner.client.core.ScreenStatus.Idle.isLoading
+import org.patifiner.client.core.StatusState
 import org.patifiner.client.root.main.data.CreateUserRequest
 
 @Immutable
@@ -11,10 +13,10 @@ data class SignupState(
     val email: String = "",
     val password: String = "",
     val confirm: String = "",
-    override val isLoading: Boolean = false,
-) : BaseState<SignupState> {
+    override val status: ScreenStatus = ScreenStatus.Idle,
+) : StatusState {
 
-    override fun withLoading(isLoading: Boolean): SignupState = copy(isLoading = isLoading)
+    override fun copyWithStatus(status: ScreenStatus): SignupState = copy(status = status)
 
     val nameValid get() = name.trim().length >= 2
     val emailValid get() = Regex(Constants.EMAIL_REGEX).matches(email.trim())
@@ -28,4 +30,8 @@ data class SignupState(
         email = email.trim(),
         password = password
     )
+}
+
+sealed interface SignupSideEffect {
+    data class Error(val message: String) : SignupSideEffect
 }

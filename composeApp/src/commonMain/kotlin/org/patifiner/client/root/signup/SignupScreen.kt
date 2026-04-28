@@ -3,16 +3,16 @@ package org.patifiner.client.root.signup
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skydoves.compose.stability.runtime.TraceRecomposition
 import org.jetbrains.compose.resources.stringResource
+import org.orbitmvi.orbit.compose.collectAsState
+import org.orbitmvi.orbit.compose.collectSideEffect
 import org.patifiner.client.core.showError
 import org.patifiner.client.core.takeIfOrEmpty
 import org.patifiner.client.design.PtfPreview
@@ -26,11 +26,6 @@ import org.patifiner.client.design.views.PtfLinkHint
 import org.patifiner.client.design.views.PtfScreen
 import org.patifiner.client.design.views.PtfTextField
 import org.patifiner.client.root.RootSnackbarHost
-import org.patifiner.client.root.signup.SignupIntent.ChangeConfirm
-import org.patifiner.client.root.signup.SignupIntent.ChangeEmail
-import org.patifiner.client.root.signup.SignupIntent.ChangeName
-import org.patifiner.client.root.signup.SignupIntent.ChangePassword
-import org.patifiner.client.root.signup.SignupIntent.Signup
 import patifinerclient.composeapp.generated.resources.Res
 import patifinerclient.composeapp.generated.resources.already_have_account
 import patifinerclient.composeapp.generated.resources.create_account_button
@@ -46,27 +41,22 @@ const val LOGIN_LINK_TAG = "LOGIN_LINK"
 @Composable
 fun SignupScreen(viewModel: SignupViewModel) {
     val snackbarHost = RootSnackbarHost.current
-    val state by viewModel.state.collectAsStateWithLifecycle()
+    val state by viewModel.collectAsState()
 
-    LaunchedEffect(Unit) {
-        viewModel.labels.collect { label ->
-            when (label) {
-                is SignupLabel.Error -> snackbarHost.showError(label.message)
-                SignupLabel.Success -> {
-                    /** handled in @RootComponent via repo */
-                }
-            }
+    viewModel.collectSideEffect { sideEffect ->
+        when (sideEffect) {
+            is SignupSideEffect.Error -> snackbarHost.showError(sideEffect.message)
         }
     }
 
     SignupContent(
         state = state,
-        onNameChange = { viewModel.onIntent(ChangeName(it)) },
-        onEmailChange = { viewModel.onIntent(ChangeEmail(it)) },
-        onPasswordChange = { viewModel.onIntent(ChangePassword(it)) },
-        onConfirmPasswordChange = { viewModel.onIntent(ChangeConfirm(it)) },
-        onSignup = { viewModel.onIntent(Signup) },
-        onBackToLogin = { viewModel.onBack() }
+        onNameChange = viewModel::changeName,
+        onEmailChange = viewModel::changeEmail,
+        onPasswordChange = viewModel::changePassword,
+        onConfirmPasswordChange = viewModel::changeConfirm,
+        onSignup = viewModel::signup,
+        onBackToLogin = viewModel::onBack
     )
 }
 
@@ -82,7 +72,7 @@ fun SignupContent(
     onBackToLogin: () -> Unit
 ) {
     PtfScreen {
-        PtfLinearProgress(isLoading = state.isLoading)
+        PtfLinearProgress(isLoading = state.status.isLoading)
         Spacer(Modifier.weight(1f))
         PtfIntro()
         Spacer(Modifier.height(16.dp))
@@ -125,7 +115,7 @@ fun SignupContent(
         )
         Spacer(Modifier.height(16.dp))
         PrimaryButton(
-            text = if (state.isLoading) stringResource(Res.string.creating_button) else stringResource(Res.string.create_account_button),
+            text = if (state.status.isLoading) stringResource(Res.string.creating_button) else stringResource(Res.string.create_account_button),
             enabled = state.canSubmit,
             onClick = onSignup
         )
@@ -143,7 +133,7 @@ fun SignupContent(
 @Composable
 fun SignupPreview() {
     SignupContent(
-        state = SignupState(isLoading = false, email = "preview@email.com", password = "password"),
+        state = SignupState(email = "preview@email.com", password = "password"),
         onEmailChange = {},
         onPasswordChange = {},
         onConfirmPasswordChange = {},

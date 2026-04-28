@@ -20,10 +20,7 @@ class SessionManager(private val sessionStorage: SessionStorage) : KoinComponent
         get() = userId?.let { getKoin().getScopeOrNull(it) }
 
     fun startSession(accessToken: String, refreshToken: String, userId: String, isIntroRequired: Boolean = false) {
-        PtfLog.d { "Close session before starting new" } // to be sure it's safe
-        closeSession()
-
-        PtfLog.d { "Session start for ${accessToken.firstOrNull()}**, intro: $isIntroRequired" }
+        PtfLog.d { "AUTH: Session start for ${accessToken.firstOrNull()}**, intro: $isIntroRequired" }
         sessionStorage.userId = userId
         sessionStorage.accessToken = accessToken
         sessionStorage.refreshToken = refreshToken
@@ -31,17 +28,21 @@ class SessionManager(private val sessionStorage: SessionStorage) : KoinComponent
         openAuthScope()
     }
 
-    fun openAuthScope() {
-        val userId = userId ?: "guest" // ??
-        getKoin().createScope(userId, named(SESSION_SCOPE))
-        PtfLog.d { "Auth scope created for $userId" }
+    fun openAuthScope(): String {
+        val userId = userId ?: "guest"
+        val scope = getKoin().createScope(userId, named(SESSION_SCOPE))
+        PtfLog.d { "AUTH: Created new scope for $userId, scope_hc: ${scope.hashCode()}" }
+        return userId
     }
 
     fun closeSession() {
-        userId?.let { userId ->
-            getKoin().getScopeOrNull(userId)?.close()
-            PtfLog.d { "Auth scope closed for $userId" }
+        val currentUserId = userId
+        currentUserId?.let { userId ->
+            val scope = getKoin().getScopeOrNull(userId)
+            scope?.close()
+            PtfLog.d { "AUTH: Closed scope for $currentUserId, scope_hc: ${scope?.hashCode()}" }
         }
+
         sessionStorage.clear()
     }
 
