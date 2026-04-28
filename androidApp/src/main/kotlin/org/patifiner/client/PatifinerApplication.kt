@@ -14,6 +14,8 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.core.qualifier.named
 import org.patifiner.client.core.PtfLog
 import org.patifiner.client.root.login.data.AuthRepository
+import org.patifiner.client.root.login.data.SessionManager
+import org.patifiner.client.root.login.data.SessionStorage
 import kotlin.system.measureTimeMillis
 
 class PatifinerApplication : Application() {
@@ -41,9 +43,11 @@ class PatifinerApplication : Application() {
                     )
                 ) { androidContext(this@PatifinerApplication) }
 
-                // warm up complex instances in bg
+                // build heavy dependencies in background
                 getKoin().get<HttpClient>(named(UNAUTH_CLIENT))
                 getKoin().get<AuthRepository>()
+                getKoin().get<SessionStorage>()
+                getKoin().get<SessionManager>()
             }
             PtfLog.i { "Koin init took $totalTime ms" }
             _ready.value = true

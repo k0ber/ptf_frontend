@@ -35,6 +35,6 @@ class UserStorage(private val settings: Settings, private val json: Json, privat
 
     fun clear() {
         settings.remove(USER_DRAFT_TAG)
-        PtfLog.d { "User Storage cleared" }
+        PtfLog.d { "AUTH: UserStorage CLEARED for hc: ${this.hashCode()}" }
     }
 }

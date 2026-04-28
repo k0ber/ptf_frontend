@@ -4,7 +4,6 @@ import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.arkivanov.mvikotlin.core.utils.isAssertOnMainThreadEnabled
 import com.russhwolf.settings.MapSettings
 import com.russhwolf.settings.Settings
 import io.ktor.client.HttpClient
@@ -50,7 +49,6 @@ abstract class BasePerformanceTest {
 
     @Before
     fun baseSetup() {
-        isAssertOnMainThreadEnabled = false
         stopKoin()
 
         startKoin {
@@ -88,6 +86,5 @@ abstract class BasePerformanceTest {
     @After
     fun baseTearDown() {
         stopKoin()
-        isAssertOnMainThreadEnabled = true
     }
 }

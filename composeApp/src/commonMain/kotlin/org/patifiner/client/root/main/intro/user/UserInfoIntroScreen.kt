@@ -7,17 +7,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.vinceglb.filekit.dialogs.FileKitType
 import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
 import org.jetbrains.compose.resources.stringResource
+import org.orbitmvi.orbit.compose.collectAsState
+import org.orbitmvi.orbit.compose.collectSideEffect
 import org.patifiner.client.core.Gender
 import org.patifiner.client.core.UserDto
 import org.patifiner.client.core.showError
@@ -40,54 +40,55 @@ const val EMPTY_NAME_CHAR = "?"
 
 @Composable
 fun UserInfoIntroScreen(viewModel: UserInfoIntroViewModel) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
+    val state by viewModel.collectAsState()
     val snackbarHost = RootSnackbarHost.current
 
-    LaunchedEffect(Unit) {
-        viewModel.labels.collect { label ->
-            when (label) {
-                UserInfoLabel.Saved -> viewModel.onNext()
-                is UserInfoLabel.Error -> snackbarHost.showError(label.message)
-            }
+    viewModel.collectSideEffect { sideEffect ->
+        when (sideEffect) {
+            UserInfoSideEffect.Saved -> viewModel.onNext()
+            is UserInfoSideEffect.Error -> snackbarHost.showError(sideEffect.message)
         }
     }
 
     val launcher = rememberFilePickerLauncher(type = FileKitType.Image) { file ->
-        file?.let { viewModel.onIntent(UserInfoIntent.UploadPhoto(it)) }
+        file?.let { viewModel.uploadAvatar(it) } // Прямой вызов метода вместо Intent
     }
 
     UserInfoContent(
         state = state,
-        onNameChange = { viewModel.onIntent(UserInfoIntent.ChangeName(it)) },
-        onSaveProfile = { viewModel.onIntent(UserInfoIntent.SaveProfile) },
+        onNameChange = viewModel::changeName,
+        onSaveProfile = viewModel::saveProfile,
         onPickAvatar = { launcher.launch() },
-        onDeletePhoto = { viewModel.onIntent(UserInfoIntent.DeletePhoto(it)) }
+        onDeletePhoto = viewModel::deletePhoto
     )
 }
 
 @Composable
 fun UserInfoContent(
-    state: UserInfoState,
+    state: UserInfoIntroState,
     onNameChange: (String) -> Unit,
     onSaveProfile: () -> Unit,
     onPickAvatar: () -> Unit,
     onDeletePhoto: (String) -> Unit,
 ) {
+    val user = state.user
+    val isLoading = state.status.isLoading
+
     PtfScreen {
-        val avatarSource = remember(state.avatarUrl, state.selectedLocalFile) {
-            val avatarUrl = state.avatarUrl
+        val avatarSource = remember(user.avatarUrl, state.selectedLocalFile) {
+            val remoteUrl = user.avatarUrl
             when {
                 state.selectedLocalFile != null -> AvatarSource.Local(state.selectedLocalFile)
-                avatarUrl != null -> AvatarSource.Remote(avatarUrl)
+                remoteUrl != null -> AvatarSource.Remote(remoteUrl)
                 else -> null
             }
         }
 
-        val placeholderText = remember(state.name) {
-            state.name.take(1).uppercase().ifBlank { EMPTY_NAME_CHAR }
+        val placeholderText = remember(user.name) {
+            user.name.take(1).uppercase().ifBlank { EMPTY_NAME_CHAR }
         }
 
-        PtfLinearProgress(isLoading = state.isLoading)
+        PtfLinearProgress(isLoading = isLoading)
 
         Spacer(Modifier.weight(1f))
 
@@ -101,23 +102,23 @@ fun UserInfoContent(
             source = avatarSource,
             placeholderText = placeholderText,
             onClick = onPickAvatar,
-            isUploading = state.isLoading
+            isUploading = isLoading
         )
 
         Spacer(Modifier.height(24.dp))
 
-        // photos
-        if (state.photos.isNotEmpty()) {
-            PtfText("Your photos (${state.photos.size}/10)", fontSize = 14)
+        // Список фото
+        if (user.photos.isNotEmpty()) {
+            PtfText("Your photos (${user.photos.size}/10)", fontSize = 14)
             LazyRow(
                 contentPadding = PaddingValues(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 item {
-                    PrimaryButton(text = "Add", onClick = onPickAvatar)
+                    PrimaryButton(text = "Add", onClick = onPickAvatar, enabled = !isLoading)
                 }
-                items(state.photos) { url ->
+                items(user.photos) { url ->
                     PhotoThumbnail(
                         url = url,
                         onDelete = { onDeletePhoto(url) }
@@ -126,26 +127,29 @@ fun UserInfoContent(
             }
         }
 
+        Spacer(Modifier.height(24.dp))
+
         // todo
 //        birthDate
 //        gender
 //        cityId
 //        languages
 
-        Spacer(Modifier.height(24.dp))
+//        Spacer(Modifier.height(24.dp))
 
         PtfTextField(
             modifier = centeredField(),
-            value = state.name,
+            value = user.name,
             onValueChange = onNameChange,
-            label = stringResource(Res.string.name_label)
+            label = stringResource(Res.string.name_label),
+            enabled = !isLoading
         )
 
         Spacer(Modifier.height(32.dp))
 
         PrimaryButton(
             text = "Continue",
-            enabled = state.name.isNotBlank() && !state.isLoading,
+            enabled = user.name.isNotBlank() && !isLoading,
             onClick = onSaveProfile
         )
 
@@ -156,7 +160,7 @@ fun UserInfoContent(
 @Composable
 fun UserInfoPreview() {
     UserInfoContent(
-        state = UserInfoState(
+        state = UserInfoIntroState(
             user = UserDto(
                 1, "Oleg", emptyList(), null, "woody@.com",
                 null, null, Gender.NOT_SPECIFIED, emptyList(), "ru"

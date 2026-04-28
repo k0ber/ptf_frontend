@@ -1,22 +1,21 @@
 package org.patifiner.client
 
-import com.arkivanov.mvikotlin.core.store.StoreFactory
-import com.arkivanov.mvikotlin.logging.store.LoggingStoreFactory
-import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
+import com.skydoves.compose.stability.runtime.ComposeStabilityAnalyzer
+import com.skydoves.compose.stability.runtime.RecompositionEvent
+import com.skydoves.compose.stability.runtime.RecompositionLogger
 import io.ktor.client.engine.HttpClientEngineFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.Json
-import org.koin.compose.getKoin
 import org.koin.core.KoinApplication
 import org.koin.core.context.startKoin
 import org.koin.core.qualifier.named
-import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import org.patifiner.client.core.createHttpClient
 import org.patifiner.client.root.login.data.AuthRepository
 import org.patifiner.client.root.login.data.SessionManager
 import org.patifiner.client.root.login.data.SessionStorage
 import org.patifiner.client.root.main.mainModule
+import org.patifiner.client.root.main.mainNavigationModule
 import org.patifiner.client.root.rootModule
 
 const val UNAUTH_CLIENT = "unauth_client"
@@ -30,6 +29,11 @@ data class KoinAppConfig(
 
 fun initKoin(config: KoinAppConfig, appDeclaration: (KoinApplication.() -> Unit)? = null) =
     startKoin {
+
+        // default logs are verbose
+//        ComposeStabilityAnalyzer.setLogger(object : RecompositionLogger {
+//            override fun log(event: RecompositionEvent) { }
+//        })
 
         appDeclaration?.invoke(this)
 
@@ -46,6 +50,7 @@ fun initKoin(config: KoinAppConfig, appDeclaration: (KoinApplication.() -> Unit)
             appModule,
             rootModule,
             mainModule,
+            mainNavigationModule,
         )
     }.also { Platform.onAppInit() }
 
@@ -60,21 +65,16 @@ val appModule = module {
         }
     }
 
-    single(named(UNAUTH_CLIENT)) { createHttpClient(engine = get(), json = get(), config = get(), sessionManager = null) }
+    single(named(UNAUTH_CLIENT), createdAtStart = true) {
+        createHttpClient(engine = get(), json = get(), config = get(), sessionManager = null)
+    }
 
-    single<SessionStorage> { SessionStorage(settings = get()) }
-    single { SessionManager(sessionStorage = get()) }
-    single {
+    single<SessionStorage>(createdAtStart = true) { SessionStorage(settings = get()) }
+    single(createdAtStart = true) { SessionManager(sessionStorage = get()) }
+    single(createdAtStart = true) {
         AuthRepository(
             unauthClient = get(named(UNAUTH_CLIENT)),
             sessionManager = get()
         )
-    }
-
-    // todo: move to view models?
-    single<StoreFactory> {
-        val base = DefaultStoreFactory()
-        val config: KoinAppConfig = get()
-        if (config.isDev) LoggingStoreFactory(base) else base
     }
 }

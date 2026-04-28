@@ -5,6 +5,9 @@ import androidx.compose.material3.SnackbarHostState
 import io.ktor.client.plugins.ResponseException
 import io.ktor.http.HttpStatusCode
 
+// todo: add default error handling with human readable text
+//data class DefaultError(val msg: String)
+
 @kotlinx.serialization.Serializable
 data class ErrorResponse(val code: String, val message: String)
 
