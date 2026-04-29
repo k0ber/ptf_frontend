@@ -17,7 +17,7 @@ Back-end part available here: [ptf_backend](https://github.com/k0ber/ptf_backend
 - [**Kotlin Multiplatform**](https://kotlinlang.org/docs/multiplatform.html)
 - [**Compose Multiplatform**](https://www.jetbrains.com/lp/compose-multiplatform/)
 - [**Navigation 3**](https://kotlinlang.org/docs/multiplatform/compose-navigation-3.html)
-- [**MVIKotlin**](https://github.com/arkivanov/MVIKotlin)
+- [**Orbit MVI**](https://github.com/orbit-mvi/orbit-mvi)
 - [**Koin (DI)**](https://insert-koin.io/)
 - [**Ktor**](https://ktor.io/)
 - [**KotlinX Serialization**](https://github.com/Kotlin/kotlinx.serialization)
