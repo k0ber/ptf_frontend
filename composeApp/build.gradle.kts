@@ -56,14 +56,14 @@ kotlin {
     jvm()
 
     wasmJs {
-        outputModuleName.set("composeApp")
+        outputModuleName.set("PtfApp")
         browser()
         binaries.executable()
     }
 
     listOf(iosX64(), iosArm64(), iosSimulatorArm64()).forEach { iosTarget ->
         iosTarget.binaries.framework {
-            baseName = "ComposeApp"
+            baseName = "PtfApp"
             isStatic = true
         }
     }
@@ -163,8 +163,10 @@ composeCompiler {
         project.layout.projectDirectory.file("stability_config.conf")
     )
 
-    metricsDestination = layout.buildDirectory.dir("compose_compiler")
-    reportsDestination = layout.buildDirectory.dir("compose_compiler")
+    if (!project.targetIsWasm()) {
+        metricsDestination = layout.buildDirectory.dir("compose_compiler")
+        reportsDestination = layout.buildDirectory.dir("compose_compiler")
+    }
 }
 
 compose {
@@ -193,3 +195,5 @@ dependencies {
     androidRuntimeClasspath(libs.compose.ui.tooling)
     allureAgent(libs.aspectj.weaver)
 }
+
+fun Project.targetIsWasm() = gradle.startParameter.taskNames.any { it.contains("wasm", ignoreCase = true) }
