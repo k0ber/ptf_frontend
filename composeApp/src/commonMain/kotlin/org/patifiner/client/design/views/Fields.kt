@@ -25,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -190,7 +191,10 @@ fun PasswordField(
             )
         },
         trailingIcon = {
-            IconButton(onClick = { visible = !visible }) {
+            IconButton(
+                onClick = { visible = !visible },
+                modifier = Modifier.focusProperties { canFocus = false }
+            ) {
                 Icon(
                     imageVector = if (visible) IcVisibilityOn else IcVisibilityOff,
                     contentDescription = stringResource(if (visible) Res.string.hide_password else Res.string.show_password),
