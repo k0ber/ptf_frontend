@@ -28,6 +28,7 @@ import org.patifiner.client.design.views.PtfTextField
 import org.patifiner.client.root.RootSnackbarHost
 import patifinerclient.composeapp.generated.resources.Res
 import patifinerclient.composeapp.generated.resources.already_have_account
+import patifinerclient.composeapp.generated.resources.confirm_password_label
 import patifinerclient.composeapp.generated.resources.create_account_button
 import patifinerclient.composeapp.generated.resources.creating_button
 import patifinerclient.composeapp.generated.resources.email_incorrect
@@ -106,6 +107,7 @@ fun SignupContent(
         Spacer(Modifier.height(8.dp))
         PasswordField(
             modifier = centeredField(),
+            label = stringResource(Res.string.confirm_password_label),
             value = state.confirm,
             onValueChange = onConfirmPasswordChange,
             isError = state.confirm.isNotEmpty() && !state.confirmValid,
