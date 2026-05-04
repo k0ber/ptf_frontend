@@ -37,10 +37,10 @@ import org.patifiner.client.root.main.intro.user.UserInteractor
     }
 
     fun onNavToMyTopics() {
-        mainNavigator.navigateTo(MainTabRoute.UserTopics)
+        mainNavigator.switchTab(MainTabRoute.Explore)
     }
 
     fun onNavToAddTopic() {
-        mainNavigator.navigateTo(MainTabRoute.AddUserTopic)
+        mainNavigator.switchTab(MainTabRoute.Groups)
     }
 }

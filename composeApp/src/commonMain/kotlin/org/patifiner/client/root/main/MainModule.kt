@@ -41,8 +41,8 @@ const val SESSION_SCOPE = "SessionScope"
 val mainNavigationModule = module {
     navigation<PtfRoute.Main> { MainScreen(authScopedViewModel()) }
     navigation<MainTabRoute.Profile> { ProfileScreen(authScopedViewModel()) }
-    navigation<MainTabRoute.UserTopics> { ShowTopicsScreen(authScopedViewModel()) }
-    navigation<MainTabRoute.AddUserTopic> { AddTopicsScreen(authScopedViewModel()) }
+    navigation<MainTabRoute.Explore> { ShowTopicsScreen(authScopedViewModel()) }
+    navigation<MainTabRoute.Groups> { AddTopicsScreen(authScopedViewModel()) }
 
     // Intro
     navigation<PtfRoute.Intro> { IntroScreen(authScopedViewModel()) }

@@ -28,7 +28,7 @@ import org.patifiner.client.design.views.PhotoThumbnail
 import org.patifiner.client.design.views.PrimaryButton
 import org.patifiner.client.design.views.PtfAvatar
 import org.patifiner.client.design.views.PtfLinearProgress
-import org.patifiner.client.design.views.PtfScreen
+import org.patifiner.client.design.views.PtfScreenContent
 import org.patifiner.client.design.views.PtfShadowedText
 import org.patifiner.client.design.views.PtfText
 import org.patifiner.client.design.views.PtfTextField
@@ -74,7 +74,7 @@ fun UserInfoContent(
     val user = state.user
     val isLoading = state.status.isLoading
 
-    PtfScreen {
+    PtfScreenContent {
         val avatarSource = remember(user.avatarUrl, state.selectedLocalFile) {
             val remoteUrl = user.avatarUrl
             when {
@@ -138,7 +138,7 @@ fun UserInfoContent(
 //        Spacer(Modifier.height(24.dp))
 
         PtfTextField(
-            modifier = centeredField(),
+            modifier = Modifier.centeredField(),
             value = user.name,
             onValueChange = onNameChange,
             label = stringResource(Res.string.name_label),

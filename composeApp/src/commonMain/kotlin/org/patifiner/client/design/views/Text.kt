@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -28,7 +29,7 @@ import androidx.compose.ui.unit.sp
 import org.patifiner.client.design.PtfPreview
 
 /**
- * todo: change params order according to official guideline https://android.googlesource.com/platform/frameworks/support/+/androidx-main/compose/docs/compose-component-api-guidelines.md
+ * check official guideline https://android.googlesource.com/platform/frameworks/support/+/androidx-main/compose/docs/compose-component-api-guidelines.md
  * Required parameters. Parameters that don’t have default values and the user is required to pass the values for those parameters in order to use the components. Coming first, they allow users to set them without using named parameters.
  * modifier: Modifier = Modifier. Modifiers should come as a first optional parameter in a @composable function. It must be named modifier and have a default value of Modifier. There should be only one modifier parameter and it should be applied to the root-most layout in the implementation. See “modifier parameter” section for more information.
  * Optional parameters. Parameters that have default values that will be used if not overridden by the user of the component. Coming after required parameters and a modifier parameter, they do not require the user to make an immediate choice and allow one-by-one override using named parameters.
@@ -67,14 +68,19 @@ fun PtfShadowedText(text: String, fontSize: Int = 32, modifier: Modifier = Modif
 }
 
 @Composable
-fun PtfText(text: String, fontSize: Int = 16, modifier: Modifier = Modifier) {
+fun PtfText(
+    text: String,
+    modifier: Modifier = Modifier,
+    fontSize: Int = 16,
+    textColor: Color = colorScheme.secondary
+) {
     Text(
         modifier = modifier,
         text = text,
         style = typography.titleMedium.copy(
             fontWeight = FontWeight.Bold,
             fontSize = fontSize.sp,
-            color = colorScheme.secondary
+            color = textColor,
         )
     )
 }

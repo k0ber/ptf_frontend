@@ -2,6 +2,7 @@ package org.patifiner.client.root.signup
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -23,7 +24,8 @@ import org.patifiner.client.design.views.PrimaryButton
 import org.patifiner.client.design.views.PtfIntro
 import org.patifiner.client.design.views.PtfLinearProgress
 import org.patifiner.client.design.views.PtfLinkHint
-import org.patifiner.client.design.views.PtfScreen
+import org.patifiner.client.design.views.PtfScaffold
+import org.patifiner.client.design.views.PtfScreenContent
 import org.patifiner.client.design.views.PtfTextField
 import org.patifiner.client.root.RootSnackbarHost
 import patifinerclient.composeapp.generated.resources.Res
@@ -72,63 +74,67 @@ fun SignupContent(
     onSignup: () -> Unit,
     onBackToLogin: () -> Unit
 ) {
-    PtfScreen {
-        PtfLinearProgress(isLoading = state.status.isLoading)
-        Spacer(Modifier.weight(1f))
-        PtfIntro()
-        Spacer(Modifier.height(16.dp))
-        PtfTextField(
-            modifier = centeredField(),
-            value = state.name,
-            onValueChange = onNameChange,
-            label = stringResource(Res.string.name_label),
-            isError = state.name.isNotEmpty() && !state.nameValid,
-            supportingText = stringResource(Res.string.email_incorrect).takeIfOrEmpty(state.name.isNotEmpty() && !state.nameValid),
-            imeAction = ImeAction.Next,
-        )
-        Spacer(Modifier.height(8.dp))
-        EmailField(
-            modifier = centeredField(),
-            value = state.email,
-            onValueChange = onEmailChange,
-            isError = state.email.isNotEmpty() && !state.emailValid,
-            supportingText = stringResource(Res.string.email_incorrect).takeIfOrEmpty(state.email.isNotEmpty() && !state.emailValid),
-            imeAction = ImeAction.Next
-        )
-        Spacer(Modifier.height(8.dp))
-        PasswordField(
-            modifier = centeredField(),
-            value = state.password,
-            onValueChange = onPasswordChange,
-            isError = state.password.isNotEmpty() && !state.passwordValid,
-            supportingText = stringResource(Res.string.pwd_to_short).takeIfOrEmpty(state.password.isNotEmpty() && !state.passwordValid),
-            imeAction = ImeAction.Next
-        )
-        Spacer(Modifier.height(8.dp))
-        PasswordField(
-            modifier = centeredField(),
-            label = stringResource(Res.string.confirm_password_label),
-            value = state.confirm,
-            onValueChange = onConfirmPasswordChange,
-            isError = state.confirm.isNotEmpty() && !state.confirmValid,
-            supportingText = stringResource(Res.string.passwords_dont_match).takeIfOrEmpty(state.confirm.isNotEmpty() && !state.confirmValid),
-            imeAction = ImeAction.Done,
-            onImeAction = onSignup
-        )
-        Spacer(Modifier.height(16.dp))
-        PrimaryButton(
-            text = if (state.status.isLoading) stringResource(Res.string.creating_button) else stringResource(Res.string.create_account_button),
-            enabled = state.canSubmit,
-            onClick = onSignup
-        )
-        Spacer(Modifier.height(4.dp))
-        PtfLinkHint(
-            modifier = Modifier.testTag(LOGIN_LINK_TAG),
-            text = stringResource(Res.string.already_have_account),
-            linkText = stringResource(Res.string.login_link),
-            onClick = onBackToLogin
-        )
-        Spacer(Modifier.weight(1f))
+    val snackbarHost = RootSnackbarHost.current
+
+    PtfScaffold(snackbarHostState = snackbarHost) { padding ->
+        PtfScreenContent(Modifier.padding(padding)) {
+            PtfLinearProgress(isLoading = state.status.isLoading)
+            Spacer(Modifier.weight(1f))
+            PtfIntro()
+            Spacer(Modifier.height(16.dp))
+            PtfTextField(
+                modifier = Modifier.centeredField(),
+                value = state.name,
+                onValueChange = onNameChange,
+                label = stringResource(Res.string.name_label),
+                isError = state.name.isNotEmpty() && !state.nameValid,
+                supportingText = stringResource(Res.string.email_incorrect).takeIfOrEmpty(state.name.isNotEmpty() && !state.nameValid),
+                imeAction = ImeAction.Next,
+            )
+            Spacer(Modifier.height(8.dp))
+            EmailField(
+                modifier = Modifier.centeredField(),
+                value = state.email,
+                onValueChange = onEmailChange,
+                isError = state.email.isNotEmpty() && !state.emailValid,
+                supportingText = stringResource(Res.string.email_incorrect).takeIfOrEmpty(state.email.isNotEmpty() && !state.emailValid),
+                imeAction = ImeAction.Next
+            )
+            Spacer(Modifier.height(8.dp))
+            PasswordField(
+                modifier = Modifier.centeredField(),
+                value = state.password,
+                onValueChange = onPasswordChange,
+                isError = state.password.isNotEmpty() && !state.passwordValid,
+                supportingText = stringResource(Res.string.pwd_to_short).takeIfOrEmpty(state.password.isNotEmpty() && !state.passwordValid),
+                imeAction = ImeAction.Next
+            )
+            Spacer(Modifier.height(8.dp))
+            PasswordField(
+                modifier = Modifier.centeredField(),
+                label = stringResource(Res.string.confirm_password_label),
+                value = state.confirm,
+                onValueChange = onConfirmPasswordChange,
+                isError = state.confirm.isNotEmpty() && !state.confirmValid,
+                supportingText = stringResource(Res.string.passwords_dont_match).takeIfOrEmpty(state.confirm.isNotEmpty() && !state.confirmValid),
+                imeAction = ImeAction.Done,
+                onImeAction = onSignup
+            )
+            Spacer(Modifier.height(16.dp))
+            PrimaryButton(
+                text = if (state.status.isLoading) stringResource(Res.string.creating_button) else stringResource(Res.string.create_account_button),
+                enabled = state.canSubmit,
+                onClick = onSignup
+            )
+            Spacer(Modifier.height(4.dp))
+            PtfLinkHint(
+                modifier = Modifier.testTag(LOGIN_LINK_TAG),
+                text = stringResource(Res.string.already_have_account),
+                linkText = stringResource(Res.string.login_link),
+                onClick = onBackToLogin
+            )
+            Spacer(Modifier.weight(1f))
+        }
     }
 }
 

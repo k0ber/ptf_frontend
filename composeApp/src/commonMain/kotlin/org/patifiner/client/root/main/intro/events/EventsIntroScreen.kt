@@ -6,9 +6,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import org.patifiner.client.design.PtfPreview
+import org.patifiner.client.design.PtfTheme
 import org.patifiner.client.design.views.PrimaryButton
-import org.patifiner.client.design.views.PtfScreen
+import org.patifiner.client.design.views.PtfScreenContent
 import org.patifiner.client.design.views.PtfShadowedText
 import org.patifiner.client.design.views.PtfText
 
@@ -23,7 +23,7 @@ fun EventsIntroScreen(viewModel: EventsIntroViewModel) {
 fun EventsIntroContent(
     onNext: () -> Unit
 ) {
-    PtfScreen {
+    PtfScreenContent {
         Spacer(Modifier.weight(1f))
 
         PtfShadowedText("EVENTS")
@@ -58,11 +58,11 @@ fun EventsIntroPreview() {
 @Preview
 @Composable
 fun EventsIntroPreviewLight() {
-    PtfPreview { EventsIntroPreview() }
+    PtfTheme { EventsIntroPreview() }
 }
 
 @Preview
 @Composable
 fun EventsIntroPreviewDark() {
-    PtfPreview(forceDarkMode = true) { EventsIntroPreview() }
+    PtfTheme(forceDarkMode = true) { EventsIntroPreview() }
 }

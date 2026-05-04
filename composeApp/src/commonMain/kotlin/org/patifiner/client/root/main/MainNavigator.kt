@@ -9,16 +9,12 @@ class MainNavigator {
     val activeTab: MainTabRoute get() = tabBackStack.last()
 
     fun switchTab(route: MainTabRoute) {
-        if (activeTab == route) return
-        tabBackStack.clear()
+        if (activeTab == route) {
+            return
+        }
+
+        tabBackStack.remove(route)
         tabBackStack.add(route)
     }
 
-    fun navigateTo(route: MainTabRoute) { // for navigation inside tabs
-        tabBackStack.add(route)
-    }
-
-    fun pop() {
-        tabBackStack.removeLastOrNull()
-    }
 }

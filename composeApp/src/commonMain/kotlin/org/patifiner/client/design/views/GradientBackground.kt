@@ -15,7 +15,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import org.patifiner.client.design.PtfPreview
-import org.patifiner.client.design.PtfTheme
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
@@ -70,12 +69,15 @@ private fun calculateEnd(size: Size, angle: Float): Offset {
 @Preview
 @Composable
 fun GradientBackgroundDarkPreview() {
-    PtfPreview { }
+    PtfPreview {
+        GradientBackground {}
+    }
 }
 
 @Preview
 @Composable
 fun GradientBackgroundLightPreview() {
-    PtfTheme(forceDarkMode = true) { }
+    PtfPreview(forceDarkMode = true) {
+        GradientBackground {}
+    }
 }
-

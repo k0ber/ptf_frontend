@@ -37,7 +37,7 @@ class ShowTopicsViewModel(
     }
 
     fun onAddClick() {
-        mainNavigator.switchTab(MainTabRoute.AddUserTopic)
+        mainNavigator.switchTab(MainTabRoute.Groups)
     }
 
 }

@@ -7,6 +7,7 @@ object PtfIcons {
         IcArrowDown, IcArrowLeft, IcArrowRight, IcArrowUp,
         IcEmail, IcPassword,
         IcVisibilityOn, IcVisibilityOff,
+        IcExplore, IcGroup, IcPerson
     )
 
     fun warmup() { // provide only icons important for app start, not all
