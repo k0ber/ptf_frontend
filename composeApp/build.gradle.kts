@@ -128,6 +128,7 @@ kotlin {
             implementation(libs.ktor.client.okhttp)
             implementation(libs.settings.core)
             implementation(libs.allure.junit4)
+            implementation(libs.mockk)
         }
         wasmJsMain.dependencies {
             implementation(libs.ktor.client.js)

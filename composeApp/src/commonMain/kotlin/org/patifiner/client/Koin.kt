@@ -1,13 +1,11 @@
 package org.patifiner.client
 
-import com.skydoves.compose.stability.runtime.ComposeStabilityAnalyzer
-import com.skydoves.compose.stability.runtime.RecompositionEvent
-import com.skydoves.compose.stability.runtime.RecompositionLogger
 import io.ktor.client.engine.HttpClientEngineFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.Json
 import org.koin.core.KoinApplication
 import org.koin.core.context.startKoin
+import org.koin.core.module.Module
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import org.patifiner.client.core.createHttpClient
@@ -26,33 +24,6 @@ data class KoinAppConfig(
     val appScope: CoroutineScope,
     val isDev: Boolean,
 )
-
-fun initKoin(config: KoinAppConfig, appDeclaration: (KoinApplication.() -> Unit)? = null) =
-    startKoin {
-
-        // default logs are verbose
-//        ComposeStabilityAnalyzer.setLogger(object : RecompositionLogger {
-//            override fun log(event: RecompositionEvent) { }
-//        })
-
-        appDeclaration?.invoke(this)
-
-        modules(
-            module {
-                single { config }
-                single { config.engine }
-                single { config.apiConfig }
-                single { config.appScope }
-                single { Platform.settings() }
-                single { Platform.networkObserver() }
-                single { Platform.dispatchers() }
-            },
-            appModule,
-            rootModule,
-            mainModule,
-            mainNavigationModule,
-        )
-    }.also { Platform.onAppInit() }
 
 val appModule = module {
     single {
@@ -78,3 +49,25 @@ val appModule = module {
         )
     }
 }
+
+fun prepareModulesFromConfig(config: KoinAppConfig): List<Module> = listOf(
+    module {
+        single { config }
+        single { config.engine }
+        single { config.apiConfig }
+        single { config.appScope }
+        single { Platform.settings() }
+        single { Platform.networkObserver() }
+        single { Platform.dispatchers() }
+    },
+    appModule,
+    rootModule,
+    mainModule,
+    mainNavigationModule
+)
+
+fun initKoin(config: KoinAppConfig, appDeclaration: (KoinApplication.() -> Unit)? = null) =
+    startKoin {
+        appDeclaration?.invoke(this)
+        modules(prepareModulesFromConfig(config))
+    }.also { Platform.onAppInit() }
