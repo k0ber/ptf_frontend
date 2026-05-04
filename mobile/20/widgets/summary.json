@@ -1,1 +1,1 @@
-{"reportName":"Mobile Quality Report","testRuns":[],"statistic":{"failed":0,"broken":0,"skipped":0,"passed":2,"unknown":0,"total":2},"time":{"start":1777925331770,"stop":1777925465000,"duration":133230,"minDuration":0,"maxDuration":1091,"sumDuration":1091}}
+{"reportName":"Mobile Quality Report","testRuns":[],"statistic":{"failed":0,"broken":0,"skipped":1,"passed":5,"unknown":0,"total":6},"time":{"start":1777925331770,"stop":1777952412206,"duration":27080436,"minDuration":0,"maxDuration":69206,"sumDuration":132921}}

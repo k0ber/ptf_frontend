@@ -1,0 +1,552 @@
+stable class org.patifiner.client.AndroidNetworkObserver {
+  unstable val connectivityManager: ConnectivityManager
+  unstable val _isOnline: MutableStateFlow<Boolean>
+  unstable val isOnline: StateFlow<Boolean>
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.Platform {
+  stable val os: Os
+  <runtime stability> = Stable
+}
+stable class patifinerclient.composeapp.generated.resources.Res.drawable {
+  <runtime stability> = Stable
+}
+stable class patifinerclient.composeapp.generated.resources.Res.string {
+  <runtime stability> = Stable
+}
+stable class patifinerclient.composeapp.generated.resources.Res.array {
+  <runtime stability> = Stable
+}
+stable class patifinerclient.composeapp.generated.resources.Res.plurals {
+  <runtime stability> = Stable
+}
+stable class patifinerclient.composeapp.generated.resources.Res.font {
+  <runtime stability> = Stable
+}
+stable class patifinerclient.composeapp.generated.resources.Res {
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.KoinAppConfig {
+  unstable val engine: HttpClientEngineFactory<*>
+  stable val apiConfig: ApiConfig
+  unstable val appScope: CoroutineScope
+  stable val isDev: Boolean
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.ApiConfig {
+  stable val baseUrl: String
+  stable val port: Int
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.core.Constants {
+  stable val EMAIL_REGEX: String
+  stable val MIN_PASS_LNG: Int
+  unstable val emailRegex: Regex
+  <runtime stability> = Stable
+}
+unstable class org.patifiner.client.core.TokenRequest.$serializer {
+  unstable val descriptor: SerialDescriptor
+  <runtime stability> = Unstable
+}
+stable class org.patifiner.client.core.TokenRequest {
+  stable val email: String
+  stable val password: String
+  <runtime stability> = Stable
+}
+unstable class org.patifiner.client.core.TokenResponse.$serializer {
+  unstable val descriptor: SerialDescriptor
+  <runtime stability> = Unstable
+}
+stable class org.patifiner.client.core.TokenResponse {
+  stable val accessToken: String
+  stable val refreshToken: String
+  <runtime stability> = Stable
+}
+unstable class org.patifiner.client.core.RefreshTokenRequest.$serializer {
+  unstable val descriptor: SerialDescriptor
+  <runtime stability> = Unstable
+}
+stable class org.patifiner.client.core.RefreshTokenRequest {
+  stable val refreshToken: String
+  <runtime stability> = Stable
+}
+unstable class org.patifiner.client.core.UserDto.$serializer {
+  unstable val descriptor: SerialDescriptor
+  <runtime stability> = Unstable
+}
+stable class org.patifiner.client.core.UserDto {
+  stable val id: Long
+  stable val name: String
+  stable val photos: List<String>
+  stable val birthDate: LocalDate?
+  stable val email: String
+  stable val cityId: Long?
+  stable val cityName: String?
+  stable val gender: Gender
+  stable val languages: List<UserLanguage>
+  stable val locale: String
+  <runtime stability> = Stable
+}
+unstable class org.patifiner.client.core.UserLanguage.$serializer {
+  unstable val descriptor: SerialDescriptor
+  <runtime stability> = Unstable
+}
+stable class org.patifiner.client.core.UserLanguage {
+  stable val languageCode: String
+  stable val level: LanguageLevel
+  <runtime stability> = Stable
+}
+unstable class org.patifiner.client.core.ErrorResponse.$serializer {
+  unstable val descriptor: SerialDescriptor
+  <runtime stability> = Unstable
+}
+stable class org.patifiner.client.core.ErrorResponse {
+  stable val code: String
+  stable val message: String
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.core.ApiException {
+  unstable val status: HttpStatusCode
+  stable val error: ErrorResponse
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.core.UnauthorizedException {
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.core.NotFoundException {
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.core.ServerErrorException {
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.core.PtfLog {
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.core.ScreenStatus.Idle {
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.core.ScreenStatus.Loading {
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.core.ScreenStatus.Error {
+  stable val message: String
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.design.PtfAnimations {
+  stable val TAB_ANIM_MS: Int
+  stable val SCREEN_ANIM_MS: Int
+  stable val tabTransitionSpec: @[ExtensionFunctionType] Function1<AnimatedContentTransitionScope<*>, ContentTransform>
+  stable val screenForwardSpec: @[ExtensionFunctionType] Function1<AnimatedContentTransitionScope<*>, ContentTransform>
+  stable val screenBackwardSpec: @[ExtensionFunctionType] Function1<AnimatedContentTransitionScope<*>, ContentTransform>
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.design.PtfSpacing {
+  stable val xs: Int
+  stable val sm: Int
+  stable val md: Int
+  stable val lg: Int
+  stable val xl: Int
+  stable val xxl: Int
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.design.icons.PtfIcons {
+  stable val all: List<ImageVector>
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.design.views.AvatarSource.Remote {
+  stable val url: String
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.design.views.AvatarSource.Local {
+  unstable val file: PlatformFile
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.root.PtfRoute.Login {
+  stable val requiresAuth: Boolean
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.root.PtfRoute.Signup {
+  stable val requiresAuth: Boolean
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.root.PtfRoute.Intro {
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.root.PtfRoute.Main {
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.root.RootNavigator {
+  stable val sessionManager: SessionManager
+  stable val backStack: SnapshotStateList<PtfRoute>
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.root.login.LoginState {
+  stable val email: String
+  stable val isEmailError: Boolean
+  stable val password: String
+  stable val isPasswordError: Boolean
+  stable val status: ScreenStatus
+}
+stable class org.patifiner.client.root.login.LoginSideEffect.Error {
+  stable val message: String
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.root.login.LoginViewModel {
+  stable val authRepository: AuthRepository
+  stable val navigator: RootNavigator
+  unstable val container: Container<LoginState, LoginSideEffect>
+}
+stable class org.patifiner.client.root.login.data.AuthRepository {
+  unstable val unauthClient: HttpClient
+  stable val sessionManager: SessionManager
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.root.login.data.SessionManager {
+  stable val sessionStorage: SessionStorage
+  unstable val accessTokenFlow: StateFlow<String?>
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.root.login.data.SessionStorage {
+  unstable val settings: Settings
+  unstable val _tokenFlow: MutableStateFlow<String?>
+  unstable val tokenFlow: StateFlow<String?>
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.root.main.MainNavigator {
+  stable val tabBackStack: SnapshotStateList<MainTabRoute>
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.root.main.MainTabRoute.Profile {
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.root.main.MainTabRoute.Explore {
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.root.main.MainTabRoute.Groups {
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.root.main.MainViewModel {
+  stable val navigator: MainNavigator
+}
+stable class org.patifiner.client.root.main.data.UserRepository {
+  unstable val authClient: HttpClient
+  <runtime stability> = Stable
+}
+unstable class org.patifiner.client.root.main.data.CreateUserRequest.$serializer {
+  unstable val descriptor: SerialDescriptor
+  <runtime stability> = Unstable
+}
+stable class org.patifiner.client.root.main.data.CreateUserRequest {
+  stable val name: String
+  stable val email: String
+  stable val password: String
+  <runtime stability> = Stable
+}
+unstable class org.patifiner.client.root.main.data.UserCreatedResponse.$serializer {
+  unstable val descriptor: SerialDescriptor
+  <runtime stability> = Unstable
+}
+stable class org.patifiner.client.root.main.data.UserCreatedResponse {
+  stable val userInfo: UserDto
+  stable val token: TokenResponse
+  <runtime stability> = Stable
+}
+unstable class org.patifiner.client.root.main.data.UpdateUserRequest.$serializer {
+  unstable val descriptor: SerialDescriptor
+  <runtime stability> = Unstable
+}
+stable class org.patifiner.client.root.main.data.UpdateUserRequest {
+  stable val name: String?
+  stable val birthDate: String?
+  stable val gender: Gender
+  stable val cityId: Long?
+  stable val languages: List<UserLanguage>
+  stable val locale: String?
+  <runtime stability> = Stable
+}
+unstable class org.patifiner.client.root.main.data.SetMainPhotoRequest.$serializer {
+  unstable val descriptor: SerialDescriptor
+  <runtime stability> = Unstable
+}
+stable class org.patifiner.client.root.main.data.SetMainPhotoRequest {
+  stable val url: String
+  <runtime stability> = Stable
+}
+unstable class org.patifiner.client.root.main.data.DeletePhotoRequest.$serializer {
+  unstable val descriptor: SerialDescriptor
+  <runtime stability> = Unstable
+}
+stable class org.patifiner.client.root.main.data.DeletePhotoRequest {
+  stable val url: String
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.root.main.data.UserStorage {
+  unstable val settings: Settings
+  unstable val json: Json
+  stable val dispatchers: PtfDispatchers
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.root.main.intro.IntroNavigator {
+  stable val backStack: SnapshotStateList<IntroRoute>
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.root.main.intro.IntroRoute.UserInfo {
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.root.main.intro.IntroRoute.Topics {
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.root.main.intro.IntroRoute.Events {
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.root.main.intro.IntroViewModel {
+  stable val navigator: IntroNavigator
+  stable val rootNavigator: RootNavigator
+}
+stable class org.patifiner.client.root.main.intro.events.EventsIntroState {
+  stable val q: String
+  stable val status: ScreenStatus
+}
+stable class org.patifiner.client.root.main.intro.events.EventsIntroSideEffect.Error {
+  stable val message: String
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.root.main.intro.events.EventsIntroViewModel {
+  stable val introViewModel: IntroViewModel
+  unstable val container: Container<EventsIntroState, EventsIntroSideEffect>
+}
+stable class org.patifiner.client.root.main.intro.topics.TopicsIntroState {
+  stable val q: String
+  stable val status: ScreenStatus
+}
+stable class org.patifiner.client.root.main.intro.topics.TopicsIntroSideEffect.Error {
+  stable val message: String
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.root.main.intro.topics.TopicsIntroViewModel {
+  stable val introViewModel: IntroViewModel
+  unstable val container: Container<TopicsIntroState, TopicsIntroSideEffect>
+}
+stable class org.patifiner.client.root.main.intro.user.UserInfoIntroState {
+  stable val user: UserDto
+  stable val status: ScreenStatus
+  unstable val selectedLocalFile: PlatformFile?
+}
+stable class org.patifiner.client.root.main.intro.user.UserInfoSideEffect.Error {
+  stable val message: String
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.root.main.intro.user.UserInfoSideEffect.Saved {
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.root.main.intro.user.UserInfoIntroViewModel {
+  stable val userInteractor: UserInteractor
+  stable val introViewModel: IntroViewModel
+  unstable val container: Container<UserInfoIntroState, UserInfoSideEffect>
+}
+stable class org.patifiner.client.root.main.intro.user.UserInteractor {
+  stable val authRepository: AuthRepository
+  stable val userRepository: UserRepository
+  stable val userStorage: UserStorage
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.root.main.profile.ProfileState {
+  stable val user: UserDto
+  stable val status: ScreenStatus
+}
+stable class org.patifiner.client.root.main.profile.ProfileSideEffect.Error {
+  stable val message: String
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.root.main.profile.ProfileSideEffect.ProfileUpdated {
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.root.main.profile.ProfileViewModel {
+  stable val userInteractor: UserInteractor
+  stable val mainNavigator: MainNavigator
+  unstable val container: Container<ProfileState, ProfileSideEffect>
+}
+unstable class org.patifiner.client.root.main.topics.TopicDto.$serializer {
+  unstable val descriptor: SerialDescriptor
+  <runtime stability> = Unstable
+}
+stable class org.patifiner.client.root.main.topics.TopicDto {
+  stable val locale: String
+  stable val id: Long
+  stable val name: String
+  stable val slug: String
+  stable val description: String?
+  stable val tags: List<String>?
+  stable val icon: String?
+  stable val parentId: Long?
+  stable val childrenIds: List<Long>
+  <runtime stability> = Stable
+}
+unstable class org.patifiner.client.root.main.topics.UserTopicDto.$serializer {
+  unstable val descriptor: SerialDescriptor
+  <runtime stability> = Unstable
+}
+stable class org.patifiner.client.root.main.topics.UserTopicDto {
+  stable val id: Long
+  stable val userId: Long
+  stable val topic: TopicDto
+  stable val level: TopicLevel
+  stable val description: String?
+}
+stable class org.patifiner.client.root.main.topics.LoadUserTopicsTreeUseCase {
+  stable val repo: TopicsRepository
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.root.main.topics.SearchTopicsUseCase {
+  stable val repo: TopicsRepository
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.root.main.topics.AddUserTopicUseCase {
+  stable val repo: TopicsRepository
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.root.main.topics.RemoveUserTopicUseCase {
+  stable val repo: TopicsRepository
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.root.main.topics.add.UserTopicInfo {
+  stable val topicId: Long
+  stable val level: TopicLevel
+  stable val description: String
+}
+stable class org.patifiner.client.root.main.topics.add.AddTopicsState {
+  stable val query: String
+  stable val searchResult: List<TopicViewModel>
+  stable val userTopicsTree: List<TopicViewModel>
+  stable val openedTopic: TopicViewModel?
+  stable val draft: UserTopicInfo?
+  stable val status: ScreenStatus
+  unstable val flatById$delegate: Lazy<Map<Long, TopicViewModel>>
+}
+stable class org.patifiner.client.root.main.topics.add.AddTopicsSideEffect.Error {
+  stable val message: String
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.root.main.topics.add.AddTopicsViewModel {
+  stable val repo: TopicsRepository
+  unstable val container: Container<AddTopicsState, AddTopicsSideEffect>
+}
+stable class org.patifiner.client.root.main.topics.add.ui.TopicViewModel {
+  stable val id: Long
+  stable val name: String
+  stable val slug: String
+  stable val description: String?
+  stable val tags: List<String>?
+  stable val icon: String?
+  stable val parentId: Long?
+  stable val children: List<TopicViewModel>
+  stable val userInfo: UserTopicInfo?
+}
+stable class org.patifiner.client.root.main.topics.add.ui.logic.TreeAction.OpenDraft {
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.root.main.topics.add.ui.logic.TreeAction.ChangeOpened {
+  stable val openedTopic: TopicViewModel?
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.root.main.topics.add.ui.logic.TopicClickDelegate {
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.root.main.topics.add.ui.logic.RowBuildingResult {
+  stable val rows: List<LayoutItem>
+  stable val bgSizes: BgSizes?
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.root.main.topics.add.ui.logic.BgSizes {
+  stable val startX: Int
+  stable val width: Int
+  stable val startY: Int
+  stable val height: Int
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.root.main.topics.add.ui.logic.MeasuredTopic {
+  stable val topic: TopicViewModel
+  runtime val placeable: Placeable
+  stable val height: Int
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.root.main.topics.add.ui.logic.LayoutItem.TopicsRow {
+  stable val topics: List<MeasuredTopic>
+  stable val selected: MeasuredTopic?
+  runtime val breadcrumbPlaceable: Placeable?
+  stable val height: Int
+  stable val rowWidth: Int
+  stable val isChildRow: Boolean
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.root.main.topics.add.ui.logic.LayoutItem {
+  <runtime stability> = Stable
+}
+unstable class org.patifiner.client.root.main.topics.data.CreateTopicRequest.$serializer {
+  unstable val descriptor: SerialDescriptor
+  <runtime stability> = Unstable
+}
+stable class org.patifiner.client.root.main.topics.data.CreateTopicRequest {
+  stable val name: String
+  stable val parentId: Long?
+  <runtime stability> = Stable
+}
+unstable class org.patifiner.client.root.main.topics.data.AddUserTopicRequest.$serializer {
+  unstable val descriptor: SerialDescriptor
+  <runtime stability> = Unstable
+}
+stable class org.patifiner.client.root.main.topics.data.AddUserTopicRequest {
+  stable val topicId: Long
+  stable val level: TopicLevel
+  stable val description: String?
+  <runtime stability> = Stable
+}
+unstable class org.patifiner.client.root.main.topics.data.AddUserTopicsRequest.$serializer {
+  unstable val descriptor: SerialDescriptor
+  <runtime stability> = Unstable
+}
+stable class org.patifiner.client.root.main.topics.data.AddUserTopicsRequest {
+  stable val topics: List<AddUserTopicRequest>
+  <runtime stability> = Stable
+}
+unstable class org.patifiner.client.root.main.topics.data.RemoveUserTopicsRequest.$serializer {
+  unstable val descriptor: SerialDescriptor
+  <runtime stability> = Unstable
+}
+stable class org.patifiner.client.root.main.topics.data.RemoveUserTopicsRequest {
+  stable val topicIds: List<Long>
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.root.main.topics.data.TopicsRepository {
+  unstable val client: HttpClient
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.root.main.topics.show.ShowTopicsState {
+  stable val topics: List<UserTopicDto>
+  stable val status: ScreenStatus
+}
+stable class org.patifiner.client.root.main.topics.show.ShowTopicsSideEffect.Error {
+  stable val message: String
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.root.main.topics.show.ShowTopicsViewModel {
+  stable val repo: TopicsRepository
+  stable val mainNavigator: MainNavigator
+  unstable val container: Container<ShowTopicsState, ShowTopicsSideEffect>
+}
+stable class org.patifiner.client.root.signup.SignupState {
+  stable val name: String
+  stable val email: String
+  stable val password: String
+  stable val confirm: String
+  stable val status: ScreenStatus
+}
+stable class org.patifiner.client.root.signup.SignupSideEffect.Error {
+  stable val message: String
+  <runtime stability> = Stable
+}
+stable class org.patifiner.client.root.signup.SignupViewModel {
+  stable val repo: AuthRepository
+  stable val navigator: RootNavigator
+  unstable val container: Container<SignupState, SignupSideEffect>
+}

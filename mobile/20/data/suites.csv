@@ -1,3 +1,7 @@
 "DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
-"Device: Pixel 10 Pro XL. No benchmark data found","0","Performance & Compose Metrics","","2026-05-04","passed","2026-05-04","","","",""
 "","1091","checkAllModules[jvm]","","2026-05-04","passed","2026-05-04","","CheckModulesTest[jvm]","CheckModulesTest",""
+"","62503","measureLoginToSignup","","2026-05-04","passed","2026-05-04","","com.patifiner.benchmark.BaselineProfileGenerator","com.patifiner.benchmark.performance.ChangeTabsBenchmark",""
+"","117","loginEmailIsRestored","","2026-05-04","passed","2026-05-04","","com.patifiner.benchmark.BaselineProfileGenerator","com.patifiner.benchmark.tests.LoginStateRestorationTest",""
+"Device: Pixel 10 Pro XL. Median Startup: 196.62112ms, Median Frames: 41.0","0","Performance & Compose Metrics","","2026-05-04","passed","2026-05-04","","","",""
+"","4","generateBaselineProfiles","","2026-05-04","skipped","2026-05-04","","com.patifiner.benchmark.BaselineProfileGenerator","com.patifiner.benchmark.BaselineProfileGenerator",""
+"","69206","measureColdStartup","","2026-05-04","passed","2026-05-04","","com.patifiner.benchmark.BaselineProfileGenerator","com.patifiner.benchmark.performance.ColdStartupBenchmark",""
