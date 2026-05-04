@@ -26,7 +26,7 @@ import patifinerclient.composeapp.generated.resources.tab_explore
 import patifinerclient.composeapp.generated.resources.tab_groups
 import patifinerclient.composeapp.generated.resources.tab_profile
 
-val mainTabs = listOf(
+val mainTabs: List<MainTabRoute> = listOf(
     MainTabRoute.Explore,
     MainTabRoute.Groups,
     MainTabRoute.Profile
