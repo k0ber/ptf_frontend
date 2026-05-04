@@ -1,0 +1,1 @@
+[{"uid":"163a974a469e81b9","name":"Performance & Compose Metrics","time":{"start":1777925465000,"stop":1777925465000,"duration":0},"status":"passed","severity":"normal"},{"uid":"2fe93ecbeadb0114","name":"checkAllModules[jvm]","time":{"start":1777925331770,"stop":1777925332861,"duration":1091},"status":"passed","severity":"normal"}]
