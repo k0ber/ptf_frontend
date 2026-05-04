@@ -1,21 +1,17 @@
 package org.patifiner.client.design.views
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
@@ -23,44 +19,31 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
-import coil3.compose.LocalPlatformContext
-import coil3.request.ImageRequest
-import coil3.request.crossfade
-import io.github.vinceglb.filekit.PlatformFile
-import io.github.vinceglb.filekit.startAccessingSecurityScopedResource
-import io.github.vinceglb.filekit.stopAccessingSecurityScopedResource
-import org.patifiner.client.design.PtfPreview
-import org.patifiner.client.design.icons.IcArrowUp
-import org.patifiner.client.design.scrollableScreen
+import org.patifiner.client.design.PtfTheme
+import org.patifiner.client.design.ptfScrollable
 
 const val AVATAR_SIZE = 120
 
 @Composable
-fun PtfScreen(
+fun PtfScreenContent(
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit
 ) {
     val scrollState = rememberScrollState()
 
-    GradientBackground(modifier = modifier.fillMaxSize()) {
-        Column(
-            modifier = scrollableScreen(scrollState),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            content()
-        }
+    Column(
+        modifier = modifier.ptfScrollable(scrollState),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Spacer(Modifier.statusBarsPadding())
+        content()
+        Spacer(Modifier.navigationBarsPadding()) // not needed for tabs
     }
 }
 
@@ -68,17 +51,20 @@ fun PtfScreen(
 fun PtfScaffold(
     snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
-    content: @Composable (PaddingValues) -> Unit
+//    containerColor: Color = Color.Transparent,
+    navContent: @Composable () -> Unit = {},
+    content: @Composable (PaddingValues) -> Unit,
 ) {
-    GradientBackground(modifier = modifier.fillMaxSize()) {
-        Scaffold(
-            modifier = modifier,
-            containerColor = Color.Transparent,
-            contentWindowInsets = WindowInsets(0.dp),
-            snackbarHost = { PtfSnackbarHost(snackbarHostState) },
-            content = content
-        )
-    }
+//  GradientBackground(modifier = modifier.fillMaxSize()) {
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        containerColor = colorScheme.background,  // Color.Transparent,// containerColor,
+        contentWindowInsets = WindowInsets(0.dp),
+        snackbarHost = { PtfSnackbarHost(snackbarHostState) },
+        bottomBar = navContent, //  // if (isWideScreen) Rail else BottomBar ?
+        content = content
+    )
+//  }
 }
 
 @Composable
@@ -101,111 +87,11 @@ fun PtfSnackbarHost(
     }
 }
 
-@Stable
-sealed interface AvatarSource {
-    data class Remote(val url: String) : AvatarSource
-    data class Local(val file: PlatformFile) : AvatarSource
-}
-
-@Composable
-fun PtfAvatar(
-    source: AvatarSource?,
-    onClick: () -> Unit = {},
-    modifier: Modifier = Modifier,
-    isUploading: Boolean = false,
-    placeholderText: String = "?"
-) {
-    if (source is AvatarSource.Local) {  // iOS/macOS Sandbox Access
-        DisposableEffect(source.file) {
-            source.file.startAccessingSecurityScopedResource()
-            onDispose {
-                source.file.stopAccessingSecurityScopedResource()
-            }
-        }
-    } // extension for source?
-
-    val context = LocalPlatformContext.current
-    val model = remember(source, context) {
-        ImageRequest.Builder(context)
-            .data(
-                when (source) {
-                    is AvatarSource.Remote -> source.url
-                    is AvatarSource.Local -> source.file
-                    null -> null
-                }
-            )
-            .crossfade(true)
-            .build()
-    }
-
-    Box(
-        modifier = modifier
-            .size(AVATAR_SIZE.dp)
-            .clip(CircleShape)
-            .background(colorScheme.surfaceVariant)
-            .clickable(enabled = !isUploading, onClick = onClick),
-        contentAlignment = Alignment.Center
-    ) {
-        PtfText(text = placeholderText, fontSize = 40)
-
-        AsyncImage(
-            model = model,
-            contentDescription = "Avatar",
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop,
-        )
-
-        if (isUploading) {
-            CircularProgressIndicator(
-                modifier = Modifier.fillMaxSize(),
-                color = colorScheme.primary,
-                strokeWidth = 3.dp
-            )
-        }
-    }
-}
-
-@Composable
-fun PhotoThumbnail(url: String, onDelete: () -> Unit) {
-    Box(
-        Modifier
-            .size(80.dp)
-            .clip(RoundedCornerShape(8.dp))
-    ) {
-        AsyncImage(
-            model = url,
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
-        Box(
-            Modifier
-                .align(Alignment.TopEnd)
-                .size(24.dp)
-                .background(Color.Black.copy(0.5f), CircleShape)
-                .clickable { onDelete() },
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                IcArrowUp,
-                null,
-                tint = Color.White,
-                modifier = Modifier.size(16.dp)
-            )
-        }
-    }
-}
-
 //region preview
 @Composable
 fun ContainersPreview() {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        PtfAvatar(
-            source = null,
-            onClick = {},
-        )
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        PtfAvatar(source = null, onClick = {})
         PhotoThumbnail("") {}
     }
 }
@@ -213,7 +99,7 @@ fun ContainersPreview() {
 @Preview
 @Composable
 fun PtfScaffoldPreview() {
-    PtfPreview {
+    PtfTheme {
         val hostState = remember { SnackbarHostState() }
         LaunchedEffect(Unit) {
             hostState.showSnackbar(
@@ -221,7 +107,7 @@ fun PtfScaffoldPreview() {
                 duration = SnackbarDuration.Indefinite
             )
         }
-        PtfScaffold(modifier = Modifier.fillMaxSize(), snackbarHostState = hostState) {
+        PtfScaffold(snackbarHostState = hostState) {
             ContainersPreview()
         }
     }
@@ -230,7 +116,7 @@ fun PtfScaffoldPreview() {
 @Preview
 @Composable
 fun PtfScaffoldPreviewDark() {
-    PtfPreview(forceDarkMode = true) {
+    PtfTheme(forceDarkMode = true) {
         val hostState = remember { SnackbarHostState() }
         LaunchedEffect(Unit) {
             hostState.showSnackbar(

@@ -19,7 +19,7 @@ import org.patifiner.client.design.PtfPreview
 import org.patifiner.client.design.views.Chip
 import org.patifiner.client.design.views.PrimaryButton
 import org.patifiner.client.design.views.PtfLinearProgress
-import org.patifiner.client.design.views.PtfScreen
+import org.patifiner.client.design.views.PtfScreenContent
 import org.patifiner.client.design.views.PtfShadowedText
 import org.patifiner.client.design.views.PtfText
 import org.patifiner.client.root.RootSnackbarHost
@@ -48,11 +48,11 @@ fun TopicsIntroContent(
     state: TopicsIntroState,
     onNext: () -> Unit,
     onSearchChange: (String) -> Unit,
-    // onTopicClick: (String) -> Unit
+//    onTopicClick: (String) -> Unit
 ) {
     val mockTopics = listOf("Music", "Sport", "Art", "Tech", "Food", "Travel", "Games", "Movies", "Books", "Dance")
 
-    PtfScreen {
+    PtfScreenContent {
         PtfLinearProgress(isLoading = state.status.isLoading)
 
         Spacer(Modifier.weight(1f))

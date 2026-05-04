@@ -26,4 +26,9 @@
     <string name="already_have_account">Уже есть аккаунт?</string>
     <string name="login_link">Войти</string>
 
+    <!-- Tabs -->
+    <string name="tab_explore">Лента</string>
+    <string name="tab_groups">Группы</string>
+    <string name="tab_profile">Профиль</string>
+
 </resources>

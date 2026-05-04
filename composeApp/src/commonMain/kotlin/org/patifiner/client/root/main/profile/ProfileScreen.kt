@@ -1,17 +1,12 @@
 package org.patifiner.client.root.main.profile
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -22,6 +17,7 @@ import org.patifiner.client.core.UserDto
 import org.patifiner.client.core.showError
 import org.patifiner.client.design.PtfPreview
 import org.patifiner.client.design.views.PtfLinearProgress
+import org.patifiner.client.design.views.PtfScreenContent
 import org.patifiner.client.design.views.PtfText
 import org.patifiner.client.root.RootSnackbarHost
 
@@ -58,11 +54,7 @@ fun ProfileContent(
     val user = state.user
     val isLoading = state.status.isLoading
 
-    Column(
-        Modifier.fillMaxSize().padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
+    PtfScreenContent {
         PtfLinearProgress(isLoading = isLoading)
 
         Spacer(Modifier.height(16.dp))
@@ -88,25 +80,34 @@ fun ProfileContent(
     }
 }
 
-@Preview
 @Composable
 fun ProfilePreview() {
-    PtfPreview {
-        ProfileContent(
-            ProfileState(
-                UserDto(
-                    id = 1,
-                    name = "Mikle",
-                    photos = emptyList(),
-                    birthDate = null,
-                    email = "test@email",
-                    cityId = 1,
-                    cityName = "Pkh",
-                    gender = Gender.MALE,
-                    languages = emptyList(),
-                    locale = "en",
-                )
+    ProfileContent(
+        ProfileState(
+            UserDto(
+                id = 1,
+                name = "Mikhail",
+                photos = emptyList(),
+                birthDate = null,
+                email = "test@email",
+                cityId = 1,
+                cityName = "Pkh",
+                gender = Gender.MALE,
+                languages = emptyList(),
+                locale = "en",
             )
         )
-    }
+    )
+}
+
+@Preview
+@Composable
+fun ProfilePreviewLight() {
+    PtfPreview { ProfilePreview() }
+}
+
+@Preview
+@Composable
+fun ProfilePreviewDark() {
+    PtfPreview(true) { ProfilePreview() }
 }

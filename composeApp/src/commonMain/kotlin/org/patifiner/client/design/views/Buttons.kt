@@ -22,10 +22,10 @@ import org.patifiner.client.design.PtfPreview
 
 @Composable
 fun PrimaryButton(
-    text: String,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    text: String = "",
+    enabled: Boolean = true,
 ) {
     FilledTonalButton(
         onClick = onClick,
@@ -64,6 +64,8 @@ fun ButtonsPreview() {
         PrimaryButton(text = "Login with E-mail", enabled = true, modifier = Modifier, onClick = {})
         Spacer(modifier = Modifier.height(8.dp))
         PrimaryButton(text = "Login with E-mail", enabled = false, modifier = Modifier, onClick = {})
+        Spacer(modifier = Modifier.height(8.dp))
+        PrimaryButton(enabled = true, modifier = Modifier, onClick = {})
     }
 }
 

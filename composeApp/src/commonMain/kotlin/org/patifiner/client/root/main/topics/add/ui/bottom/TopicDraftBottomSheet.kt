@@ -1,6 +1,5 @@
 package org.patifiner.client.root.main.topics.add.ui.bottom
 
-import org.patifiner.client.root.main.topics.add.ui.TopicViewModel
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,15 +27,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import org.patifiner.client.design.PtfPreview
 import org.patifiner.client.design.PtfTheme
 import org.patifiner.client.design.views.PtfInputExampleText
 import org.patifiner.client.design.views.PtfShadowedText
 import org.patifiner.client.root.main.topics.TopicLevel
 import org.patifiner.client.root.main.topics.add.UserTopicInfo
-import org.patifiner.client.root.main.topics.presentableTopicLevels
+import org.patifiner.client.root.main.topics.add.ui.TopicViewModel
 import org.patifiner.client.root.main.topics.add.ui.fakeTopicsRow
 import org.patifiner.client.root.main.topics.add.ui.topics.TopicCard
+import org.patifiner.client.root.main.topics.presentableTopicLevels
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -122,7 +121,7 @@ fun BottomSheetContent(
 @Preview
 @Composable
 fun TopicDraftCardPreview() {
-    PtfPreview {
+    PtfTheme {
         val fakeTopic = fakeTopicsRow().first()
         val draftInfo = UserTopicInfo(
             topicId = fakeTopic.id,

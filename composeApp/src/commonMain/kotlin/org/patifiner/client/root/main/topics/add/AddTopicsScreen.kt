@@ -1,8 +1,6 @@
 package org.patifiner.client.root.main.topics.add
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -25,6 +23,7 @@ import org.patifiner.client.core.showError
 import org.patifiner.client.design.PtfPreview
 import org.patifiner.client.design.centeredField
 import org.patifiner.client.design.icons.IcEmail
+import org.patifiner.client.design.views.PtfScreenContent
 import org.patifiner.client.design.views.PtfShadowedText
 import org.patifiner.client.design.views.PtfText
 import org.patifiner.client.root.RootSnackbarHost
@@ -64,7 +63,7 @@ fun AddUserTopicContent(
     onDraftDismiss: () -> Unit,
     onDraftConfirm: (UserTopicInfo) -> Unit,
 ) {
-    Column(modifier = Modifier.fillMaxSize()) {
+    PtfScreenContent {
         Spacer(Modifier.height(32.dp))
         PtfShadowedText(
             modifier = Modifier.align(Alignment.CenterHorizontally),
@@ -77,7 +76,7 @@ fun AddUserTopicContent(
         )
         Spacer(Modifier.height(8.dp))
         OutlinedTextField(
-            modifier = centeredField(),
+            modifier = Modifier.centeredField(),
             value = state.query,
             onValueChange = onQueryChange,
             singleLine = true,
@@ -113,19 +112,28 @@ fun AddUserTopicContent(
     }
 }
 
-@Preview
 @Composable
 fun TopicsScreenPreview() {
-    PtfPreview {
-        val fakeTree = fakeTopicsTree()
-        val state = AddTopicsState(userTopicsTree = fakeTree)
-        AddUserTopicContent(
-            state = state,
-            onQueryChange = {},
-            onTopicClick = {},
-            onDraftChange = {},
-            onDraftDismiss = {},
-            onDraftConfirm = {},
-        )
-    }
+    val fakeTree = fakeTopicsTree()
+    val state = AddTopicsState(userTopicsTree = fakeTree)
+    AddUserTopicContent(
+        state = state,
+        onQueryChange = {},
+        onTopicClick = {},
+        onDraftChange = {},
+        onDraftDismiss = {},
+        onDraftConfirm = {},
+    )
+}
+
+@Preview
+@Composable
+fun TopicsScreenPreviewLight() {
+    PtfPreview { TopicsScreenPreview() }
+}
+
+@Preview
+@Composable
+fun TopicsScreenPreviewDark() {
+    PtfPreview(true) { TopicsScreenPreview() }
 }
