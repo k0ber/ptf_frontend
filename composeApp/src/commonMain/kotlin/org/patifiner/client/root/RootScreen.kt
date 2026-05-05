@@ -3,7 +3,9 @@ package org.patifiner.client.root
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -46,22 +48,27 @@ fun RootScreen() {
 
     CompositionLocalProvider(RootSnackbarHost provides snackbarHost) {
         PtfTheme {
-            Box(Modifier.fillMaxSize()) {
-                NavDisplay(
-                    backStack = navigator.backStack,
-                    onBack = { navigator.pop() },
-                    entryProvider = koinEntryProvider(),
-                    transitionSpec = PtfAnimations.screenForwardSpec,
-                    popTransitionSpec = PtfAnimations.screenBackwardSpec,
-                    predictivePopTransitionSpec = PtfAnimations.screenPredictiveBackward(),
-                    entryDecorators = listOf(rememberSaveableStateHolderNavEntryDecorator()),
-                )
-
-                if (!isOnline) {
-                    PtfAlert(
-                        text = stringResource(Res.string.no_connection),
-                        modifier = Modifier.statusBarsPadding()
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = MaterialTheme.colorScheme.background
+            ) {
+                Box(Modifier.fillMaxSize()) {
+                    NavDisplay(
+                        backStack = navigator.backStack,
+                        onBack = { navigator.pop() },
+                        entryProvider = koinEntryProvider(),
+                        transitionSpec = PtfAnimations.screenForwardSpec,
+                        popTransitionSpec = PtfAnimations.screenBackwardSpec,
+                        predictivePopTransitionSpec = PtfAnimations.screenPredictiveBackward(),
+                        entryDecorators = listOf(rememberSaveableStateHolderNavEntryDecorator()),
                     )
+
+                    if (!isOnline) {
+                        PtfAlert(
+                            text = stringResource(Res.string.no_connection),
+                            modifier = Modifier.statusBarsPadding()
+                        )
+                    }
                 }
             }
         }
