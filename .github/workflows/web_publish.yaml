@@ -9,6 +9,12 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          clean: true
+          fetch-depth: 0
+
       - name: Setup Env
         id: setup
         uses: ./.github/actions/setup-env
