@@ -39,11 +39,14 @@ class RootNavigator(appScope: CoroutineScope, private val sessionManager: Sessio
     }
 
     fun navigateTo(route: PtfRoute) {
+        if (backStack.lastOrNull() == route) return
         backStack.add(route)
     }
 
     fun pop() {
-        backStack.removeLastOrNull()
+        if (backStack.size > 1) {
+            backStack.removeLastOrNull()
+        }
     }
 
     fun completeIntro() {
