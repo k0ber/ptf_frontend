@@ -1,39 +1,26 @@
 name: Frontend Publish
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 on:
   push:
-    branches:
-      - main
-    paths:
-      - 'gradle.properties'
+    branches: [ main ]
+    paths: ['gradle.properties']
 
 jobs:
-  common_env:
-    uses: ./.github/workflows/_common_env.yml
-
   publish:
-    needs: common_env
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up JDK 21
-        uses: actions/setup-java@v4
-        with:
-          java-version: '21'
-          distribution: 'temurin'
+      - name: Setup Env
+        id: setup
+        uses: ./.github/actions/setup-env
 
       - name: Build Wasm
         run: |
           chmod +x gradlew
-          ./gradlew :composeApp:wasmJsBrowserDistribution --no-daemon -x :androidApp:preBuild -PisCi=true
+          ./gradlew :composeApp:wasmJsBrowserDistribution --no-daemon -x :androidApp:preBuild
         env:
-          ORG_GRADLE_PROJECT_versionName: ${{ needs.common_env.outputs.version_name }}
-          ORG_GRADLE_PROJECT_versionCode: ${{ needs.common_env.outputs.version_code }}
-          ORG_GRADLE_PROJECT_isCi: ${{ needs.common_env.outputs.is_ci }}
+          ORG_GRADLE_PROJECT_isCi: "true"
+          ORG_GRADLE_PROJECT_versionName: ${{ steps.setup.outputs.version_name }}
+          ORG_GRADLE_PROJECT_versionCode: ${{ steps.setup.outputs.version_code }}
 
       - name: Login to GHCR
         uses: docker/login-action@v3
@@ -49,8 +36,7 @@ jobs:
           push: true
           tags: |
             ghcr.io/${{ github.repository }}:latest
-            ghcr.io/${{ github.repository }}:${{ needs.common_env.outputs.version_name }}
-            ghcr.io/${{ github.repository }}:${{ github.sha }}
+            ghcr.io/${{ github.repository }}:${{ steps.setup.outputs.version_name }}
 
       - name: Copy docker-compose via SCP
         uses: appleboy/scp-action@v0.1.7
@@ -70,7 +56,7 @@ jobs:
           script: |
             set -euo pipefail
             PROJECT_DIR="/root/ptf-frontend"
-            cd "$PROJECT_DIR" || exit 1
+            cd "$PROJECT_DIR"
             
             echo "Authorizing Docker on VDS..."
             echo "${{ secrets.UPLOAD_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
@@ -78,7 +64,7 @@ jobs:
             echo "Creating .env file..."
             cat << 'EOF' > .env
             IMAGE_REPO=${{ github.repository }}
-            IMAGE_TAG=${{ github.sha }}
+            IMAGE_TAG=${{ steps.setup.outputs.version_name }}
             DASHBOARD_ROOT_PWD=${{ secrets.DASHBOARD_ROOT_PWD_ESCAPED }}
             EOF
             
