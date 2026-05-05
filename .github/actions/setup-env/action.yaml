@@ -12,12 +12,6 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: Checkout code
-      uses: actions/checkout@v6
-      with:
-        clean: true
-        fetch-depth: 0
-
     - name: Configure Git
       shell: bash
       run: |
